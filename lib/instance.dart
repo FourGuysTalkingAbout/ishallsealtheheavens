@@ -88,7 +88,8 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const
+            EdgeInsets.all(8.0),
             child: IconButton(
               iconSize: 40.0,
               icon: Icon(Icons.collections),
