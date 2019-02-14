@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ishallsealtheheavens/instance.dart';
+
+import 'instance.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+
       home: MyHomePage(title: 'Guest'),
     );
   }
@@ -58,7 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.camera),
+//        label: Text('Click ME!'),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomAppBar(),
