@@ -11,10 +11,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink,
       ),
 
-      home: MyHomePage(title: 'Guest'),
+      home: MyHomePage(title: 'Base app'),
     );
   }
 }
@@ -29,41 +29,51 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 10;
+  TextEditingController _createInstanceController = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter--;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _createInstanceController.addListener(_printLatestValue);
+  }
+
+  @override
+  void dispose() {
+    _createInstanceController.dispose();
+    super.dispose();
+  }
+
+  _printLatestValue() {
+    print("instance name: ${_createInstanceController.text}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: TopAppBar(
-      ),
+      appBar: TopAppBar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+            TextFormField(
+                controller: _createInstanceController,
+                maxLengthEnforced: true,
+                maxLength: 10,
+                textAlign: TextAlign.center,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "name the instance",
+                  labelText: "create instance",
+                  alignLabelWithHint: true,
+                ),
+                onFieldSubmitted: (text) {
+                  print("instance name: $text");
+                }),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.camera),
-//        label: Text('Click ME!'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomAppBar(),
     );
   }
