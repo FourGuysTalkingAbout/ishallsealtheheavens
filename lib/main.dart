@@ -29,6 +29,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  TextEditingController _createInstanceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _createInstanceController.addListener(_printLatestValue);
+  }
+
+  @override
+  void dispose() {
+    _createInstanceController.dispose();
+    super.dispose();
+  }
+
+  _printLatestValue() {
+    print("instance name: ${_createInstanceController.text}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +55,23 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: <Widget>[
+            TextFormField(
+                controller: _createInstanceController,
+                maxLengthEnforced: true,
+                maxLength: 10,
+                textAlign: TextAlign.center,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "name the instance",
+                  labelText: "create instance",
+                  alignLabelWithHint: true,
+                ),
+                onFieldSubmitted: (text) {
+                  print("instance name: $text");
+                }),
+          ],
         ),
       ),
       bottomNavigationBar: CustomAppBar(),
