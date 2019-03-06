@@ -29,23 +29,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController _createInstanceController = TextEditingController();
+  final Function(String instanceName) onChangeInstanceName;
 
-  @override
-  void initState() {
-    super.initState();
-    _createInstanceController.addListener(_printLatestValue);
-  }
-
-  @override
-  void dispose() {
-    _createInstanceController.dispose();
-    super.dispose();
-  }
-
-  _printLatestValue() {
-    print("instance name: ${_createInstanceController.text}");
-  }
+  _MyHomePageState({this.onChangeInstanceName});
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +40,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: TopAppBar(),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextFormField(
-                controller: _createInstanceController,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
                 maxLengthEnforced: true,
                 maxLength: 10,
                 textAlign: TextAlign.center,
@@ -68,11 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   labelText: "create instance",
                   alignLabelWithHint: true,
                 ),
-                onFieldSubmitted: (text) {
-                  print("instance name: $text");
-                }),
-          ],
-        ),
+                onChanged: (instanceName) {
+                  onChangeInstanceName(instanceName);
+                },
+                onSubmitted: (instanceName) {
+                  print("instance name: $instanceName");
+                },
+              ),
+            ]),
       ),
       bottomNavigationBar: CustomAppBar(),
     );
