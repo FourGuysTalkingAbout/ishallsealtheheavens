@@ -6,9 +6,9 @@ class TopAppBar extends AppBar {
           key: key,
           backgroundColor: Colors.deepPurple,
           leading: Builder(builder: (BuildContext context) {
-            return new _topBarText();
+            return new TopBarText();
           }),
-          title: new _topBarTitle(),
+          title: new TopBarTitle(),
           centerTitle: true,
           actions: <Widget>[
             new IconButton(
@@ -17,8 +17,8 @@ class TopAppBar extends AppBar {
         );
 }
 
-class _topBarTitle extends StatelessWidget {
-  const _topBarTitle({
+class TopBarTitle extends StatelessWidget {
+  const TopBarTitle({
     Key key,
   }) : super(key: key);
 
@@ -31,8 +31,8 @@ class _topBarTitle extends StatelessWidget {
   }
 }
 
-class _topBarText extends StatelessWidget {
-  const _topBarText({
+class TopBarText extends StatelessWidget {
+  const TopBarText({
     Key key,
   }) : super(key: key);
 
@@ -88,8 +88,7 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const
-            EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: IconButton(
               iconSize: 40.0,
               icon: Icon(Icons.collections),
