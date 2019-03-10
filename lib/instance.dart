@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frideos/frideos.dart';
 
 class TopAppBar extends AppBar {
   TopAppBar({Key key, Widget leading, Widget bottom})
@@ -28,6 +29,13 @@ class TopBarTitle extends StatelessWidget {
       "Name Of In",
       textAlign: TextAlign.center,
     );
+//    return Column(
+//      StreamedWidget(
+//        initialData: streamedInstanceName.value,
+//        stream: streamedInstanceName.outStream,
+//        builder: (context, snapshot) => Text("Time: ${snapshot.data}"),
+//      ),
+//    );
   }
 }
 
