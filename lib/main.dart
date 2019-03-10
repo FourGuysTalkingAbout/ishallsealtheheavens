@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'instance.dart';
+import 'package:ishallsealtheheavens/instance.dart';
+import 'Host.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,10 +11,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        primarySwatch: Colors.blue,
       ),
-
-      home: MyHomePage(title: 'Base app'),
+      home: MyHomePage(title: 'Host'),
     );
   }
 }
@@ -29,40 +28,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Function(String instanceName) onChangeInstanceName;
+  int _counter = 10;
 
-  _MyHomePageState({this.onChangeInstanceName});
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[300],
       appBar: TopAppBar(),
-      body: Center(
-        child: Column(
+      body: Column(
+        children: <Widget>[
+          SecondAppBar(),
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextField(
-                maxLengthEnforced: true,
-                maxLength: 10,
-                textAlign: TextAlign.center,
-                textCapitalization: TextCapitalization.characters,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "name the instance",
-                  labelText: "create instance",
-                  alignLabelWithHint: true,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'You have pushed the button this many times:',
                 ),
-                onChanged: (instanceName) {
-                  onChangeInstanceName(instanceName);
-                },
-                onSubmitted: (instanceName) {
-                  print("instance name: $instanceName");
-                },
               ),
-            ]),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.display1,
+              ),
+            ],
+          ),
+        ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.camera),
+//        label: Text('Click ME!'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomAppBar(),
     );
   }
 }
+
