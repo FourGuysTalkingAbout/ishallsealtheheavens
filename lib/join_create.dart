@@ -3,21 +3,6 @@ import 'package:frideos/frideos.dart';
 
 import 'instance.dart';
 
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-      ),
-
-      home: JoinCreate(title: 'Base app'),
-    );
-  }
-}
-
 class JoinCreate extends StatefulWidget {
   JoinCreate({Key key, this.title}) : super(key: key);
 
