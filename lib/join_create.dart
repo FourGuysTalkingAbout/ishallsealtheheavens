@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 
+import 'app_bar_bottom.dart';
+import 'app_bar_top.dart';
 import 'instance.dart';
 
 class JoinCreate extends StatefulWidget {
