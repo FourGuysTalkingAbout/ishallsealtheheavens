@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frideos/frideos.dart';
 
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
@@ -15,25 +14,7 @@ class JoinCreate extends StatefulWidget {
 }
 
 class _JoinCreateState extends State<JoinCreate> {
-  String instanceName = '';
-
-  final streamedInstanceName = StreamedValue<String>();
-
-  @override
-  initState() {
-    super.initState();
-    streamedInstanceName.value = instanceName;
-  }
-
-  @override
-  void dispose() {
-    streamedInstanceName.dispose();
-    super.dispose();
-  }
-
-  final Function(String instanceName) onChangeInstanceName;
-
-  _JoinCreateState({this.onChangeInstanceName});
+  TextEditingController _instanceNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +25,10 @@ class _JoinCreateState extends State<JoinCreate> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new _textField(onChangeInstanceName: onChangeInstanceName),
+              new InstanceNameTextFormField(
+                  instanceNameController: _instanceNameController),
+              new InstanceNameRaisedButton(
+                  instanceNameController: _instanceNameController),
             ]),
       ),
       bottomNavigationBar: CustomAppBar(),
@@ -52,34 +36,51 @@ class _JoinCreateState extends State<JoinCreate> {
   }
 }
 
-class _textField extends StatelessWidget {
-  const _textField({
+class InstanceNameRaisedButton extends StatelessWidget {
+  const InstanceNameRaisedButton({
     Key key,
-    @required this.onChangeInstanceName,
-  }) : super(key: key);
+    @required TextEditingController instanceNameController,
+  })  : _instanceNameController = instanceNameController,
+        super(key: key);
 
-  final Function(String instanceName) onChangeInstanceName;
+  final TextEditingController _instanceNameController;
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+      onPressed: () {
+        final route = new MaterialPageRoute(
+            builder: (BuildContext context) =>
+                new InstancePage(value: _instanceNameController.text));
+      },
+    );
+  }
+}
+
+class InstanceNameTextFormField extends StatelessWidget {
+  const InstanceNameTextFormField({
+    Key key,
+    @required TextEditingController instanceNameController,
+  })  : _instanceNameController = instanceNameController,
+        super(key: key);
+
+  final TextEditingController _instanceNameController;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: _instanceNameController,
       maxLengthEnforced: true,
       maxLength: 10,
       textAlign: TextAlign.center,
       textCapitalization: TextCapitalization.characters,
+      textInputAction: TextInputAction.go,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         hintText: "name the instance",
         labelText: "create instance",
         alignLabelWithHint: true,
       ),
-      onChanged: (instanceName) {
-        onChangeInstanceName(instanceName);
-      },
-      onSubmitted: (instanceName) {
-        onChangeInstanceName(instanceName);
-        print("instance name: $instanceName");
-      },
     );
   }
 }
