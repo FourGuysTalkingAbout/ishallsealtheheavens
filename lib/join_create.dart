@@ -48,11 +48,14 @@ class InstanceNameRaisedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
+      child: Text("Create Instance"),
       onPressed: () {
         final route = new MaterialPageRoute(
             builder: (BuildContext context) =>
                 new InstancePage(value: _instanceNameController.text));
+        Navigator.of(context).push(route);
       },
+
     );
   }
 }
