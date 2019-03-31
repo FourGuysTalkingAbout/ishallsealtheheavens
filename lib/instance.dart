@@ -13,6 +13,6 @@ class InstancePage extends StatefulWidget {
 class _InstancePageState extends State<InstancePage> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text(widget.value));
+    return Container(child: Text("${widget.value}"));
   }
 }
