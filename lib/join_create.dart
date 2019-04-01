@@ -51,11 +51,11 @@ class InstanceNameRaisedButton extends StatelessWidget {
       child: Text("Create Instance"),
       onPressed: () {
         final route = new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                new InstancePage(value: _instanceNameController.text));
+          builder: (BuildContext context) =>
+              new InstancePage(value: _instanceNameController.text),
+        );
         Navigator.of(context).push(route);
       },
-
     );
   }
 }

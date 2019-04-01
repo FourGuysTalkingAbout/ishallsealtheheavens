@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'app_bar_bottom.dart';
+import 'app_bar_top_instance.dart';
 import 'join_create.dart';
 
 class InstancePage extends StatefulWidget {
@@ -13,6 +16,16 @@ class InstancePage extends StatefulWidget {
 class _InstancePageState extends State<InstancePage> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text("${widget.value}"));
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: TopAppBar(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[Text(widget.value)],
+        ),
+      ),
+      bottomNavigationBar: CustomAppBar(),
+    );
   }
 }
