@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'join_create.dart';
+import 'instance.dart';
 
 class App extends StatelessWidget {
   @override
@@ -9,7 +10,7 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.pink,
         ),
-        home: JoinCreate(),
+        home: InstancePage(),
         title: 'Base app');
   }
 }
