@@ -25,8 +25,10 @@ class _InstancePageState extends State<InstancePage> {
       appBar: TopAppBar(),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: <Widget>[
+            SecondAppBar(),
+
+          ],
         ),
       ),
       floatingActionButton: Padding(
@@ -49,7 +51,7 @@ class _InstancePageState extends State<InstancePage> {
 
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
     //todo:figure out a way to name images
-    //'images' is folder in firebase, '123451' is name of the file
+    //'images' is a folder in firebase, '123451' is name of the file
   final StorageReference storageRef =
         FirebaseStorage.instance.ref().child('images').child('123451');
 
