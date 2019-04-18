@@ -1,8 +1,4 @@
-
-
 import 'package:flutter/material.dart';
-
-
 
 class TopAppBar extends AppBar {
   TopAppBar({Key key, Widget leading, Widget bottom})
@@ -168,4 +164,5 @@ class CustomAppBar extends StatelessWidget {
     );
   }
 }
+
 */
