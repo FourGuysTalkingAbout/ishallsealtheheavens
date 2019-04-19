@@ -21,6 +21,7 @@ class _JoinCreateState extends State<JoinCreate> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
+      endDrawer: drawerMenu(),
       body: Center(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
