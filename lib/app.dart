@@ -10,7 +10,7 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.pink,
         ),
-        home: InstancePage(),
+        home: JoinCreate(),
         title: 'Base app');
   }
 }
