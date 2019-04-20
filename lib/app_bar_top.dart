@@ -6,15 +6,15 @@ class TopAppBar extends AppBar {
     key: key,
     backgroundColor: Colors.deepPurple,
     leading: Builder(builder: (BuildContext context) {
-      return new _topBarText();
+      return new _TopBarText();
     }),
-    title: _topBarTitle(),
+    title: _TopBarTitle(),
     centerTitle: true,
   );
 }
 
-class drawerMenu extends StatelessWidget{
-  const drawerMenu();
+class DrawerMenu extends StatelessWidget{
+  const DrawerMenu();
 
   Widget build(BuildContext context) {
     return Drawer(
@@ -43,8 +43,8 @@ class drawerMenu extends StatelessWidget{
   }
 }
 
-class instanceInfo extends StatelessWidget {
-  const instanceInfo({
+class InstanceInfo extends StatelessWidget {
+  const InstanceInfo({
     Key key,
   }) : super(key: key);
 
@@ -61,8 +61,8 @@ class instanceInfo extends StatelessWidget {
   }
 }
 
-class deleteInstance extends StatelessWidget {
-  const deleteInstance({
+class DeleteInstance extends StatelessWidget {
+  const DeleteInstance({
     Key key,
   }) : super(key: key);
 
@@ -79,8 +79,8 @@ class deleteInstance extends StatelessWidget {
   }
 }
 
-class _topBarTitle extends StatelessWidget {
-  const _topBarTitle({
+class _TopBarTitle extends StatelessWidget {
+  const _TopBarTitle({
     Key key,
   }) : super(key: key);
 
@@ -93,8 +93,8 @@ class _topBarTitle extends StatelessWidget {
   }
 }
 
-class _topBarText extends StatelessWidget {
-  const _topBarText({
+class _TopBarText extends StatelessWidget {
+  const _TopBarText({
     Key key,
   }) : super(key: key);
 
