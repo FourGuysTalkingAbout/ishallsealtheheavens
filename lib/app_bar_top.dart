@@ -6,95 +6,19 @@ class TopAppBar extends AppBar {
     key: key,
     backgroundColor: Colors.deepPurple,
     leading: Builder(builder: (BuildContext context) {
-      return new _TopBarText();
+      return new TopBarText();
     }),
-    title: _TopBarTitle(),
+    title: new BarTitle("No Instance"),
     centerTitle: true,
+    actions: <Widget>[
+      new IconButton(
+          icon: new Icon(Icons.dehaze), onPressed: () => print("tap"))
+    ],
   );
 }
 
-class DrawerMenu extends StatelessWidget{
-  const DrawerMenu();
-
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: new ListView(
-        children:[
-          new UserAccountsDrawerHeader(
-              accountName: new Text ('Name of Instance'),
-              accountEmail: null
-          ),
-          new ListTile(
-            leading: new instanceInfo(), // Test divider
-          ),
-          new Divider(color: Color(0xFF000000),),
-          new ListTile(
-            leading:  new deleteInstance(),
-          ),
-          new Divider(color: Color(0xFF000000),), // Test divider
-          new ListTile(
-              leading: new IconButton(icon: new Icon(Icons.search), onPressed: ()=> Text('Blah')),
-              title: TextField(),
-              trailing: IconButton(icon: new Icon(Icons.play_arrow), onPressed:()=> Text('Pressed'))
-          )
-        ],
-      ) ,
-    );
-  }
-}
-
-class InstanceInfo extends StatelessWidget {
-  const InstanceInfo({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: ()=> Text("Test instance info",),
-      child: Text("Instance Info",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )
-      ),
-    );
-  }
-}
-
-class DeleteInstance extends StatelessWidget {
-  const DeleteInstance({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: ()=> Text("Test delete instance",),
-      child: Text("Delete Instance",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )
-      ),
-    );
-  }
-}
-
-class _TopBarTitle extends StatelessWidget {
-  const _TopBarTitle({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text(
-      "Name Of In",
-      textAlign: TextAlign.center,
-    );
-  }
-}
-
-class _TopBarText extends StatelessWidget {
-  const _TopBarText({
+class TopBarText extends StatelessWidget {
+  const TopBarText({
     Key key,
   }) : super(key: key);
 
@@ -109,6 +33,57 @@ class _TopBarText extends StatelessWidget {
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
                 color: Colors.white)));
+  }
+}
+
+class BarTitle extends StatelessWidget{
+  final String title;
+
+  const BarTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(title,
+      style: buildTextStyle,
+      textAlign: TextAlign.center,
+    );
+
+  }
+
+  TextStyle get buildTextStyle {
+    return TextStyle(
+      fontSize: 20.0,
+      fontWeight: FontWeight.bold,
+    );
+  }
+}
+
+
+class SecondAppBar extends StatelessWidget {
+  const SecondAppBar();
+
+  final int _numInstances = 0;
+
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48.0,
+      width: 415.0,
+      color: Colors.grey[300],
+      child: Center(
+        child: BarTitle("You have $_numInstances instances"),
+      ),
+
+
+      /*
+     *  Will be dynamic in the future. It should tell user how many instances
+     *  he/she has.
+     *
+     *  ie. how many he/she is hosting and how many he/she joined.
+     *
+     *
+     * */
+
+    );
   }
 }
 
