@@ -161,8 +161,6 @@ class EditIcon extends StatelessWidget {
     return new IconButton(
         icon: Icon(Icons.mode_edit),
         onPressed: () => null
-<<<<<<< HEAD
-=======
     );
   }
 }
@@ -205,56 +203,11 @@ class CheckIcon extends StatelessWidget {
       iconSize: 35.0,
       color: Colors.black,
       onPressed: () => Text('TEST MEE'),
->>>>>>> 60deb8b13160977265912e72ca2a98b593c44285
+
     );
   }
 }
 
-<<<<<<< HEAD
-class HostText extends StatelessWidget {
-  const HostText();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text('  Host',
-        style: TextStyle(
-          fontSize: 25.0,
-          fontWeight: FontWeight.bold,
-        )
-    );
-  }
-}
-
-class AddContact extends StatelessWidget {
-  const AddContact();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(
-            Icons.person_add
-        ),
-        iconSize: 35.0,
-        alignment: Alignment.center,
-        onPressed: ()=> Text('Blah'));
-  }
-}
-
-class CheckIcon extends StatelessWidget {
-  const CheckIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(icon: Icon(Icons.check),
-      iconSize: 35.0,
-      color: Colors.black,
-      onPressed: () => Text('TEST MEE'),
-    );
-  }
-}
-
-=======
->>>>>>> 60deb8b13160977265912e72ca2a98b593c44285
 class CheckIconButton extends StatelessWidget {
   const CheckIconButton();
 
@@ -268,7 +221,3 @@ class CheckIconButton extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 60deb8b13160977265912e72ca2a98b593c44285
