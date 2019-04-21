@@ -20,11 +20,14 @@ class _JoinCreateState extends State<JoinCreate> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
-      endDrawer: drawerMenu(),
+
+      //endDrawer: DrawerMenu(),
       body: Center(
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+
             children: <Widget>[
+              SecondAppBar(),
+              SizedBox(height: 100),
               new InstanceNameTextFormField(
                   instanceNameController: _instanceNameController),
               new InstanceNameRaisedButton(
@@ -52,7 +55,7 @@ class InstanceNameRaisedButton extends StatelessWidget {
       onPressed: () {
         final route = new MaterialPageRoute(
           builder: (BuildContext context) =>
-              new InstancePage(value: _instanceNameController.text),
+          new InstancePage(value: _instanceNameController.text),
         );
         Navigator.of(context).push(route);
       },

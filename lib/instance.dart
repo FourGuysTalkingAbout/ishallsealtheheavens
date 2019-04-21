@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ishallsealtheheavens/app_bar_top.dart';
+import 'package:ishallsealtheheavens/app_bar_top_instance.dart';
 import 'app_bar_bottom.dart';
 import 'join_create.dart';
 
@@ -21,12 +21,16 @@ class _InstancePageState extends State<InstancePage> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
-      appBar: TopAppBar(),
-      endDrawer: drawerMenu(),
+      appBar: InstanceTopAppBar(),
+      endDrawer: DrawerMenu(),
       body: Center(
         child: Column(
           children: <Widget>[
+<<<<<<< HEAD
             SecondAppBar(),
+=======
+            InstanceSecondAppBar(),
+>>>>>>> fix
 
           ],
         ),
@@ -52,10 +56,15 @@ class _InstancePageState extends State<InstancePage> {
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
     //todo:figure out a way to name images
     //'images' is a folder in firebase, '123451' is name of the file
+<<<<<<< HEAD
   final StorageReference storageRef =
         FirebaseStorage.instance.ref().child('images').child('123451');
+=======
+    final StorageReference storageRef =
+    FirebaseStorage.instance.ref().child('images').child('123451');
+>>>>>>> fix
 
-  final StorageUploadTask uploadTask = storageRef.putFile(image);
+    final StorageUploadTask uploadTask = storageRef.putFile(image);
 
   }
 }
