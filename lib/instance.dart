@@ -27,6 +27,10 @@ class _InstancePageState extends State<InstancePage> {
         child: Column(
           children: <Widget>[
             InstanceSecondAppBar(),
+<<<<<<< HEAD
+=======
+
+>>>>>>> 60deb8b13160977265912e72ca2a98b593c44285
           ],
         ),
       ),
@@ -53,6 +57,10 @@ class _InstancePageState extends State<InstancePage> {
     //'images' is a folder in firebase, '123451' is name of the file
     final StorageReference storageRef =
     FirebaseStorage.instance.ref().child('images').child('123451');
+<<<<<<< HEAD
+=======
+
+>>>>>>> 60deb8b13160977265912e72ca2a98b593c44285
     final StorageUploadTask uploadTask = storageRef.putFile(image);
 
   }
