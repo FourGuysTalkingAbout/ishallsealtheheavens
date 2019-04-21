@@ -26,12 +26,7 @@ class _InstancePageState extends State<InstancePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-<<<<<<< HEAD
-            SecondAppBar(),
-=======
             InstanceSecondAppBar(),
->>>>>>> fix
-
           ],
         ),
       ),
@@ -56,14 +51,8 @@ class _InstancePageState extends State<InstancePage> {
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
     //todo:figure out a way to name images
     //'images' is a folder in firebase, '123451' is name of the file
-<<<<<<< HEAD
-  final StorageReference storageRef =
-        FirebaseStorage.instance.ref().child('images').child('123451');
-=======
     final StorageReference storageRef =
     FirebaseStorage.instance.ref().child('images').child('123451');
->>>>>>> fix
-
     final StorageUploadTask uploadTask = storageRef.putFile(image);
 
   }

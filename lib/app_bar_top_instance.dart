@@ -207,108 +207,8 @@ class CheckIcon extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
-class SecondAppBar extends StatelessWidget {
-  const SecondAppBar();
-
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(3.0),
-      height: 48.0,
-      width: 415.0,
-      color: Colors.grey[100],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          new Row(
-            children:[
-              new hostText(),
-              Stack(
-                children: [
-                  new editIcon(),
-                  Align(
-                    alignment: Alignment(1,0.70),
-                    child: Text('       Edit'),
-                  )
-                ],
-              ),
-            ],
-          ),
-          new Row(
-            children:[
-              checkIconButton(),
-              addContact(),
-              new Container(
-              ),
-              new checkIcon(),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class editIcon extends StatelessWidget {
-  const editIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return new IconButton(
-        icon: Icon(Icons.mode_edit),
-        onPressed: () => null
-    );
-  }
-}
-
-class hostText extends StatelessWidget {
-  const hostText();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text('  Host',
-        style: TextStyle(
-          fontSize: 25.0,
-          fontWeight: FontWeight.bold,
-        )
-    );
-  }
-}
-
-class addContact extends StatelessWidget {
-  const addContact();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(
-            Icons.person_add
-        ),
-        iconSize: 35.0,
-        alignment: Alignment.center,
-        onPressed: ()=> Text('Blah'));
-  }
-}
-
-class checkIcon extends StatelessWidget {
-  const checkIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(icon: Icon(Icons.check),
-      iconSize: 35.0,
-      color: Colors.black,
-      onPressed: () => Text('TEST MEE'),
-    );
-  }
-}
-
-class checkIconButton extends StatelessWidget {
-  const checkIconButton();
-=======
 class CheckIconButton extends StatelessWidget {
   const CheckIconButton();
->>>>>>> fix
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +220,4 @@ class CheckIconButton extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> fix
