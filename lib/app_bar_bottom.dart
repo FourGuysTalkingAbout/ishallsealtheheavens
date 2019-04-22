@@ -14,7 +14,7 @@ class CustomAppBar extends StatefulWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
-    //todo:
+    //todo: connect the gallery button with gallery page
     return BottomAppBar(
       elevation: 1.0,
       color: Colors.white,
@@ -27,7 +27,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             child: IconButton(
                 iconSize: 40.0,
                 icon: Icon(Icons.people),
-                onPressed: () {
+                onPressed: () { //
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       'PastInst', (route) => route.isCurrent
                           ? route.settings.name == "PastInst"
@@ -54,7 +54,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
               iconSize: 40.0,
               icon: Icon(Icons.collections),
               onPressed: () {
-                print('I was tapped');
+                Navigator.of(context).pushNamedAndRemoveUntil
+                  ('Gallery', (route) => route.isCurrent
+                ? route.settings.name == 'Instance'
+                ? false : true : true);
               },
             ),
           )
