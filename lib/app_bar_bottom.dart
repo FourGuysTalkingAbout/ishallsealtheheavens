@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'past_instance.dart';
-import 'app.dart';
 
 
 class CustomAppBar extends StatefulWidget {
@@ -14,7 +12,6 @@ class CustomAppBar extends StatefulWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
-    //todo: connect the gallery button with gallery page
     return BottomAppBar(
       elevation: 1.0,
       color: Colors.white,
