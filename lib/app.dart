@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'join_create.dart';
 import 'instance.dart';
+import 'past_instance.dart';
+
 
 class App extends StatelessWidget {
   @override
@@ -10,7 +12,14 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.pink,
         ),
-        home: JoinCreate(),
+        initialRoute: '/',
+        routes: {
+          //todo: create a create gallery page
+          '/' : (context) => JoinCreate(),
+          'PastInst' : (context) => PastInstance(),
+          'Instance' : (context) => InstancePage(),
+
+        },
         title: 'Base app');
   }
 }
