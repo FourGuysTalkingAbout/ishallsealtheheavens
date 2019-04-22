@@ -27,7 +27,7 @@ class _InstancePageState extends State<InstancePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-            SecondAppBar(),
+//            SecondAppBar(),
 
           ],
         ),
