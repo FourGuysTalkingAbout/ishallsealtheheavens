@@ -8,7 +8,6 @@ class PastInstance extends StatefulWidget {
 }
 
 class _PastInstanceState extends State<PastInstance> {
-  int _page =1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
