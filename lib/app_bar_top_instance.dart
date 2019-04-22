@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'app_bar_top.dart';
+
 
 class InstanceTopAppBar extends AppBar {
   InstanceTopAppBar({Key key, Widget leading, Widget bottom})
@@ -6,7 +8,7 @@ class InstanceTopAppBar extends AppBar {
     key: key,
     backgroundColor: Colors.deepPurple,
     leading: Builder(builder: (BuildContext context) {
-      return new _TopBarText();
+      return new TopBarText();
     }),
     title: _TopBarTitle(),
     centerTitle: true,
@@ -90,25 +92,6 @@ class _TopBarTitle extends StatelessWidget {
       "Name Of In",
       textAlign: TextAlign.center,
     );
-  }
-}
-
-class _TopBarText extends StatelessWidget {
-  const _TopBarText({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return new FlatButton(
-        onPressed: () => {},
-        child: new Text("FS",
-            style: TextStyle(
-                decoration: TextDecoration.underline,
-                fontSize: 20.0,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)));
   }
 }
 
