@@ -1,43 +1,88 @@
 import 'package:flutter/material.dart';
+import 'app_bar_top.dart';
 
-class TopAppBar extends AppBar {
-  TopAppBar({Key key, Widget leading, Widget bottom})
+
+class InstanceTopAppBar extends AppBar {
+  InstanceTopAppBar({Key key, Widget leading, Widget bottom})
       : super(
-          key: key,
-          backgroundColor: Colors.deepPurple,
-          leading: Builder(builder: (BuildContext context) {
-            return new TopBarText();
-          }),
-          title: new TopBarTitle(),
-          centerTitle: true,
-          actions: <Widget>[
-            new IconButton(
-                icon: new Icon(Icons.dehaze), onPressed: () => print("tap"))
-          ],
-        );
+    key: key,
+    backgroundColor: Colors.deepPurple,
+    leading: Builder(builder: (BuildContext context) {
+      return new TopBarText();
+    }),
+    title: _TopBarTitle(),
+    centerTitle: true,
+  );
 }
 
-class TopBarText extends StatelessWidget {
-  const TopBarText({
+class DrawerMenu extends StatelessWidget{
+  const DrawerMenu();
+
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: new ListView(
+        children:[
+          new UserAccountsDrawerHeader(
+              accountName: new Text ('Name of Instance'),
+              accountEmail: null
+          ),
+          new ListTile(
+            leading: new InstanceInfo(), // Test divider
+          ),
+          new Divider(color: Color(0xFF000000),),
+          new ListTile(
+            leading:  new DeleteInstance(),
+          ),
+          new Divider(color: Color(0xFF000000),), // Test divider
+          new ListTile(
+              leading: new IconButton(icon: new Icon(Icons.search), onPressed: ()=> Text('Blah')),
+              title: TextField(),
+              trailing: IconButton(icon: new Icon(Icons.play_arrow), onPressed:()=> Text('Pressed'))
+          )
+        ],
+      ) ,
+    );
+  }
+}
+
+class InstanceInfo extends StatelessWidget {
+  const InstanceInfo({
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new FlatButton(
-        onPressed: () => {},
-        child: new Text("FS",
-            style: TextStyle(
-                decoration: TextDecoration.underline,
-                fontSize: 20.0,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)));
+    return FlatButton(
+      onPressed: ()=> Text("Test instance info",),
+      child: Text("Instance Info",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          )
+      ),
+    );
   }
 }
 
-class TopBarTitle extends StatelessWidget {
-  const TopBarTitle({
+class DeleteInstance extends StatelessWidget {
+  const DeleteInstance({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: ()=> Text("Test delete instance",),
+      child: Text("Delete Instance",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          )
+      ),
+    );
+  }
+}
+
+class _TopBarTitle extends StatelessWidget {
+  const _TopBarTitle({
     Key key,
   }) : super(key: key);
 
@@ -50,8 +95,8 @@ class TopBarTitle extends StatelessWidget {
   }
 }
 
-class SecondAppBar extends StatelessWidget {
-  const SecondAppBar();
+class InstanceSecondAppBar extends StatelessWidget {
+  const InstanceSecondAppBar();
 
   Widget build(BuildContext context) {
     return Container(
@@ -64,10 +109,10 @@ class SecondAppBar extends StatelessWidget {
         children: [
           new Row(
             children:[
-              new hostText(),
+              new HostText(),
               Stack(
                 children: [
-                  new editIcon(),
+                  new EditIcon(),
                   Align(
                     alignment: Alignment(1,0.70),
                     child: Text('       Edit'),
@@ -78,11 +123,11 @@ class SecondAppBar extends StatelessWidget {
           ),
           new Row(
             children:[
-              checkIconButton(),
-              addContact(),
+              CheckIconButton(),
+              AddContact(),
               new Container(
               ),
-              new checkIcon(),
+              new CheckIcon(),
             ],
           )
         ],
@@ -91,8 +136,8 @@ class SecondAppBar extends StatelessWidget {
   }
 }
 
-class editIcon extends StatelessWidget {
-  const editIcon();
+class EditIcon extends StatelessWidget {
+  const EditIcon();
 
   @override
   Widget build(BuildContext context) {
@@ -103,8 +148,8 @@ class editIcon extends StatelessWidget {
   }
 }
 
-class hostText extends StatelessWidget {
-  const hostText();
+class HostText extends StatelessWidget {
+  const HostText();
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +162,8 @@ class hostText extends StatelessWidget {
   }
 }
 
-class addContact extends StatelessWidget {
-  const addContact();
+class AddContact extends StatelessWidget {
+  const AddContact();
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +177,8 @@ class addContact extends StatelessWidget {
   }
 }
 
-class checkIcon extends StatelessWidget {
-  const checkIcon();
+class CheckIcon extends StatelessWidget {
+  const CheckIcon();
 
   @override
   Widget build(BuildContext context) {
@@ -141,12 +186,13 @@ class checkIcon extends StatelessWidget {
       iconSize: 35.0,
       color: Colors.black,
       onPressed: () => Text('TEST MEE'),
+
     );
   }
 }
 
-class checkIconButton extends StatelessWidget {
-  const checkIconButton();
+class CheckIconButton extends StatelessWidget {
+  const CheckIconButton();
 
   @override
   Widget build(BuildContext context) {
@@ -157,5 +203,4 @@ class checkIconButton extends StatelessWidget {
     );
   }
 }
-
 
