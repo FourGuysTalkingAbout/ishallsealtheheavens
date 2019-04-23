@@ -5,7 +5,6 @@ import 'instance.dart';
 import 'past_instance.dart';
 import 'gallery.dart';
 
-
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
