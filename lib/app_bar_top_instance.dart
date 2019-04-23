@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_bar_top.dart';
 
-
 class InstanceTopAppBar extends AppBar {
   InstanceTopAppBar({Key key, Widget leading, Widget bottom})
       : super(
@@ -10,7 +9,7 @@ class InstanceTopAppBar extends AppBar {
     leading: Builder(builder: (BuildContext context) {
       return new TopBarText();
     }),
-    title: _TopBarTitle(),
+    title: TopBarTitle(),
     centerTitle: true,
   );
 }
@@ -64,14 +63,17 @@ class InstanceInfo extends StatelessWidget {
 }
 
 class DeleteInstance extends StatelessWidget {
-  const DeleteInstance({
-    Key key,
+  DeleteInstance({
+    Key key
   }) : super(key: key);
+
+  PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-      onPressed: ()=> Text("Test delete instance",),
+      onPressed: ()=> popUpConfirm.confirm(context, 'Are you sure you want to delete this Instance?', 'Instance will be deleted '
+          'Your images/edits will be archived'),
       child: Text("Delete Instance",
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -79,18 +81,63 @@ class DeleteInstance extends StatelessWidget {
       ),
     );
   }
+
 }
 
-class _TopBarTitle extends StatelessWidget {
-  const _TopBarTitle({
+class TopBarTitle extends StatelessWidget {
+  const TopBarTitle({
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new Text(
-      "Name Of In",
+    return new Text('Name of In',
       textAlign: TextAlign.center,
+    );
+  }
+}
+
+class PopUpMenu {
+
+  // logic
+  _confirmResult(bool isYes, BuildContext context) {
+    if (isYes) {
+      print('test yes');
+      Navigator.pop(context);
+    }
+    else {
+      print('test no');
+      Navigator.pop(context);
+    }
+  }
+
+  confirm(BuildContext context, String title, String description) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(description)
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => _confirmResult(false, context),
+                child: Text('Cancel'),
+              ),
+              FlatButton(
+                onPressed: () => _confirmResult(true, context),
+                child: Text('Yes'),
+              )
+            ],
+          );
+        }
+
     );
   }
 }

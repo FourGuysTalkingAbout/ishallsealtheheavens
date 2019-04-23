@@ -20,11 +20,9 @@ class _JoinCreateState extends State<JoinCreate> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
-
       //endDrawer: DrawerMenu(),
       body: Center(
         child: Column(
-
             children: <Widget>[
               SecondAppBar(),
               SizedBox(height: 100),
@@ -63,6 +61,7 @@ class InstanceNameRaisedButton extends StatelessWidget {
   }
 }
 
+
 class InstanceNameTextFormField extends StatelessWidget {
   const InstanceNameTextFormField({
     Key key,
@@ -71,6 +70,8 @@ class InstanceNameTextFormField extends StatelessWidget {
         super(key: key);
 
   final TextEditingController _instanceNameController;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,4 +90,5 @@ class InstanceNameTextFormField extends StatelessWidget {
       ),
     );
   }
+
 }
