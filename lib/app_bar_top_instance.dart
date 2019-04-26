@@ -186,32 +186,43 @@ class EditIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //todo: add functionality to menu options when tapped
+    var entranceCode = 'IN3CH';
+    String instanceName = 'Name of In';
+    String instanceDescription = '';
+    int numberOfGuests;
+
     return PopupMenuButton(
         icon: Icon(Icons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
+               PopupMenuItem(
                 child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 1.0),
-                    title: Text('Name:')),
+                  //TODO:create a onpressed that edits 'instanceName'
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                    leading: Text('Name:'),
+                    title: Text('$instanceName',textScaleFactor: 1.2,)
+                ),
               ),
               PopupMenuDivider(),
-              const PopupMenuItem(
+               PopupMenuItem(
                 child: ListTile(
-                  title: Text('Entrance Code:'),
-                  contentPadding: EdgeInsets.only(left: 1.0),
+                  //TODO:create a onpressed that allows to edit 'entranceCode?
+                  //TODO:make the 'entranceCode' bigger font
+                  title: Text('Entrance Code: $entranceCode '),
+                  contentPadding: EdgeInsets.only(left: 55.0), //todo:change back to 0.0
                 ),
               ),
               PopupMenuDivider(),
               const PopupMenuItem(
                 child: ListTile(
+                  //TODO:create a dialog that is allows writing descriptions of instance
                   title: Text('Set Description'),
                   contentPadding: EdgeInsets.only(right: 0.0),
                 ),
               ),
               PopupMenuDivider(),
               const PopupMenuItem(
+                //TODO: implement a way to limit guests in the instance
                 child: ListTile(
                   title: Text('Limit number of Guests'),
                   contentPadding: EdgeInsets.only(right: 0.0),
@@ -219,6 +230,7 @@ class EditIcon extends StatelessWidget {
               ),
               PopupMenuDivider(),
               const PopupMenuItem(
+                //TODO: is this a Text location or some sort of google maps thing?
                 child: ListTile(
                   title: Text('Set Location'),
                   contentPadding: EdgeInsets.only(right: 0.0),
