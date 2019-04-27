@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'app_bar_top_instance.dart';
 import 'app_bar_bottom.dart';
 
+
+final db = Firestore.instance;
 class InstancePage extends StatefulWidget {
   final String value; //TODO: is this needed?
 
@@ -17,7 +19,7 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-  final db = Firestore.instance;
+
 
   openCamera() async {
     //TODO: implement a better naming convention for the 'imageName'
@@ -39,7 +41,7 @@ class _InstancePageState extends State<InstancePage> {
     var url = await taskSnapshot.ref
         .getDownloadURL(); // takes the URL of the imageFile
 
-    DocumentReference DocRef = await db
+    DocumentReference DocRef = await db //uploads the URL into the collection photos
         .collection('instances')
         .document('instance1')
         .collection('photos')
@@ -51,14 +53,11 @@ class _InstancePageState extends State<InstancePage> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
-      appBar: InstanceTopAppBar(),
+      appBar: InstanceTopAppBar() ,
       endDrawer: DrawerMenu(),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            InstanceSecondAppBar(),
-          ],
-        ),
+        child: PhotoGridView()
+//        InstanceSecondAppBar()
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 15.0),
@@ -76,3 +75,36 @@ class _InstancePageState extends State<InstancePage> {
     );
   }
 }
+
+class PhotoGridView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: db.collection('instances').document('instance1').collection('photos').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        snapshot.hasData ? CircularProgressIndicator() : print(snapshot.hasError);
+        return GridView.count(
+          crossAxisCount: 2,
+          padding: EdgeInsets.all(0.0),// padding of the cards
+          childAspectRatio: 6.5/9.0, // size of the card
+          children:
+          snapshot.data.documents.map((DocumentSnapshot document){
+            return Card(
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(10.0), //Image.network padding
+                    child: Image.network(document['url']),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      }
+    );
+  }
+}
+
