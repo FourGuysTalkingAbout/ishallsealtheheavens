@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,7 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
+  final db = Firestore.instance;
 
   openCamera() async {
     //TODO: implement a better naming convention for the 'imageName'
@@ -26,14 +28,22 @@ class _InstancePageState extends State<InstancePage> {
 
     //'images' is a folder in Firebase Storage,
     final StorageReference storageRef =
-    FirebaseStorage.instance.ref().child('images').child('$imageName');
+        FirebaseStorage.instance.ref().child('images').child('$imageName');
 
     final StorageUploadTask uploadTask =
-    storageRef.putFile(imageFile); // uploads file into Firebase Storage
+        storageRef.putFile(imageFile); // uploads file into Firebase Storage
 
-    final StorageTaskSnapshot taskSnapshot =
-    await uploadTask.onComplete; // waits for 'uploadTask' to complete then creates a snapshot
+    final StorageTaskSnapshot taskSnapshot = await uploadTask
+        .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
 
+    var url = await taskSnapshot.ref
+        .getDownloadURL(); // takes the URL of the imageFile
+
+    DocumentReference DocRef = await db
+        .collection('instances')
+        .document('instance1')
+        .collection('photos')
+        .add({'url': url});
   }
 
   @override
@@ -46,7 +56,6 @@ class _InstancePageState extends State<InstancePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-
             InstanceSecondAppBar(),
           ],
         ),
