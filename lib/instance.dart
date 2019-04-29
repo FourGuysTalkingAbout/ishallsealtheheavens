@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -57,11 +56,13 @@ class _InstancePageState extends State<InstancePage> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
-      appBar: InstanceTopAppBar(),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(100), child: InstanceTopAppBar()),
       endDrawer: DrawerMenu(),
-      body: Center(child: PhotoGridView()
+      body: Center(
+        child: PhotoGridView(),
 //        InstanceSecondAppBar()
-          ),
+      ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 15.0),
         child: IconButton(

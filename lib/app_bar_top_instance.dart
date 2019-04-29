@@ -4,42 +4,47 @@ import 'app_bar_top.dart';
 class InstanceTopAppBar extends AppBar {
   InstanceTopAppBar({Key key, Widget leading, Widget bottom})
       : super(
-    key: key,
-    backgroundColor: Colors.deepPurple,
-    leading: Builder(builder: (BuildContext context) {
-      return new TopBarText();
-    }),
-    title: TopBarTitle(),
-    centerTitle: true,
-  );
+          key: key,
+          backgroundColor: Colors.deepPurple,
+          leading: Builder(builder: (BuildContext context) {
+            return new TopBarText();
+          }),
+          title: TopBarTitle(),
+          bottom: InstanceSecondAppBar(),
+          centerTitle: true,
+        );
 }
 
-class DrawerMenu extends StatelessWidget{
+class DrawerMenu extends StatelessWidget {
   const DrawerMenu();
 
   Widget build(BuildContext context) {
     return Drawer(
       child: new ListView(
-        children:[
+        children: [
           new UserAccountsDrawerHeader(
-              accountName: new Text ('Name of Instance'),
-              accountEmail: null
-          ),
+              accountName: new Text('Name of Instance'), accountEmail: null),
           new ListTile(
             leading: new InstanceInfo(), // Test divider
           ),
-          new Divider(color: Color(0xFF000000),),
-          new ListTile(
-            leading:  new DeleteInstance(),
+          new Divider(
+            color: Color(0xFF000000),
           ),
-          new Divider(color: Color(0xFF000000),), // Test divider
           new ListTile(
-              leading: new IconButton(icon: new Icon(Icons.search), onPressed: ()=> Text('Blah')),
+            leading: new DeleteInstance(),
+          ),
+          new Divider(
+            color: Color(0xFF000000),
+          ), // Test divider
+          new ListTile(
+              leading: new IconButton(
+                  icon: new Icon(Icons.search), onPressed: () => Text('Blah')),
               title: TextField(),
-              trailing: IconButton(icon: new Icon(Icons.play_arrow), onPressed:()=> Text('Pressed'))
-          )
+              trailing: IconButton(
+                  icon: new Icon(Icons.play_arrow),
+                  onPressed: () => Text('Pressed')))
         ],
-      ) ,
+      ),
     );
   }
 }
@@ -52,36 +57,36 @@ class InstanceInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-      onPressed: ()=> Text("Test instance info",),
+      onPressed: () => Text(
+            "Test instance info",
+          ),
       child: Text("Instance Info",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-          )
-      ),
+          )),
     );
   }
 }
 
 class DeleteInstance extends StatelessWidget {
-  DeleteInstance({
-    Key key
-  }) : super(key: key);
+  DeleteInstance({Key key}) : super(key: key);
 
   PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-      onPressed: ()=> popUpConfirm.confirm(context, 'Are you sure you want to delete this Instance?', 'Instance will be deleted '
+      onPressed: () => popUpConfirm.confirm(
+          context,
+          'Are you sure you want to delete this Instance?',
+          'Instance will be deleted '
           'Your images/edits will be archived'),
       child: Text("Delete Instance",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-          )
-      ),
+          )),
     );
   }
-
 }
 
 class TopBarTitle extends StatelessWidget {
@@ -91,21 +96,20 @@ class TopBarTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Text('Name of In',
+    return new Text(
+      'Name of In',
       textAlign: TextAlign.center,
     );
   }
 }
 
 class PopUpMenu {
-
   // logic
   _confirmResult(bool isYes, BuildContext context) {
     if (isYes) {
       print('test yes');
       Navigator.pop(context);
-    }
-    else {
+    } else {
       print('test no');
       Navigator.pop(context);
     }
@@ -120,9 +124,7 @@ class PopUpMenu {
             title: Text(title),
             content: SingleChildScrollView(
               child: ListBody(
-                children: <Widget>[
-                  Text(description)
-                ],
+                children: <Widget>[Text(description)],
               ),
             ),
             actions: <Widget>[
@@ -136,48 +138,45 @@ class PopUpMenu {
               )
             ],
           );
-        }
-
-    );
+        });
   }
 }
 
-class InstanceSecondAppBar extends StatelessWidget {
+class InstanceSecondAppBar extends PreferredSize {
   const InstanceSecondAppBar();
 
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(3.0),
-      height: 48.0,
-      width: 415.0,
-      color: Colors.grey[100],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          new Row(
-            children:[
-              new HostText(),
-              Stack(
-                children: [
-                  new EditIcon(),
-                  Align(
-                    alignment: Alignment(1,0.70),
-                    child: Text('       Edit'),
-                  )
-                ],
-              ),
-            ],
-          ),
-          new Row(
-            children:[
-              CheckIconButton(),
-              AddContact(),
-              new Container(
-              ),
-              new CheckIcon(),
-            ],
-          )
-        ],
+    return PreferredSize(
+      child: Container(
+        height: 50.0,
+        color: Colors.grey[100],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            new Row(
+              children: [
+                new HostText(),
+                Stack(
+                  children: [
+                    new EditIcon(),
+                    Align(
+                      alignment: Alignment(1, 0.70),
+                      child: Text('       Edit'),
+                    )
+                  ],
+                ),
+              ],
+            ),
+            new Row(
+              children: [
+                CheckIconButton(),
+                AddContact(),
+                new Container(),
+                new CheckIcon(),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -188,10 +187,7 @@ class EditIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new IconButton(
-        icon: Icon(Icons.mode_edit),
-        onPressed: () => null
-    );
+    return new IconButton(icon: Icon(Icons.mode_edit), onPressed: () => null);
   }
 }
 
@@ -204,8 +200,7 @@ class HostText extends StatelessWidget {
         style: TextStyle(
           fontSize: 25.0,
           fontWeight: FontWeight.bold,
-        )
-    );
+        ));
   }
 }
 
@@ -215,12 +210,10 @@ class AddContact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        icon: Icon(
-            Icons.person_add
-        ),
+        icon: Icon(Icons.person_add),
         iconSize: 35.0,
         alignment: Alignment.center,
-        onPressed: ()=> Text('Blah'));
+        onPressed: () => Text('Blah'));
   }
 }
 
@@ -229,11 +222,11 @@ class CheckIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(icon: Icon(Icons.check),
+    return IconButton(
+      icon: Icon(Icons.check),
       iconSize: 35.0,
       color: Colors.black,
       onPressed: () => Text('TEST MEE'),
-
     );
   }
 }
@@ -246,8 +239,6 @@ class CheckIconButton extends StatelessWidget {
     return new IconButton(
         icon: Icon(Icons.arrow_downward),
         iconSize: 35.0,
-        onPressed: () => Text('test press')
-    );
+        onPressed: () => Text('test press'));
   }
 }
-
