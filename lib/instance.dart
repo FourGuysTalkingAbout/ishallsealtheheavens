@@ -89,29 +89,33 @@ class PhotoGridView extends StatelessWidget {
             .collection('photos')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          snapshot.hasData
-              ? CircularProgressIndicator()
-              : print(snapshot.hasError);
-          return GridView.count(
-            crossAxisCount: 2,
-            padding: EdgeInsets.all(0.0), // padding of the cards
-            childAspectRatio: 6.5 / 9.0, // size of the card
-            children: snapshot.data.documents.map((DocumentSnapshot document) {
-              return Card(
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                          const EdgeInsets.all(10.0), //Image.network padding
-                      child: Image.network(document['url']),
+          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return new Text('Loading...');
+            default:
+              return GridView.count(
+                crossAxisCount: 2,
+                padding: EdgeInsets.all(0.0), // padding of the cards
+                childAspectRatio: 6.5 / 9.0, // size of the card
+                children:
+                    snapshot.data.documents.map((DocumentSnapshot document) {
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(
+                              10.0), //Image.network padding
+                          child: Image.network(document['url']),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                }).toList(),
               );
-            }).toList(),
-          );
+          }
         });
   }
 }
