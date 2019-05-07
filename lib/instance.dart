@@ -95,28 +95,81 @@ class PhotoGridView extends StatelessWidget {
             case ConnectionState.waiting:
               return new Text('Loading...');
             default:
-              return GridView.count(
-                crossAxisCount: 2,
-                padding: EdgeInsets.all(0.0), // padding of the cards
-                childAspectRatio: 6.5 / 9.0, // size of the card
-                children:
-                    snapshot.data.documents.map((DocumentSnapshot document) {
-                  return Card(
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(
-                              10.0), //Image.network padding
-                          child: Image.network(document['url']),
-                        ),
-                      ],
+              return Column(
+                children: <Widget>[
+                  Expanded(
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: GridView.count(
+                        key: PageStorageKey<String>('Preseves scroll position'),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 4.0,
+                        crossAxisSpacing: 4.0,
+                        padding: EdgeInsets.all(4.0), // padding of the cards
+                        childAspectRatio: 1.0, // size of the card
+                        children: snapshot.data.documents
+                            .map((DocumentSnapshot document) {
+                          return GestureDetector(
+                            child: SizedBox.expand(
+                              child: Column(
+                                children: <Widget>[
+                                  GridTile(
+                                    child: Hero(
+                                        tag: document.documentID,
+                                        child: Image.network(document['url'],
+                                            height:
+                                                205, //TODO:might have to fix test needed
+                                            width:
+                                                240, //TODO:might have to fix test needed
+                                            fit: BoxFit.cover)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DetailsPage(
+                                        id: document.documentID,
+                                        imageUrl: document['url']))),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               );
           }
         });
+  }
+}
+
+class DetailsPage extends StatelessWidget {
+  final String imageUrl;
+  String id;
+
+  DetailsPage({this.imageUrl, this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        child: Center(
+          child: Hero(
+            tag: id,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover, //TODO:might have to fix test needed
+              height: double.infinity, //TODO://might have to fix test needed
+              width: double.infinity, //TODO://might have to fix test needed
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }
