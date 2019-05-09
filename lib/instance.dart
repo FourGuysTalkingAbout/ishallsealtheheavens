@@ -104,37 +104,25 @@ class PhotoGridView extends StatelessWidget {
                       child: GridView.count(
                         key: PageStorageKey<String>('Preseves scroll position'),
                         crossAxisCount: 2,
-                        mainAxisSpacing: 4.0,
+                        mainAxisSpacing: 16.0,
                         crossAxisSpacing: 4.0,
                         padding: EdgeInsets.all(4.0), // padding of the cards
                         childAspectRatio: 1.0, // size of the card
                         children: snapshot.data.documents
                             .map((DocumentSnapshot document) {
-                          return GestureDetector(
-                            child: SizedBox.expand(
-                              child: Column(
-                                children: <Widget>[
-                                  GridTile(
-                                    child: Hero(
-                                        tag: document.documentID,
-                                        child: Image.network(document['url'],
-                                            height:
-                                                205, //TODO:might have to fix test needed
-                                            width:
-                                                240, //TODO:might have to fix test needed
-                                            fit: BoxFit.cover
-                                            )
-                                            ),
-                                  ),
-                                ],
-                              ),
+                          return GridTile(
+                            child: GestureDetector(
+                              child: Hero(
+                                  tag: document.documentID,
+                                  child: Image.network(document['url'],
+                                      fit: BoxFit.fill)),
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DetailsPage(
+                                          id: document.documentID,
+                                          imageUrl: document['url']))),
                             ),
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DetailsPage(
-                                        id: document.documentID,
-                                        imageUrl: document['url']))),
                           );
                         }).toList(),
                       ),
@@ -157,8 +145,8 @@ class DetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: FlatButton(onPressed: () =>  deleteData(),
-          child: Icon(Icons.delete)),
+      floatingActionButton:
+          FlatButton(onPressed: () => deleteData(), child: Icon(Icons.delete)),
       body: GestureDetector(
         child: Center(
           child: Hero(
@@ -179,9 +167,11 @@ class DetailsPage extends StatelessWidget {
   }
 
   deleteData() {
-    db.collection('instances')
+    db
+        .collection('instances')
         .document('instance1')
         .collection('photos')
-        .document(id).delete();//TODO: ONLY DELETES IN DATABASE NOT STORAGE
+        .document(id)
+        .delete(); //TODO: ONLY DELETES IN DATABASE NOT STORAGE
   }
 }
