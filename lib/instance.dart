@@ -122,7 +122,9 @@ class PhotoGridView extends StatelessWidget {
                                                 205, //TODO:might have to fix test needed
                                             width:
                                                 240, //TODO:might have to fix test needed
-                                            fit: BoxFit.cover)),
+                                            fit: BoxFit.cover
+                                            )
+                                            ),
                                   ),
                                 ],
                               ),
@@ -154,6 +156,9 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: FlatButton(onPressed: () =>  deleteData(),
+          child: Icon(Icons.delete)),
       body: GestureDetector(
         child: Center(
           child: Hero(
@@ -171,5 +176,12 @@ class DetailsPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  deleteData() {
+    db.collection('instances')
+        .document('instance1')
+        .collection('photos')
+        .document(id).delete();//TODO: ONLY DELETES IN DATABASE NOT STORAGE
   }
 }
