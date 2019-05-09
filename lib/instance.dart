@@ -111,23 +111,13 @@ class PhotoGridView extends StatelessWidget {
                         children: snapshot.data.documents
                             .map((DocumentSnapshot document) {
                           return GestureDetector(
-                            child: SizedBox.expand(
-                              child: Column(
-                                children: <Widget>[
-                                  GridTile(
-                                    child: Hero(
-                                        tag: document.documentID,
-                                        child: Image.network(document['url'],
-                                            height:
-                                                205, //TODO:might have to fix test needed
-                                            width:
-                                                240, //TODO:might have to fix test needed
-                                            fit: BoxFit.cover
-                                            )
-                                            ),
-                                  ),
-                                ],
-                              ),
+                            child: GridTile(
+                              child: Hero(
+                                  tag: document.documentID,
+                                  child: Image.network(document['url'],
+                                      fit: BoxFit.cover
+                                      )
+                                      ),
                             ),
                             onTap: () => Navigator.push(
                                 context,
