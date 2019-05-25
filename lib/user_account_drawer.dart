@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+
 class UserAccountDrawer extends StatefulWidget {
   UserAccountDrawer({Key key,}) : super(key: key);
   @override
@@ -12,7 +14,13 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          DrawerHeader(decoration: BoxDecoration(color: Color(0xFFD1C4E9)),
+          //TODO:Made it look like the Figma Design, don't know if it's worth all the extra widgets.
+          DrawerHeader(margin: EdgeInsets.all(0.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+            decoration: BoxDecoration(border: Border(
+            bottom: Divider.createBorderSide(context,color: Colors.black,width: 2.0)
+          ),
+              color: Color(0xFFD1C4E9)),
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 CircleAvatar(backgroundImage: AssetImage('images/apex_lestley.png'),maxRadius: 50,),
@@ -21,6 +29,9 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
                 )),
               ],
             ),
+          ),
+          Container(color: Color(0xff757575),
+            height: 10.0,
           ),
           ListTile(
           ),
