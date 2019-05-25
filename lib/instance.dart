@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'app_bar_top_instance.dart';
 import 'app_bar_bottom.dart';
+import 'user_account_drawer.dart';
+
 
 class InstancePage extends StatefulWidget {
   final String value;
+
+
 
   InstancePage({Key key, this.value}) : super(key: key);
 
@@ -15,6 +19,8 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +28,10 @@ class _InstancePageState extends State<InstancePage> {
       backgroundColor: Colors.white,
       appBar: InstanceTopAppBar(),
       endDrawer: DrawerMenu(),
+      drawer: UserAccountDrawer(),
       body: Center(
         child: Column(
           children: <Widget>[
-
             InstanceSecondAppBar(),
           ],
         ),
@@ -57,3 +63,4 @@ class _InstancePageState extends State<InstancePage> {
 
   }
 }
+
