@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_bar_past_instance.dart';
 import 'app_bar_bottom.dart';
+import 'user_account_drawer.dart';
 
 
 Color partyBackgroundColor = Color(0xFFE5E5E5);
@@ -29,6 +30,7 @@ class _PastInstanceState extends State<PastInstance> {
     return Scaffold(
         appBar: InstanceTopAppBar(),
         backgroundColor: partyBackgroundColor,
+        drawer: UserAccountDrawer(),
         endDrawer: DrawerMenu(),
         bottomNavigationBar: CustomAppBar(),
         body: Center(
