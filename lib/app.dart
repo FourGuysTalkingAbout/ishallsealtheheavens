@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'join_create.dart';
-import 'instance.dart';
+import 'join_create_page.dart';
+import 'instance_page.dart';
 import 'past_instance.dart';
 import 'gallery.dart';
 
@@ -13,14 +13,13 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.pink,
         ),
-
         initialRoute: '/', // home basically
         routes: {
-          '/' : (context) => JoinCreate(),
-          'PastInst' : (context) => PastInstance(),
-          'Instance' : (context) => InstancePage(),
-          'Gallery'  : (context) => Gallery(),
-
+          '/': (context) => LoginPage(),
+          'JoinCreate': (context) => JoinCreatePage(),
+          'PastInst': (context) => PastInstance(),
+          'Instance': (context) => InstancePage(),
+          'Gallery': (context) => Gallery(),
         },
         title: 'Base app');
   }
