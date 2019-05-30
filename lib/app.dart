@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'join_create_page.dart';
-import 'instance_page.dart';
-import 'past_instance.dart';
 import 'gallery.dart';
+import 'instance_page.dart';
+import 'join_create_page.dart';
+import 'login_page.dart';
+import 'past_instance.dart';
 
 class App extends StatelessWidget {
   @override
