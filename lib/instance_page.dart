@@ -6,11 +6,8 @@ import 'app_bar_top_instance.dart';
 import 'app_bar_bottom.dart';
 import 'user_account_drawer.dart';
 
-
 class InstancePage extends StatefulWidget {
   final String value;
-
-
 
   InstancePage({Key key, this.value}) : super(key: key);
 
@@ -19,8 +16,6 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,9 +37,9 @@ class _InstancePageState extends State<InstancePage> {
           icon: Icon(Icons.camera),
           iconSize: 35.0,
           //todo:should be better code to disable splash on button
-          splashColor:  Colors.transparent,
+          splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
-          onPressed: () =>  openCamera(),
+          onPressed: () => openCamera(),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -53,14 +48,11 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   Future openCamera() async {
-
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
     //todo:figure out a way to name images
     //'images' is a folder in firebase, '123451' is name of the file
     final StorageReference storageRef =
-    FirebaseStorage.instance.ref().child('images').child('123451');
+        FirebaseStorage.instance.ref().child('images').child('123451');
     final StorageUploadTask uploadTask = storageRef.putFile(image);
-
   }
 }
-
