@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "310452880947-5d96iscg5hb8jcbfggn8acte6rul9f7f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firestore_practice",
+            "certificate_hash": "e4bb57ff22bba4023744e37c171d1cd5b8e9f98c"
+          }
+        },
+        {
           "client_id": "310452880947-53k2v0kh3k9ff7jr73k9s4grfo0eca3k.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -43,6 +51,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "310452880947-c5fh338komtvk5ju0amqhj1lkce9752t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ishallsealtheheavens",
+            "certificate_hash": "e4bb57ff22bba4023744e37c171d1cd5b8e9f98c"
+          }
+        },
+        {
+          "client_id": "310452880947-ocshjhpj8jllgegk0h8666fu2r76v5ca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ishallsealtheheavens",
+            "certificate_hash": "1c13d505d05e40483b34877f658e3e1223d72b5e"
+          }
+        },
         {
           "client_id": "310452880947-rft4rhh14l9662bn3drf76ndv3pv78c6.apps.googleusercontent.com",
           "client_type": 1,

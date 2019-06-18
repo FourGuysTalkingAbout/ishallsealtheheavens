@@ -16,8 +16,8 @@ class App extends StatelessWidget {
         ),
         initialRoute: '/', // home basically
         routes: {
-          '/': (context) => LoginPage(),
-          'JoinCreate': (context) => JoinCreatePage(),
+          '/': (context) => JoinCreatePage(),
+          'JoinCreate': (context) => LoginPage(),
           'PastInst': (context) => PastInstance(),
           'Instance': (context) => InstancePage(),
           'Gallery': (context) => Gallery(),

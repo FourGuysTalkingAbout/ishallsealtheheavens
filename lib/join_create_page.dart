@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/user_account_drawer.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
@@ -20,6 +21,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
+      drawer: UserAccountDrawer(),
       //endDrawer: DrawerMenu(),
       body: Center(
         child: Column(children: <Widget>[
