@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 class TopAppBar extends AppBar {
   TopAppBar({Key key, Widget leading, Widget bottom})
       : super(
-          key: key,
-          backgroundColor: Colors.deepPurple,
-          leading: Builder(builder: (BuildContext context) {
-            return new TopBarText();
-          }),
-          title: new TopBarTitle(),
-          centerTitle: true,
-          actions: <Widget>[
-            new IconButton(
-                icon: new Icon(Icons.dehaze), onPressed: () => print("tap"))
-          ],
-        );
+    key: key,
+    backgroundColor: Colors.deepPurple,
+    leading: Builder(builder: (BuildContext context) {
+      return new TopBarText();
+    }),
+    title: new BarTitle("No Instance"),
+    centerTitle: true,
+    actions: <Widget>[
+      new IconButton(
+          icon: new Icon(Icons.dehaze), onPressed: () => print("tap"))
+    ],
+  );
 }
 
 class TopBarText extends StatelessWidget {
@@ -36,23 +36,54 @@ class TopBarText extends StatelessWidget {
   }
 }
 
-class TopBarTitle extends StatelessWidget {
-  const TopBarTitle({
-    Key key,
-  }) : super(key: key);
+class BarTitle extends StatelessWidget{
+  final String title;
+
+  const BarTitle(this.title);
 
   @override
   Widget build(BuildContext context) {
-    return new Text(
-      "Name Of In",
+    return Text(title,
+      style: buildTextStyle,
       textAlign: TextAlign.center,
     );
-//    return Column(
-//      StreamedWidget(
-//        initialData: streamedInstanceName.value,
-//        stream: streamedInstanceName.outStream,
-//        builder: (context, snapshot) => Text("Time: ${snapshot.data}"),
-//      ),
-//    );
+
+  }
+
+  TextStyle get buildTextStyle {
+    return TextStyle(
+      fontSize: 20.0,
+      fontWeight: FontWeight.bold,
+    );
   }
 }
+
+
+class SecondAppBar extends StatelessWidget {
+  const SecondAppBar();
+
+  final int _numInstances = 0;
+
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48.0,
+      width: 415.0,
+      color: Colors.grey[300],
+      child: Center(
+        child: BarTitle("You have $_numInstances instances"),
+      ),
+
+
+      /*
+     *  Will be dynamic in the future. It should tell user how many instances
+     *  he/she has.
+     *
+     *  ie. how many he/she is hosting and how many he/she joined.
+     *
+     *
+     * */
+
+    );
+  }
+}
+
