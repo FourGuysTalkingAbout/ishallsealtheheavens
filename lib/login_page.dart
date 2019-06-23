@@ -33,10 +33,10 @@ class _UserProfileState extends State<UserProfile> {
   initState() {
     super.initState();
     authService.profile.listen(
-      (state) => setState(() => _profile = state),
+          (state) => setState(() => _profile = state),
     );
     authService.loading.listen(
-      (state) => setState(() => _loading = state),
+          (state) => setState(() => _loading = state),
     );
   }
 
