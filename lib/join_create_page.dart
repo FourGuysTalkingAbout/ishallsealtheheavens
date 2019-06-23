@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
+import 'user_account_drawer.dart';
 
 class JoinCreatePage extends StatefulWidget {
   JoinCreatePage({Key key, this.title}) : super(key: key);
@@ -21,6 +22,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
       //endDrawer: DrawerMenu(),
+      drawer: UserAccountDrawer(),
       body: Center(
         child: Column(children: <Widget>[
           SecondAppBar(),
@@ -29,6 +31,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
               instanceNameController: _instanceNameController),
           new InstanceNameRaisedButton(
               instanceNameController: _instanceNameController),
+
         ]),
       ),
       bottomNavigationBar: CustomAppBar(),

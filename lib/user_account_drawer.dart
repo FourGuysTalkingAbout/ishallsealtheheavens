@@ -62,7 +62,6 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
           ListTile(
             title: LoginButton(),
           ),
-
           Divider(
             color: Colors.black,
           )
