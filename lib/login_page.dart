@@ -7,12 +7,13 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff673AB7),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             LoginButton(),
-            UserProfile(),
+//            UserProfile(),
           ],
         ),
       ),
@@ -33,10 +34,10 @@ class _UserProfileState extends State<UserProfile> {
   initState() {
     super.initState();
     authService.profile.listen(
-          (state) => setState(() => _profile = state),
+      (state) => setState(() => _profile = state),
     );
     authService.loading.listen(
-          (state) => setState(() => _loading = state),
+      (state) => setState(() => _loading = state),
     );
   }
 
@@ -60,22 +61,55 @@ class LoginButton extends StatelessWidget {
       stream: authService.user,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return MaterialButton(
-//            onPressed: () => authService.signOut(),
-            onPressed: () => Navigator.of(context).pushNamed('JoinCreate'),
-            color: Colors.white,
-            textColor: Colors.black,
-            child: Text('Join or Create an Instance'),
+          return ListBody(
+            children: <Widget>[
+              MaterialButton(
+                onPressed: () => Navigator.of(context).pushNamed('JoinCreate'),
+                color: Colors.white,
+                textColor: Colors.black,
+                child: Text('Join or Create an Instance'),
+              ),
+              MaterialButton(
+                onPressed: () => authService.signOut(),
+                color: Colors.white,
+                textColor: Colors.black,
+                child: Text('Sign out'),
+              ),
+            ],
           );
         } else {
-          return MaterialButton(
-            onPressed: () => authService.googleSignIn(),
-            color: Colors.white,
-            textColor: Colors.black,
-            child: Text('Login with Google'),
+          return ListBody(
+            children: <Widget>[
+              MaterialButton(
+                onPressed: () => Navigator.of(context).pushNamed('LoginEmail'),
+                color: Color(0xff757575),
+                textColor: Color(0xffFFC107),
+                child: Text('Login with Email'),
+              ),
+              MaterialButton(
+                onPressed: () => {},
+                color: Color(0xff3b5998),
+                textColor: Colors.white,
+                child: Text('Login with Facebook'),
+              ),
+              MaterialButton(
+                onPressed: () => authService.googleSignIn(),
+                color: Color(0xffdb3236),
+                textColor: Colors.white,
+                child: Text('Login with Google'),
+              ),
+              MaterialButton(
+                  onPressed: () => {},
+                  color: Color(0xff673AB7),
+                  textColor: Color(0xffFFC107),
+                  child: Container(
+                    child: Text('No Account \n View Only'),
+                  )),
+            ],
           );
         }
       },
     );
   }
 }
+

@@ -74,29 +74,20 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
 class LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: authService.user,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
+
           return FlatButton(
-            onPressed: () => authService.signOut(),
+            onPressed: () => {authService.signOut(),
+            Navigator.of(context).pushNamed('/')},
             textColor: Colors.black,
             child: Container(
               alignment: Alignment(-1.17, 0),
               child: Text('Sign Out'),
             ),
           );
-        } else {
-          return FlatButton(
-            onPressed: () => authService.googleSignIn(),
-            textColor: Colors.black,
-            child: Container(
-              alignment: Alignment(-1.17, 0),
-              child: Text('Sign In'),
-            ),
-          );
         }
-      },
-    );
-  }
-}
+
+        }
+
+
+
+
