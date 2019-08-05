@@ -5,6 +5,8 @@ import 'instance_page.dart';
 import 'join_create_page.dart';
 import 'login_page.dart';
 import 'past_instance.dart';
+import 'login_with_email.dart';
+import 'signup_with_email.dart';
 
 class App extends StatelessWidget {
   @override
@@ -17,6 +19,8 @@ class App extends StatelessWidget {
         initialRoute: '/', // home basically
         routes: {
           '/': (context) => LoginPage(),
+          'LoginEmail': (context) => LoginWithEmail(),
+          'SignupEmail': (context) => SignupWithEmail(),
           'JoinCreate': (context) => JoinCreatePage(),
           'PastInst': (context) => PastInstance(),
           'Instance': (context) => InstancePage(),
