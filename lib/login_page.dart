@@ -14,17 +14,15 @@ class _LoginPageState extends State<LoginPage> {
   bool isFBLoggedIn = false;
   bool triedCheckLoggedIn = false;
 
-
   void onFBLoginStatusChanged(bool isLoggedIn) {
     setState(() {
       this.isFBLoggedIn = isLoggedIn;
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if(triedCheckLoggedIn == false) {
+    if (triedCheckLoggedIn == false) {
       _checkLoggedIn();
     }
 
@@ -34,6 +32,12 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+                width: 48,
+                height: 128,
+                child: Image(
+                  image: AssetImage('images/icecreamcolour.png'),
+                )),
             LoginButton(),
 //            UserProfile(),
           ],
@@ -45,11 +49,10 @@ class _LoginPageState extends State<LoginPage> {
   Future _checkLoggedIn() async {
     GoogleSignInAccount googleuser = GoogleSignIn().currentUser;
     if (googleuser == null) {
-    await authService.googleSignIn();
-
-    }else if (FaceBookLogin().isFBLoggedin == false){
+      await authService.googleSignIn();
+    } else if (FaceBookLogin().isFBLoggedin == false) {
       await authService.initiateFacebookLogin();
-    }else
+    } else
       return AfterLogIn();
   }
 }
@@ -62,10 +65,6 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   Map<String, dynamic> _profile;
   bool _loading = false;
-
-
-
-
 
   @override // if you setup listeners on a stream or an observable need to initialize the state
   initState() {
@@ -91,7 +90,6 @@ class _UserProfileState extends State<UserProfile> {
   }
 }
 
-
 class AfterLogIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -113,7 +111,6 @@ class AfterLogIn extends StatelessWidget {
     );
   }
 }
-
 
 class LoginButton extends StatelessWidget {
   @override
@@ -150,8 +147,7 @@ class LoginButton extends StatelessWidget {
               MaterialButton(
                 onPressed: () {
                   authService.initiateFacebookLogin();
-
-                } ,
+                },
                 color: Color(0xff3b5998),
                 textColor: Colors.white,
                 child: Text('Login with Facebook'),
@@ -176,4 +172,3 @@ class LoginButton extends StatelessWidget {
     );
   }
 }
-
