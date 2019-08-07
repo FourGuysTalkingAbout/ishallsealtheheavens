@@ -1,12 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
+
+
+
+final AuthService authService = AuthService();
 
 class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
+
 
   Observable<FirebaseUser> user; // firebase user
   Observable<Map<String, dynamic>> profile; // custom user data in Firestore
@@ -14,6 +20,8 @@ class AuthService {
 
   AuthService() {
     user = Observable(_auth.onAuthStateChanged);
+
+
 
     profile = user.switchMap((FirebaseUser u) {
       if (u != null) {
@@ -63,8 +71,37 @@ class AuthService {
   }
 
   void signOut() {
+//    FacebookLogin.channel.invokeMethod('logOut');
     _auth.signOut();
   }
+
+  ////////////FACEBOOK LOGIN//////////////////////////
+
+
+  Future<void> initiateFacebookLogin() async {
+    var facebooklogin = FacebookLogin();
+    var facebookLoginResult = await facebooklogin.logInWithReadPermissions(['email']);
+
+    switch(facebookLoginResult.status) {
+      case FacebookLoginStatus.error:
+        print('Error');
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        print('cancelled By User');
+        break;
+      case FacebookLoginStatus.loggedIn:
+        print('Facebooked logged In');
+//        onLoginStatusChanged(true);
+    }
+  }
+  Future<bool> isFBLoggedIn() async {
+   FacebookLogin().currentAccessToken;
+  }
+
+  Future<void> facebookLogOut() async {
+    FacebookLogin.channel.invokeMethod('logOut');
+  }
+
+
 }
 
-final AuthService authService = AuthService();

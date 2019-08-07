@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'logic/login_authentication.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 class UserAccountDrawer extends StatefulWidget {
   UserAccountDrawer({
@@ -10,7 +14,10 @@ class UserAccountDrawer extends StatefulWidget {
   _UserAccountDrawerState createState() => _UserAccountDrawerState();
 }
 
+
 class _UserAccountDrawerState extends State<UserAccountDrawer> {
+
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -46,7 +53,7 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
             color: Colors.black,
           ),
           ListTile(
-            title: Text('Username:'),
+            title: Text('Username:' + GoogleSignIn().currentUser.displayName),
           ),
           Divider(
             color: Colors.black,
@@ -74,20 +81,14 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
 class LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-          return FlatButton(
-            onPressed: () => {authService.signOut(),
-            Navigator.of(context).pushNamed('/')},
-            textColor: Colors.black,
-            child: Container(
-              alignment: Alignment(-1.17, 0),
-              child: Text('Sign Out'),
-            ),
-          );
-        }
-
-        }
-
-
-
-
+    return FlatButton(
+      onPressed: () =>
+          {authService.signOut(), Navigator.of(context).pushNamed('/')},
+      textColor: Colors.black,
+      child: Container(
+        alignment: Alignment(-1.17, 0),
+        child: Text('Sign Out'),
+      ),
+    );
+  }
+}
