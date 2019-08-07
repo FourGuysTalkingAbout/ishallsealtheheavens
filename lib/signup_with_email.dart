@@ -9,6 +9,12 @@ class SignupWithEmail extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+                width: 48,
+                height: 128,
+                child: Image(
+                  image: AssetImage('images/icecreamcolour.png'),
+                )),
             EmailForm(),
           ],
         ),
