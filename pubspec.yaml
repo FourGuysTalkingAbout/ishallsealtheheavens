@@ -13,6 +13,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
+  flutter_facebook_login: ^2.0.1
   cloud_firestore: ^0.10.0
   firebase_core: ^0.3.4
   firebase_auth: ^0.8.4+5
@@ -42,6 +43,8 @@ flutter:
   assets:
     - images/IconIcecream.png
     - images/apex_lestley.png
+    - images/icecreamcolour.png
+    - login_back_icon.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

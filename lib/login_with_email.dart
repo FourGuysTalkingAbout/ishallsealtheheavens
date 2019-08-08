@@ -9,6 +9,12 @@ class LoginWithEmail extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+                width: 48,
+                height: 128,
+                child: Image(
+                  image: AssetImage('images/icecreamcolour.png'),
+                )),
             EmailForm(),
           ],
         ),
@@ -87,9 +93,17 @@ class EmailForm extends StatelessWidget {
               child: Text('Back'),
             ),
           ),
-        )
+        ),
+        Container(
+          alignment: Alignment.center,
+          margin: EdgeInsets.symmetric(vertical: 7.5),
+          child: MaterialButton(
+            onPressed: () => Navigator.of(context).pushNamed('/'),
+            textColor: Color(0xffFFC107),
+            child: Text('Forgot Password?'),
+          ),
+        ),
       ],
     );
   }
 }
-
