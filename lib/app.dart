@@ -20,7 +20,7 @@ class App extends StatelessWidget {
         routes: {
           '/': (context) => LoginPage(),
           'LoginEmail': (context) => LoginWithEmail(),
-          'SignupEmail': (context) => SignupWithEmail(),
+          'SignupEmail': (context) => SignUpWithEmail(),
           'JoinCreate': (context) => JoinCreatePage(),
           'PastInst': (context) => PastInstance(),
           'Instance': (context) => InstancePage(),
