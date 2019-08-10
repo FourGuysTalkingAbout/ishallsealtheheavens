@@ -41,7 +41,7 @@ class AuthService {
         await googleUser.authentication;
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
-    final FirebaseUser user = await _auth.signInWithCredential(credential);
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
     assert(user.email != null);
     assert(user.displayName != null);
     assert(!user.isAnonymous);
@@ -71,7 +71,10 @@ class AuthService {
 
   Future<void> signOut() async {
     await _auth.signOut();
-    print('google signout');
+    await _googleSignIn.signOut(); //is this needed?
+    await _facebookLogin.logOut();
+
+    print('google/facebook/auth all IN one signout');
   }
 
   ////////////FACEBOOK LOGIN//////////////////////////
@@ -83,13 +86,46 @@ class AuthService {
 
     final AuthCredential fbCredential =
         FacebookAuthProvider.getCredential(accessToken: fbToken.token);
-    final FirebaseUser user = await _auth.signInWithCredential(fbCredential);
+    final FirebaseUser user = (await _auth.signInWithCredential(fbCredential)).user;
     updateUserData(user);
     return user;
   }
 
   Future<void> facebookLogOut() async {
-    await FacebookLogin.channel.invokeMethod('logOut');
+    await _auth.signOut();
+    await _facebookLogin.logOut(); //is this needed?
     print('fb logout');
+  }
+
+
+  /////////////////////SIGN UP/LOGIN WITH EMAIL/////////////
+  Future<FirebaseUser> signInWithEmail(String email, String password) async {
+     FirebaseUser user = (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;
+     assert(user != null);
+     assert(await user.getIdToken() != null);
+     final FirebaseUser currentUser = await _auth.currentUser();
+     assert(user.uid == currentUser.uid);
+
+     updateUserData(user);
+     print('Signed in ' + user.displayName);
+     return user;
+  }
+
+  //TODO create a displayname for when they signup via email
+  Future<FirebaseUser> signUpWithEmail(String email, String password) async {
+    try{
+      FirebaseUser user = (await FirebaseAuth.instance.
+      createUserWithEmailAndPassword(email: email, password: password))
+          .user;
+      assert(user != null);
+      assert(await user.getIdToken() != null);
+
+      updateUserData(user);
+      print('Signed in ' + user.displayName);
+      return user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
   }
 }

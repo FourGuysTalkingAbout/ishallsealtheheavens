@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'logic/login_authentication.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -17,6 +16,9 @@ class UserAccountDrawer extends StatefulWidget {
 
 
 class _UserAccountDrawerState extends State<UserAccountDrawer> {
+
+  //TODO Fix Display name for Email Login
+  //TODO allow Email/login to create display name
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,7 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
                 color: Colors.black,
               ),
               ListTile(
-                title: Text('Username:' + snapshot.data.displayName ),
+                title:  Text('Username: ' + (snapshot.data.displayName == null ? 'Create a Username' : snapshot.data.displayName )),
               ),
               Divider(
                 color: Colors.black,
