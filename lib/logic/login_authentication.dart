@@ -1,18 +1,18 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 
-
-
 final AuthService authService = AuthService();
 
 class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FacebookLogin _facebookLogin = FacebookLogin();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
-
 
   Observable<FirebaseUser> user; // firebase user
   Observable<Map<String, dynamic>> profile; // custom user data in Firestore
@@ -20,8 +20,6 @@ class AuthService {
 
   AuthService() {
     user = Observable(_auth.onAuthStateChanged);
-
-
 
     profile = user.switchMap((FirebaseUser u) {
       if (u != null) {
@@ -31,7 +29,7 @@ class AuthService {
             .snapshots()
             .map((snap) => snap.data);
       } else {
-        return Observable.just({}); // empty object
+        return Observable.just({}); // empty object ???? -AB
       }
     });
   }
@@ -43,14 +41,14 @@ class AuthService {
         await googleUser.authentication;
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
-    final FirebaseUser user = await _auth.signInWithCredential(credential);
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
     assert(user.email != null);
     assert(user.displayName != null);
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
     updateUserData(user);
-    print('Signed in' + user.displayName);
+    print('Signed in ' + user.displayName);
 
     loading.add(false);
     return user;
@@ -61,6 +59,7 @@ class AuthService {
 
     return ref.setData(
       {
+        'name':user.displayName,
         'uid': user.uid,
         'email': user.email,
         'photoURL': user.photoUrl,
@@ -70,38 +69,63 @@ class AuthService {
     );
   }
 
-  void signOut() {
-//    FacebookLogin.channel.invokeMethod('logOut');
-    _auth.signOut();
+  Future<void> signOut() async {
+    await _auth.signOut();
+    await _googleSignIn.signOut(); //is this needed?
+    await _facebookLogin.logOut();
+
+    print('google/facebook/auth all IN one signout');
   }
 
   ////////////FACEBOOK LOGIN//////////////////////////
 
+  Future<FirebaseUser> signInWithFacebook() async {
+    final FacebookLoginResult fbLoginResult = await _facebookLogin
+        .logInWithReadPermissions(['email', 'public_profile']);
+    FacebookAccessToken fbToken = fbLoginResult.accessToken;
 
-  Future<void> initiateFacebookLogin() async {
-    var facebooklogin = FacebookLogin();
-    var facebookLoginResult = await facebooklogin.logInWithReadPermissions(['email']);
-
-    switch(facebookLoginResult.status) {
-      case FacebookLoginStatus.error:
-        print('Error');
-        break;
-      case FacebookLoginStatus.cancelledByUser:
-        print('cancelled By User');
-        break;
-      case FacebookLoginStatus.loggedIn:
-        print('Facebooked logged In');
-//        onLoginStatusChanged(true);
-    }
-  }
-  Future<bool> isFBLoggedIn() async {
-   FacebookLogin().currentAccessToken;
+    final AuthCredential fbCredential =
+        FacebookAuthProvider.getCredential(accessToken: fbToken.token);
+    final FirebaseUser user = (await _auth.signInWithCredential(fbCredential)).user;
+    updateUserData(user);
+    return user;
   }
 
   Future<void> facebookLogOut() async {
-    FacebookLogin.channel.invokeMethod('logOut');
+    await _auth.signOut();
+    await _facebookLogin.logOut(); //is this needed?
+    print('fb logout');
   }
 
 
-}
+  /////////////////////SIGN UP/LOGIN WITH EMAIL/////////////
+  Future<FirebaseUser> signInWithEmail(String email, String password) async {
+     FirebaseUser user = (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;
+     assert(user != null);
+     assert(await user.getIdToken() != null);
+     final FirebaseUser currentUser = await _auth.currentUser();
+     assert(user.uid == currentUser.uid);
 
+     updateUserData(user);
+     print('Signed in ' + user.displayName);
+     return user;
+  }
+
+  //TODO create a displayname for when they signup via email
+  Future<FirebaseUser> signUpWithEmail(String email, String password) async {
+    try{
+      FirebaseUser user = (await FirebaseAuth.instance.
+      createUserWithEmailAndPassword(email: email, password: password))
+          .user;
+      assert(user != null);
+      assert(await user.getIdToken() != null);
+
+      updateUserData(user);
+      print('Signed in ' + user.displayName);
+      return user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+}
