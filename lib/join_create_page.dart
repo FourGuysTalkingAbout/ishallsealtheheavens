@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
-import 'instance.dart';
+import 'instance_page.dart';
+import 'user_account_drawer.dart';
 
-class JoinCreate extends StatefulWidget {
-  JoinCreate({Key key, this.title}) : super(key: key);
+class JoinCreatePage extends StatefulWidget {
+  JoinCreatePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _JoinCreateState createState() => _JoinCreateState();
+  _JoinCreatePageState createState() => _JoinCreatePageState();
 }
 
-class _JoinCreateState extends State<JoinCreate> {
+class _JoinCreatePageState extends State<JoinCreatePage> {
   TextEditingController _instanceNameController = TextEditingController();
 
   @override
@@ -21,16 +22,17 @@ class _JoinCreateState extends State<JoinCreate> {
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
       //endDrawer: DrawerMenu(),
+      drawer: UserAccountDrawer(),
       body: Center(
-        child: Column(
-            children: <Widget>[
-              SecondAppBar(),
-              SizedBox(height: 100),
-              new InstanceNameTextFormField(
-                  instanceNameController: _instanceNameController),
-              new InstanceNameRaisedButton(
-                  instanceNameController: _instanceNameController),
-            ]),
+        child: Column(children: <Widget>[
+          SecondAppBar(),
+          SizedBox(height: 100),
+          new InstanceNameTextFormField(
+              instanceNameController: _instanceNameController),
+          new InstanceNameRaisedButton(
+              instanceNameController: _instanceNameController),
+
+        ]),
       ),
       bottomNavigationBar: CustomAppBar(),
     );
@@ -53,14 +55,13 @@ class InstanceNameRaisedButton extends StatelessWidget {
       onPressed: () {
         final route = new MaterialPageRoute(
           builder: (BuildContext context) =>
-          new InstancePage(value: _instanceNameController.text),
+              new InstancePage(value: _instanceNameController.text),
         );
         Navigator.of(context).push(route);
       },
     );
   }
 }
-
 
 class InstanceNameTextFormField extends StatelessWidget {
   const InstanceNameTextFormField({
@@ -70,8 +71,6 @@ class InstanceNameTextFormField extends StatelessWidget {
         super(key: key);
 
   final TextEditingController _instanceNameController;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -90,5 +89,4 @@ class InstanceNameTextFormField extends StatelessWidget {
       ),
     );
   }
-
 }
