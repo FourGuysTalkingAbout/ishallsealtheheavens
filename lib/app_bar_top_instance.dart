@@ -57,8 +57,8 @@ class InstanceInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatButton(
       onPressed: () => Text(
-            "Test instance info",
-          ),
+        "Test instance info",
+      ),
       child: Text("Instance Info",
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class DeleteInstance extends StatelessWidget {
           context,
           'Are you sure you want to delete this Instance?',
           'Instance will be deleted '
-          'Your images/edits will be archived'),
+              'Your images/edits will be archived'),
       child: Text("Delete Instance",
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class PopUpMenu {
   }
 }
 
-class InstanceSecondAppBar extends StatelessWidget {
+class InstanceSecondAppBar extends PreferredSize {
   const InstanceSecondAppBar();
 
   Widget build(BuildContext context) {
@@ -195,21 +195,24 @@ class EditIcon extends StatelessWidget {
         icon: Icon(Icons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-               PopupMenuItem(
+              PopupMenuItem(
                 child: ListTile(
-                  //TODO:create a onpressed that edits 'instanceName'
+                    //TODO:create a onpressed that edits 'instanceName'
                     contentPadding: EdgeInsets.only(right: 0.0),
                     leading: Text('Name:'),
-                    title: Text('$instanceName',textScaleFactor: 1.2,)
-                ),
+                    title: Text(
+                      '$instanceName',
+                      textScaleFactor: 1.2,
+                    )),
               ),
               PopupMenuDivider(),
-               PopupMenuItem(
+              PopupMenuItem(
                 child: ListTile(
                   //TODO:create a onpressed that allows to edit 'entranceCode?
                   //TODO:make the 'entranceCode' bigger font
                   title: Text('Entrance Code: $entranceCode '),
-                  contentPadding: EdgeInsets.only(left: 55.0), //todo:change back to 0.0
+                  contentPadding:
+                      EdgeInsets.only(left: 55.0), //todo:change back to 0.0
                 ),
               ),
               PopupMenuDivider(),
