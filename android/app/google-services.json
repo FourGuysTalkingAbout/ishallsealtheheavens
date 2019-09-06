@@ -25,15 +25,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310452880947-53k2v0kh3k9ff7jr73k9s4grfo0eca3k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -46,6 +44,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "310452880947-rft4rhh14l9662bn3drf76ndv3pv78c6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ishallsealtheheavens",
+            "certificate_hash": "347896287e128bb34ec2b608db7e092a4738600a"
+          }
+        },
+        {
           "client_id": "310452880947-53k2v0kh3k9ff7jr73k9s4grfo0eca3k.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -56,15 +62,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310452880947-53k2v0kh3k9ff7jr73k9s4grfo0eca3k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

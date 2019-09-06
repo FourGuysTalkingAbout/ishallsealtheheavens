@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
-import 'app_bar_top.dart';
+//import 'app_bar_top.dart';
 
 class InstanceTopAppBar extends AppBar {
   InstanceTopAppBar({Key key, Widget leading, Widget bottom})
       : super(
-          key: key,
-          backgroundColor: Colors.deepPurple,
-          leading: Builder(builder: (BuildContext context) {
-            return new TopBarText();
-          }),
-          title: TopBarTitle(),
-          centerTitle: true,
-        );
+    key: key,
+    backgroundColor: Colors.deepPurple,
+    leading: TopBarText(),
+    title: TopBarTitle(),
+    centerTitle: true,
+  );
+}
+
+class TopBarText extends StatelessWidget{
+
+  Widget build(BuildContext context ) {
+    return Row(
+      children: <Widget>[
+        Icon(Icons.arrow_back,size: 33.0,),
+        Text("FS",
+    style: TextStyle(
+    decoration: TextDecoration.underline,
+    fontSize: 20.0,
+    fontStyle: FontStyle.italic,
+    fontWeight: FontWeight.bold,
+    color: Colors.white))
+      ],
+    );
+  }
 }
 
 class DrawerMenu extends StatelessWidget {
@@ -95,9 +111,10 @@ class TopBarTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Text(
-      'Name of In',
-      textAlign: TextAlign.center,
+    return Text(
+          'Past Instance',
+//          textAlign: TextAlign.center,
+
     );
   }
 }
@@ -141,7 +158,7 @@ class PopUpMenu {
   }
 }
 
-class InstanceSecondAppBar extends PreferredSize {
+class InstanceSecondAppBar extends StatelessWidget {
   const InstanceSecondAppBar();
 
   Widget build(BuildContext context) {
@@ -195,51 +212,48 @@ class EditIcon extends StatelessWidget {
         icon: Icon(Icons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              PopupMenuItem(
-                child: ListTile(
-                    //TODO:create a onpressed that edits 'instanceName'
-                    contentPadding: EdgeInsets.only(right: 0.0),
-                    leading: Text('Name:'),
-                    title: Text(
-                      '$instanceName',
-                      textScaleFactor: 1.2,
-                    )),
-              ),
-              PopupMenuDivider(),
-              PopupMenuItem(
-                child: ListTile(
-                  //TODO:create a onpressed that allows to edit 'entranceCode?
-                  //TODO:make the 'entranceCode' bigger font
-                  title: Text('Entrance Code: $entranceCode '),
-                  contentPadding:
-                      EdgeInsets.only(left: 55.0), //todo:change back to 0.0
-                ),
-              ),
-              PopupMenuDivider(),
-              const PopupMenuItem(
-                child: ListTile(
-                  //TODO:create a dialog that is allows writing descriptions of instance
-                  title: Text('Set Description'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
-                ),
-              ),
-              PopupMenuDivider(),
-              const PopupMenuItem(
-                //TODO: implement a way to limit guests in the instance
-                child: ListTile(
-                  title: Text('Limit number of Guests'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
-                ),
-              ),
-              PopupMenuDivider(),
-              const PopupMenuItem(
-                //TODO: is this a Text location or some sort of google maps thing?
-                child: ListTile(
-                  title: Text('Set Location'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
-                ),
-              ),
-            ]);
+          PopupMenuItem(
+            child: ListTile(
+              //TODO:create a onpressed that edits 'instanceName'
+                contentPadding: EdgeInsets.only(right: 0.0),
+                leading: Text('Name:'),
+                title: Text('$instanceName',textScaleFactor: 1.2,)
+            ),
+          ),
+          PopupMenuDivider(),
+          PopupMenuItem(
+            child: ListTile(
+              //TODO:create a onpressed that allows to edit 'entranceCode?
+              //TODO:make the 'entranceCode' bigger font
+              title: Text('Entrance Code: $entranceCode '),
+              contentPadding: EdgeInsets.only(left: 55.0), //todo:change back to 0.0
+            ),
+          ),
+          PopupMenuDivider(),
+          const PopupMenuItem(
+            child: ListTile(
+              //TODO:create a dialog that is allows writing descriptions of instance
+              title: Text('Set Description'),
+              contentPadding: EdgeInsets.only(right: 0.0),
+            ),
+          ),
+          PopupMenuDivider(),
+          const PopupMenuItem(
+            //TODO: implement a way to limit guests in the instance
+            child: ListTile(
+              title: Text('Limit number of Guests'),
+              contentPadding: EdgeInsets.only(right: 0.0),
+            ),
+          ),
+          PopupMenuDivider(),
+          const PopupMenuItem(
+            //TODO: is this a Text location or some sort of google maps thing?
+            child: ListTile(
+              title: Text('Set Location'),
+              contentPadding: EdgeInsets.only(right: 0.0),
+            ),
+          ),
+        ]);
   }
 }
 

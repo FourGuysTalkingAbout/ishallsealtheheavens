@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'app_bar_top_instance.dart';
 import 'app_bar_bottom.dart';
+import 'user_account_drawer.dart';
 
 import 'package:intl/intl.dart';
 
@@ -59,6 +60,7 @@ class _InstancePageState extends State<InstancePage> {
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(100), child: InstanceTopAppBar()),
       endDrawer: DrawerMenu(),
+      drawer: UserAccountDrawer(),
       body: Center(
         child: PhotoGridView(),
 //        InstanceSecondAppBar()
@@ -106,8 +108,10 @@ class PhotoGridView extends StatelessWidget {
                         crossAxisCount: 2,
                         mainAxisSpacing: 4.0,
                         crossAxisSpacing: 4.0,
-                        padding: EdgeInsets.all(4.0), // padding of the cards
-                        childAspectRatio: 1.0, // size of the card
+                        padding: EdgeInsets.all(4.0),
+                        // padding of the cards
+                        childAspectRatio: 1.0,
+                        // size of the card
                         children: snapshot.data.documents
                             .map((DocumentSnapshot document) {
                           return GestureDetector(
@@ -115,9 +119,7 @@ class PhotoGridView extends StatelessWidget {
                               child: Hero(
                                   tag: document.documentID,
                                   child: Image.network(document['url'],
-                                      fit: BoxFit.cover
-                                      )
-                                      ),
+                                      fit: BoxFit.cover)),
                             ),
                             onTap: () => Navigator.push(
                                 context,
@@ -147,8 +149,8 @@ class DetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: FlatButton(onPressed: () =>  deleteData(),
-          child: Icon(Icons.delete)),
+      floatingActionButton:
+          FlatButton(onPressed: () => deleteData(), child: Icon(Icons.delete)),
       body: GestureDetector(
         child: Center(
           child: Hero(
@@ -169,9 +171,11 @@ class DetailsPage extends StatelessWidget {
   }
 
   deleteData() {
-    db.collection('instances')
+    db
+        .collection('instances')
         .document('instance1')
         .collection('photos')
-        .document(id).delete();//TODO: ONLY DELETES IN DATABASE NOT STORAGE
+        .document(id)
+        .delete(); //TODO: ONLY DELETES IN DATABASE NOT STORAGE
   }
 }

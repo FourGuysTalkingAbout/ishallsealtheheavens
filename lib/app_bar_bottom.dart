@@ -13,8 +13,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      elevation: 1.0,
-      color: Colors.white,
+      elevation: 0.0,
+      color: Color(0xFFE5E5E5),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
