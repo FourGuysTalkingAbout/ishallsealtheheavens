@@ -31,7 +31,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
               instanceNameController: _instanceNameController),
           new InstanceNameRaisedButton(
               instanceNameController: _instanceNameController),
-
         ]),
       ),
       bottomNavigationBar: CustomAppBar(),
