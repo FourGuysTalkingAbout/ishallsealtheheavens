@@ -12,6 +12,7 @@ import 'instance_page.dart';
 import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:provider/provider.dart';
 
 
@@ -101,11 +102,24 @@ class InstanceNameRaisedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      child: title,
-      onPressed: onPressed ,
+      child: Text("Create Instance"),
+      onPressed: () {
+        createInstance();
+        final route = new MaterialPageRoute(
+          builder: (BuildContext context) =>
+              new InstancePage(instanceName: _instanceNameController.text),
+        );
+        Navigator.of(context).push(route);
+      },
     );
   }
 
+  void createInstance() async {
+    final fbDatabase = Firestore.instance;
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    
+    fbDatabase.collection('instances').add({'instanceName': _instanceNameController.text, 'user': user.uid});
+  }
 }
 
 class InstanceNameTextFormField extends StatelessWidget {
