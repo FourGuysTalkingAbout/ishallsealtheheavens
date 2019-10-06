@@ -90,6 +90,7 @@ class _LoginButtonState extends State<LoginButton> {
                 textColor: Colors.black,
                 child: Text('Sign out'),
               ),
+              UserProfile()
             ],
           );
         } else {

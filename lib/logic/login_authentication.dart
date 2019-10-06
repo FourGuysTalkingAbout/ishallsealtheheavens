@@ -6,7 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 
-final AuthService authService = AuthService();
+
 
 class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -21,11 +21,11 @@ class AuthService {
   AuthService() {
     user = Observable(_auth.onAuthStateChanged);
 
-    profile = user.switchMap((FirebaseUser u) {
-      if (u != null) {
+    profile = user.switchMap((FirebaseUser user) {
+      if (user != null) {
         return _db
             .collection('users')
-            .document(u.uid)
+            .document(user.uid)
             .snapshots()
             .map((snap) => snap.data);
       } else {
@@ -35,10 +35,13 @@ class AuthService {
   }
 
   Future<FirebaseUser> googleSignIn() async {
+    // Start
     loading.add(true);
+
+    //Step 1 Login with google. shows google's native log in screen and provide idToken and accessToken.
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    //Step 2 Login to FireBase. user is logged into google. but not firebase. pass the tokens to login to firebase.
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
     final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
@@ -129,3 +132,4 @@ class AuthService {
     }
   }
 }
+final AuthService authService = AuthService();

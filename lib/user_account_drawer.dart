@@ -14,9 +14,7 @@ class UserAccountDrawer extends StatefulWidget {
   _UserAccountDrawerState createState() => _UserAccountDrawerState();
 }
 
-
 class _UserAccountDrawerState extends State<UserAccountDrawer> {
-
   //TODO Fix Display name for Email Login
   //TODO allow Email/login to create display name
 
@@ -24,7 +22,7 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _auth.currentUser(),
-      builder:(context, AsyncSnapshot<FirebaseUser> snapshot) {
+      builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
         return Drawer(
           child: ListView(
             children: <Widget>[
@@ -44,7 +42,7 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
                       backgroundImage: AssetImage('images/apex_lestley.png'),
                       maxRadius: 50,
                     ),
-                    Text('Kikashi-Sensei@hotmail.com\n'+ snapshot.data.email,
+                    Text('Kikashi-Sensei@hotmail.com\n' + snapshot.data.email,
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -58,12 +56,17 @@ class _UserAccountDrawerState extends State<UserAccountDrawer> {
                 color: Colors.black,
               ),
               ListTile(
-                title:  Text('Username: ' + (snapshot.data.displayName == null ? 'Create a Username' : snapshot.data.displayName )),
+                title: Text('Username: ' +
+                    (snapshot.data.displayName == null
+                        ? 'Create a Username'
+                        : snapshot.data.displayName)),
               ),
               Divider(
                 color: Colors.black,
               ),
-              ListTile(),
+              ListTile(
+                title: Text('Name: ' + (snapshot.data.uid)),
+              ),
               Divider(
                 color: Colors.black,
               ),
@@ -91,8 +94,8 @@ class LoginButton extends StatelessWidget {
     return FlatButton(
       onPressed: () {
         authService.signOut();
-          Navigator.of(context).pushNamed('/');
-          },
+        Navigator.of(context).pushNamed('/');
+      },
       textColor: Colors.black,
       child: Container(
         alignment: Alignment(-1.17, 0),
