@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/join_create_page.dart';
 import 'logic/login_authentication.dart';
 
 class LoginPage extends StatefulWidget {
@@ -10,22 +11,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff673AB7),
-      body: Container(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-              width: 48,
-              height: 128,
-              child: Image(
-                image: AssetImage('images/icecreamcolour.png'),
-              )),
-          LoginButton(),
-        ],
-      )),
-    );
+    return LoginButton();
   }
 }
 
@@ -76,82 +62,82 @@ class _LoginButtonState extends State<LoginButton> {
       stream: authService.user,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return ListBody(
-            children: <Widget>[
-              MaterialButton(
-                onPressed: () => Navigator.of(context).pushNamed('JoinCreate'),
-                color: Colors.white,
-                textColor: Colors.black,
-                child: Text('Join or Create an Instance'),
-              ),
-              MaterialButton(
-                onPressed: () => authService.signOut(),
-                color: Colors.white,
-                textColor: Colors.black,
-                child: Text('Sign out'),
-              ),
-              UserProfile()
-            ],
-          );
+          return JoinCreatePage();
         } else {
-          return ListBody(
-            children: <Widget>[
-              Center(
-                child: LoginButtonContainer(
-                  child: MaterialButton(
-                    elevation: 0.0,
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed('LoginEmail'),
-                    color: Color(0xff757575),
-                    textColor: Color(0xffFFC107),
-                    child: Text('Login with Email'),
+          return Scaffold(
+            backgroundColor: const Color(0xff673AB7),
+            body: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                      width: 48,
+                      height: 128,
+                      child: Image(
+                        image: AssetImage('images/icecreamcolour.png'),
+                      )),
+                  ListBody(
+                    children: <Widget>[
+                      Center(
+                        child: LoginButtonContainer(
+                          child: MaterialButton(
+                            elevation: 0.0,
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed('LoginEmail'),
+                            color: Color(0xff757575),
+                            textColor: Color(0xffFFC107),
+                            child: Text('Login with Email'),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: LoginButtonContainer(
+                          child: MaterialButton(
+                            elevation: 0.0,
+                            onPressed: () {
+                              authService.signInWithFacebook();
+                            },
+                            color: Color(0xff3b5998),
+                            textColor: Colors.white,
+                            child: Text('Login with Facebook'),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: LoginButtonContainer(
+                          child: MaterialButton(
+                            elevation: 0.0,
+                            onPressed: () => authService.googleSignIn(),
+                            color: Color(0xffdb3236),
+                            textColor: Colors.white,
+                            child: Text('Login with Google'),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.symmetric(vertical: 4),
+                          width: 151,
+                          height: 40,
+                          decoration: new BoxDecoration(
+                            border: new Border.all(
+                              color: Color(0xffFFC107),
+                            ),
+                          ),
+                          child: MaterialButton(
+                            elevation: 0.0,
+                            onPressed: () => {},
+                            color: Color(0xff673AB7),
+                            textColor: Color(0xffFFC107),
+                            child: Text('No Account \n View Only'),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
-              Center(
-                child: LoginButtonContainer(
-                  child: MaterialButton(
-                    elevation: 0.0,
-                    onPressed: () {
-                      authService.signInWithFacebook();
-                    },
-                    color: Color(0xff3b5998),
-                    textColor: Colors.white,
-                    child: Text('Login with Facebook'),
-                  ),
-                ),
-              ),
-              Center(
-                child: LoginButtonContainer(
-                  child: MaterialButton(
-                    elevation: 0.0,
-                    onPressed: () => authService.googleSignIn(),
-                    color: Color(0xffdb3236),
-                    textColor: Colors.white,
-                    child: Text('Login with Google'),
-                  ),
-                ),
-              ),
-              Center(
-                child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  width: 151,
-                  height: 40,
-                  decoration: new BoxDecoration(
-                    border: new Border.all(
-                      color: Color(0xffFFC107),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    elevation: 0.0,
-                    onPressed: () => {},
-                    color: Color(0xff673AB7),
-                    textColor: Color(0xffFFC107),
-                    child: Text('No Account \n View Only'),
-                  ),
-                ),
-              ),
-            ],
+            ),
           );
         }
       },

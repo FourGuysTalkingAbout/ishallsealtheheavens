@@ -124,13 +124,12 @@ class InstanceListView extends StatefulWidget {
 class _InstanceListViewState extends State<InstanceListView>  {
   User user;
 
-
-
   @override
   Widget build(BuildContext context) {
+    String uid = '';
 
     return StreamBuilder<QuerySnapshot>(
-      stream: fbDatabase.collection('instances').where("users", isEqualTo: user.uid ).snapshots(),
+      stream: fbDatabase.collection('instances').where("users", isEqualTo: uid ).snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError)
           return Text('Error: ${snapshot.error}');
@@ -157,6 +156,7 @@ class _InstanceListViewState extends State<InstanceListView>  {
     String uid = user.uid;
     return uid;
   }
+
 }
 
 class User {
@@ -171,5 +171,4 @@ class User {
     String uid = user.uid;
 
   }
-
 }
