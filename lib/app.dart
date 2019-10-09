@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/logic/login_authentication.dart';
+import 'package:ishallsealtheheavens/test.dart';
+import 'package:provider/provider.dart';
 
 import 'gallery.dart';
 import 'instance_page.dart';
@@ -18,7 +21,7 @@ class App extends StatelessWidget {
         ),
         initialRoute: '/', // home basically
         routes: {
-          '/': (context) => LoginPage(),
+          '/': (context) => TestAuthProvider(),
           'LoginEmail': (context) => LoginWithEmail(),
           'SignupEmail': (context) => SignUpWithEmail(),
           'JoinCreate': (context) => JoinCreatePage(),

@@ -26,6 +26,7 @@ dependencies:
   image_picker: ^0.5.0+9
   intl: ^0.15.8
   rxdart: ^0.22.0
+  provider: ^3.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

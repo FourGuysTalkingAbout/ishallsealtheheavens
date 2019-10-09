@@ -5,30 +5,27 @@ import 'package:flutter/material.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
+import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
+import 'package:ishallsealtheheavens/logic/login_authentication.dart';
+import 'login_page.dart';
+import 'package:provider/provider.dart';
 
 
 final fbDatabase = Firestore.instance;
 
-
-class JoinCreatePage extends StatefulWidget {
-
-  JoinCreatePage({Key key, this.title}) : super(key: key);
-
+class JoinCreatePage extends StatelessWidget {
+  final TextEditingController _instanceNameController = TextEditingController();
+  JoinCreatePage({Key key, this.title, this.user}) : super(key: key);
+  final FirebaseUser user;
   final String title;
 
   @override
-  _JoinCreatePageState createState() => _JoinCreatePageState();
-}
-
-class _JoinCreatePageState extends State<JoinCreatePage> {
-
-  TextEditingController _instanceNameController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserRepository>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
@@ -39,7 +36,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
           child: Column(children: <Widget>[
             SecondAppBar(),
             SizedBox(height: 100),
-            Text('HELLO'),
+//            _buildUserInfo(user),
             new InstanceNameTextFormField(
                 instanceNameController: _instanceNameController),
             new InstanceNameRaisedButton(
@@ -52,6 +49,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     );
   }
 }
+
 
 class InstanceNameRaisedButton extends StatelessWidget {
   const InstanceNameRaisedButton({
@@ -73,6 +71,7 @@ class InstanceNameRaisedButton extends StatelessWidget {
               new InstancePage(value: _instanceNameController.text),
         );
         Navigator.of(context).push(route);
+
       },
     );
   }
@@ -121,54 +120,51 @@ class InstanceListView extends StatefulWidget {
   _InstanceListViewState createState() => _InstanceListViewState();
 }
 
-class _InstanceListViewState extends State<InstanceListView>  {
-  User user;
+class _InstanceListViewState extends State<InstanceListView> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
-    String uid = '';
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: fbDatabase.collection('instances').where("users", isEqualTo: uid ).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    return FutureBuilder(
+      future: _auth.currentUser(),
+      builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
         if (snapshot.hasError)
           return Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return Text('Loading....');
-          default:return ListView(
-            shrinkWrap: true,
-            children: snapshot.data.documents.map((DocumentSnapshot document) {
-              return Container(
-                height: 100,
-                child: Card(
-                    child: Center(child: Text(document['instanceName']))
-                ),
-              );
-            }).toList(),
+          case ConnectionState.waiting:
+            return Text('Loading.....');
+          default: FirebaseUser user = snapshot.data;
+          return Column(
+            children: <Widget>[
+              StreamBuilder<QuerySnapshot>(
+                stream: fbDatabase.collection('instances').where("users", isEqualTo: user.uid ).snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError)
+                    return Text('Error: ${snapshot.error}');
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Text('Loading....');
+                    default:
+                      return ListView(
+                        shrinkWrap: true,
+                        children: snapshot.data.documents.map((
+                            DocumentSnapshot document) {
+                          return Container(
+                            height: 100,
+                            child: Card(
+                                child: Center(child: Text(document['instanceName']))
+                            ),
+                          );
+                        }).toList(),
+                      );
+                  }
+                },
+              ),
+            ],
           );
         }
       },
     );
-  }
-
-    getCurrentUser()  async {
-    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    String uid = user.uid;
-    return uid;
-  }
-
-}
-
-class User {
-  String email;
-  String photoUrl;
-  String uid;
-
-  User({this.email,this.photoUrl,this.uid});
-
-  getCurrentUser()  async {
-    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    String uid = user.uid;
-
   }
 }
