@@ -36,7 +36,10 @@ class UserRepository with ChangeNotifier {
   }
 
   Future signOut() async {
-    _auth.signOut();
+    await _auth.signOut();
+    await _googleSignIn.signOut(); //is this needed?
+    await _facebookLogin.logOut();
+    _user = null;
     _status = Status.Unauthenticated;
     notifyListeners();
     return Future.delayed(Duration.zero);
@@ -165,3 +168,5 @@ class UserRepository with ChangeNotifier {
     }
   }
 }
+
+final UserRepository authService = UserRepository.instance();

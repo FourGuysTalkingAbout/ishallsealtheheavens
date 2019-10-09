@@ -9,7 +9,6 @@ import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
-import 'package:ishallsealtheheavens/logic/login_authentication.dart';
 import 'login_page.dart';
 import 'package:provider/provider.dart';
 
