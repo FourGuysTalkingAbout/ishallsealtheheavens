@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/gallery.dart';
+import 'package:ishallsealtheheavens/join_create_page.dart';
+import 'package:ishallsealtheheavens/past_instance.dart';
 
 class CustomAppBar extends StatefulWidget {
   const CustomAppBar();
@@ -90,4 +93,29 @@ class SlideRightRoute extends PageRouteBuilder {
             child: child,
           ),
         );
+}
+
+
+
+
+
+
+class BottomNavBar extends StatelessWidget {
+  BottomNavBar({@required this.onTapped, @required this.currentIndex});
+  int currentIndex;
+  Function onTapped;
+  
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem> [
+        BottomNavigationBarItem(icon: Icon(Icons.people)),
+        BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/IconIcecream.png'))),
+        BottomNavigationBarItem(icon: Icon(Icons.collections))
+      ],
+      selectedItemColor: Colors.amber[800],
+      currentIndex: currentIndex,
+      onTap:  onTapped,
+    );
+  }
 }

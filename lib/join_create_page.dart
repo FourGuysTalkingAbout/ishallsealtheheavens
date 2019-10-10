@@ -1,6 +1,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/gallery.dart';
+import 'package:ishallsealtheheavens/past_instance.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
@@ -186,6 +188,40 @@ class ActiveInstancesView extends StatelessWidget {
           );
         }
       },
+    );
+  }
+}
+
+
+class TestNavBar extends StatefulWidget {
+  @override
+  _TestNavBarState createState() => _TestNavBarState( );
+}
+
+class _TestNavBarState extends State<TestNavBar> {
+
+  int _selectedIndex = 0;
+  List<Widget> _navOptions = [
+    JoinCreatePage(),
+    PastInstance(),
+    Gallery(),
+    ];
+
+
+void _onItemTapped(int index) {
+  setState(() {
+    _selectedIndex = index;
+  });
+  
+}
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: UserAccountDrawer(),
+      body: _navOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _selectedIndex,
+        onTapped: _onItemTapped,),
     );
   }
 }

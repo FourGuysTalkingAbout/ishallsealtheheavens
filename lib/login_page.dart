@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
             case Status.Authenticating:
               return LoginButtons();
             case Status.Authenticated:
-              return JoinCreatePage(user: user.user);
+              return TestNavBar();
           }
           return Container();
         },
@@ -132,3 +132,4 @@ class LoginButtonContainer extends Container {
     );
   }
 }
+
