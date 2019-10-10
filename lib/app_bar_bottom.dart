@@ -41,7 +41,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           'Instance',
                           (route) => route.isCurrent
-                              ? route.settings.name == 'Instance' ? false : true
+                              ? route.settings.name == 'JoinCreate' ? false : true
                               : true);
                     })),
           ),

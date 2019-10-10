@@ -11,6 +11,7 @@ class InstanceTopAppBar extends AppBar {
           }),
           title: TopBarTitle(),
           centerTitle: true,
+          bottom: InstanceSecondAppBar(),
         );
 }
 
@@ -146,9 +147,7 @@ class InstanceSecondAppBar extends PreferredSize {
 
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(3.0),
-      height: 48.0,
-      width: 415.0,
+      height: 50,
       color: Colors.grey[100],
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

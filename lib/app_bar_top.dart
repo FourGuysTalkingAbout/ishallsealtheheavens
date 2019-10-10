@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/instance_page.dart';
+import 'package:provider/provider.dart';
+
+import 'logic/login_authProvider.dart';
 
 class TopAppBar extends AppBar {
   TopAppBar({Key key, Widget leading, Widget bottom})
@@ -58,32 +63,4 @@ class BarTitle extends StatelessWidget{
   }
 }
 
-
-class SecondAppBar extends StatelessWidget {
-  const SecondAppBar();
-
-  final int _numInstances = 0;
-
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48.0,
-      width: 415.0,
-      color: Colors.grey[300],
-      child: Center(
-        child: BarTitle("You have $_numInstances instances"),
-      ),
-
-
-      /*
-     *  Will be dynamic in the future. It should tell user how many instances
-     *  he/she has.
-     *
-     *  ie. how many he/she is hosting and how many he/she joined.
-     *
-     *
-     * */
-
-    );
-  }
-}
 

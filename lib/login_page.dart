@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ishallsealtheheavens/join_create_page.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'login_with_email.dart';
-
 
 class LoginPage extends StatelessWidget {
 

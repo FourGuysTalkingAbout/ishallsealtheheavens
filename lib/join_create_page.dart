@@ -1,6 +1,5 @@
-import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
@@ -8,8 +7,6 @@ import 'instance_page.dart';
 import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login_page.dart';
-import 'login_page.dart';
 import 'package:provider/provider.dart';
 
 
@@ -31,17 +28,23 @@ class JoinCreatePage extends StatelessWidget {
       //endDrawer: DrawerMenu(),
       drawer: UserAccountDrawer(),
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(children: <Widget>[
-            SecondAppBar(),
-            SizedBox(height: 100),
-//            _buildUserInfo(user),
-            new InstanceNameTextFormField(
-                instanceNameController: _instanceNameController),
-            new InstanceNameRaisedButton(
-                instanceNameController: _instanceNameController),
-            InstanceListView()
-          ]),
+        child: Column(
+          children: <Widget>[
+            InstanceNameTextFormField(instanceNameController: _instanceNameController),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                InstanceNameRaisedButton(
+                  instanceNameController: _instanceNameController,
+                  title: Text('Create Instance'),),
+                InstanceNameRaisedButton(
+                  instanceNameController: _instanceNameController,
+                title: Text('Join Instance')
+                ),
+              ],
+            ),
+            ActiveInstancesView(),
+          ],
         ),
       ),
       bottomNavigationBar: CustomAppBar(),
@@ -52,17 +55,17 @@ class JoinCreatePage extends StatelessWidget {
 
 class InstanceNameRaisedButton extends StatelessWidget {
   const InstanceNameRaisedButton({
-    Key key,
-    @required TextEditingController instanceNameController,
+    Key key, @required TextEditingController instanceNameController, this.title,
   })  : _instanceNameController = instanceNameController,
         super(key: key);
 
   final TextEditingController _instanceNameController;
+  final Widget title;
 
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      child: Text("Create Instance"),
+      child: title,
       onPressed: () {
         createInstance();
         final route = new MaterialPageRoute(
@@ -97,73 +100,93 @@ class InstanceNameTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _instanceNameController,
-      maxLengthEnforced: true,
-      maxLength: 10,
-      textAlign: TextAlign.center,
-      textCapitalization: TextCapitalization.characters,
-      textInputAction: TextInputAction.go,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: "name the instance",
-        labelText: "create instance",
-        alignLabelWithHint: true,
+
+   return Container(
+//      alignment: Alignment.center,
+      margin: EdgeInsets.symmetric(
+          horizontal: 50, vertical: 7.5),
+      color: Color(0xffC4C4C4),
+      child: TextFormField(
+        maxLength: 20,
+        controller: _instanceNameController,
+        textAlign: TextAlign.center,
+        decoration: InputDecoration(
+          counterText: '',
+//          contentPadding:
+//          EdgeInsets.only(left: 5, top: 5, bottom: 10),
+          border: InputBorder.none,
+          hintText: 'Join/Enter a Instance',
+          alignLabelWithHint: true
+        ),
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Enter your email';
+          }
+          return null;
+        },
       ),
     );
+
+//    return TextField(
+//      controller: _instanceNameController,
+//      maxLengthEnforced: true,
+//      maxLength: 10,
+//      textAlign: TextAlign.center,
+//      textCapitalization: TextCapitalization.characters,
+//      textInputAction: TextInputAction.go,
+//      decoration: InputDecoration(
+//        border: OutlineInputBorder(),
+//        hintText: "name the instance",
+//        labelText: "create instance",
+//        alignLabelWithHint: true,
+//      ),
+//    );
   }
 }
 
-class InstanceListView extends StatefulWidget {
-  @override
-  _InstanceListViewState createState() => _InstanceListViewState();
-}
-
-class _InstanceListViewState extends State<InstanceListView> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
+class ActiveInstancesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _auth.currentUser(),
-      builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
+    final provider = Provider.of<UserRepository>(context);
+    FirebaseUser user = provider.user;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: fbDatabase.collection('instances').where("users", isEqualTo: user.uid ).snapshots(),
+      builder: (BuildContext context,
+          AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError)
           return Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return Text('Loading.....');
-          default: FirebaseUser user = snapshot.data;
-          return Column(
-            children: <Widget>[
-              StreamBuilder<QuerySnapshot>(
-                stream: fbDatabase.collection('instances').where("users", isEqualTo: user.uid ).snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError)
-                    return Text('Error: ${snapshot.error}');
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Text('Loading....');
-                    default:
-                      return ListView(
-                        shrinkWrap: true,
-                        children: snapshot.data.documents.map((
-                            DocumentSnapshot document) {
-                          return Container(
-                            height: 100,
-                            child: Card(
-                                child: Center(child: Text(document['instanceName']))
-                            ),
-                          );
-                        }).toList(),
-                      );
-                  }
-                },
-              ),
-            ],
+            return Text('Loading....');
+          default: return ListView(
+            physics: PageScrollPhysics(),
+            shrinkWrap: true,
+            children: snapshot.data.documents.map((DocumentSnapshot document) {
+              return Padding(
+                padding: const EdgeInsets.only(top:20.0,right:8.0, left: 8.0, bottom: 0.0),
+                child: Container(
+                    height: 250,
+                    decoration: BoxDecoration(border: Border(
+                        left: BorderSide( width:8.0,color: Colors.grey[400]),
+                        right: BorderSide( width:8.0,color: Colors.grey[400]),
+                        top:BorderSide( width:8.0,color: Colors.grey[400]))),
+                  child: GridTile(
+                      header:Center(child: Text('FOOTER')),
+                      footer:Container(
+                      height: 80,
+                      color: Colors.grey[400],
+                      child: Center(child: Text(document['instanceName'],style: TextStyle(fontSize: 24.0),))),
+                      child: document['url'] != null ? Image.network(
+                        document['url'],fit: BoxFit.fill,): Text('')
+                  ),
+                ),
+              );
+            }).toList(),
           );
         }
       },
     );
   }
 }
+
