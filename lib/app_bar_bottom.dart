@@ -109,12 +109,14 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem> [
-        BottomNavigationBarItem(icon: Icon(Icons.people)),
-        BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/IconIcecream.png'))),
-        BottomNavigationBarItem(icon: Icon(Icons.collections))
+        BottomNavigationBarItem(icon: Icon(Icons.people),title: Text('')),
+        BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/IconIcecream.png')),title: Text('')),
+        BottomNavigationBarItem(icon: Icon(Icons.collections),title: Text(''))
       ],
-      selectedItemColor: Colors.amber[800],
+      selectedItemColor: Colors.black,
       currentIndex: currentIndex,
+      backgroundColor: Colors.deepPurple,
+      unselectedItemColor: Colors.white,
       onTap:  onTapped,
     );
   }

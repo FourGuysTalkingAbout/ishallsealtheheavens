@@ -18,7 +18,6 @@ class _GalleryState extends State<Gallery> {
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       appBar: GalleryTopAppBar(),
-      drawer: UserAccountDrawer(),
       body: Center(
         child: Column(
           children: <Widget>[
@@ -39,7 +38,6 @@ class _GalleryState extends State<Gallery> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: CustomAppBar(),
     );
   }
 }

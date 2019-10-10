@@ -28,7 +28,6 @@ class JoinCreatePage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
       //endDrawer: DrawerMenu(),
-      drawer: UserAccountDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -49,7 +48,6 @@ class JoinCreatePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: CustomAppBar(),
     );
   }
 }
@@ -164,6 +162,7 @@ class ActiveInstancesView extends StatelessWidget {
           default: return ListView(
             physics: PageScrollPhysics(),
             shrinkWrap: true,
+            // scrollDirection: Axis.horizontal, //Change to horizontal possible
             children: snapshot.data.documents.map((DocumentSnapshot document) {
               return Padding(
                 padding: const EdgeInsets.only(top:20.0,right:8.0, left: 8.0, bottom: 0.0),
@@ -173,7 +172,7 @@ class ActiveInstancesView extends StatelessWidget {
                         left: BorderSide( width:8.0,color: Colors.grey[400]),
                         right: BorderSide( width:8.0,color: Colors.grey[400]),
                         top:BorderSide( width:8.0,color: Colors.grey[400]))),
-                  child: GridTile(
+                  child: GridTile( // put gridTile in InstacePageDetails
                       header:Center(child: Text('FOOTER')),
                       footer:Container(
                       height: 80,
@@ -200,10 +199,10 @@ class TestNavBar extends StatefulWidget {
 
 class _TestNavBarState extends State<TestNavBar> {
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   List<Widget> _navOptions = [
-    JoinCreatePage(),
     PastInstance(),
+    JoinCreatePage(),
     Gallery(),
     ];
 
