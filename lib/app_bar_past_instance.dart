@@ -15,17 +15,14 @@ class InstanceTopAppBar extends AppBar {
 class TopBarText extends StatelessWidget{
 
   Widget build(BuildContext context ) {
-    return Row(
-      children: <Widget>[
-        Icon(Icons.arrow_back,size: 33.0,),
-        Text("FS",
-    style: TextStyle(
-    decoration: TextDecoration.underline,
-    fontSize: 20.0,
-    fontStyle: FontStyle.italic,
-    fontWeight: FontWeight.bold,
-    color: Colors.white))
-      ],
+    return Center(
+      child: Text("FS",
+      style: TextStyle(
+      decoration: TextDecoration.underline,
+      fontSize: 20.0,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.bold,
+      color: Colors.white)),
     );
   }
 }

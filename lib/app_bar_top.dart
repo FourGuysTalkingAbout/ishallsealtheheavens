@@ -6,14 +6,14 @@ import 'package:provider/provider.dart';
 import 'logic/login_authProvider.dart';
 
 class TopAppBar extends AppBar {
-  TopAppBar({Key key, Widget leading, Widget bottom})
+  TopAppBar({Key key, Widget leading, Widget bottom, Widget title})
       : super(
     key: key,
     backgroundColor: Colors.deepPurple,
     leading: Builder(builder: (BuildContext context) {
       return new TopBarText();
     }),
-    title: new BarTitle("No Instance"),
+    title: new BarTitle("Home"),
     centerTitle: true,
     actions: <Widget>[
       new IconButton(

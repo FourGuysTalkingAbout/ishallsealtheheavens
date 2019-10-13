@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +13,13 @@ import 'package:intl/intl.dart';
 final db = Firestore.instance;
 
 class InstancePage extends StatefulWidget {
-  final String value; //TODO: is this needed?
+//  final String value;
+  final String instanceName;
+  final String instanceId;
+  final bool;
 
-  InstancePage({Key key, this.value}) : super(key: key);
+  InstancePage({Key key, this.instanceName, this.instanceId, this.bool})
+      : super(key: key);
 
   @override
   _InstancePageState createState() => _InstancePageState();
@@ -43,13 +48,25 @@ class _InstancePageState extends State<InstancePage> {
 
     var url = await taskSnapshot.ref
         .getDownloadURL(); // takes the URL of the imageFile
+//
+    QuerySnapshot test = await db
+        .collection('instances')
+        .document(widget.instanceId)
+        .collection('photos')
+        .getDocuments();
+    var test2 = db
+        .collection('instances')
+        .document(widget.instanceId)
+        .snapshots()
+        .contains(url);
+//    var testing = db.collection('instances').document(widget.instanceId).setData({'url': url});
+//    List photoURLS;
+//    photoURLS.add(url);
+    db.collection('instances').document(widget.instanceId).updateData({
+      'photoURL': FieldValue.arrayUnion([url])
+    });
 
-    DocumentReference DocRef =
-        await db //uploads the URL into the collection photos
-            .collection('instances')
-            .document('instance1')
-            .collection('photos')
-            .add({'url': url});
+//    db.collection('instances').document(widget.instanceId).setData({'url': url}, merge: true);
   }
 
   @override
@@ -58,11 +75,17 @@ class _InstancePageState extends State<InstancePage> {
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100), child: InstanceTopAppBar()),
+          preferredSize: Size.fromHeight(100),
+          child: InstanceTopAppBar(
+            title: Text(widget.instanceName),
+          )),
       endDrawer: DrawerMenu(),
       drawer: UserAccountDrawer(),
       body: Center(
-        child: PhotoGridView(),
+        child: PhotoGridView(
+          docId: widget.instanceId,
+          instanceName: widget.instanceName,
+        ),
 //        InstanceSecondAppBar()
       ),
       floatingActionButton: Padding(
@@ -82,13 +105,45 @@ class _InstancePageState extends State<InstancePage> {
   }
 }
 
+
+
 class PhotoGridView extends StatelessWidget {
+  final String instanceName;
+  final String docId;
+
+  PhotoGridView({this.instanceName, this.docId});
+
+  getImages() {
+    db.collection('instances').where('instanceName', isEqualTo: docId).snapshots();
+    return ;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
+    return StreamBuilder(
+      stream: getImages(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Text('Loading...');
+          default:
+//          List Images = snapshot.data['photoURL']
+            return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2),
+                itemBuilder: (context, index) {
+              List Images = snapshot.data.documents['photoURL'];
+
+                  return
+            });
+        }
+      },
+    );
+
+    StreamBuilder<QuerySnapshot>(
         stream: db
             .collection('instances')
-            .document('instance1')
+            .document(docId)
             .collection('photos')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -141,7 +196,7 @@ class PhotoGridView extends StatelessWidget {
 
 class DetailsPage extends StatelessWidget {
   final String imageUrl;
-  String id;
+  final String id;
 
   DetailsPage({this.imageUrl, this.id});
 

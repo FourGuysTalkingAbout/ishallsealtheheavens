@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:ishallsealtheheavens/gallery.dart';
 import 'package:ishallsealtheheavens/past_instance.dart';
 import 'app_bar_bottom.dart';
+import 'app_bar_past_instance.dart';
 import 'app_bar_top.dart';
+import 'app_bar_top_gallery.dart';
 import 'instance_page.dart';
 import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
@@ -19,6 +21,7 @@ class JoinCreatePage extends StatelessWidget {
   JoinCreatePage({Key key, this.title, this.user}) : super(key: key);
   final FirebaseUser user;
   final String title;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,79 +32,87 @@ class JoinCreatePage extends StatelessWidget {
       appBar: TopAppBar(),
       //endDrawer: DrawerMenu(),
       body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            InstanceNameTextFormField(instanceNameController: _instanceNameController),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                InstanceNameRaisedButton(
-                  instanceNameController: _instanceNameController,
-                  title: Text('Create Instance'),),
-                InstanceNameRaisedButton(
-                  instanceNameController: _instanceNameController,
-                title: Text('Join Instance')
-                ),
-              ],
-            ),
-            ActiveInstancesView(),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              InstanceNameTextFormField(instanceNameController: _instanceNameController),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  InstanceNameRaisedButton(
+                    instanceNameController: _instanceNameController,
+                    title: Text('Create Instance'),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        createInstance();
+                        final route =  MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          new InstancePage(instanceName: _instanceNameController.text,),
+                        );
+                        Navigator.of(context).push(route);
+                      }
+                  },
+                  ),
+                  InstanceNameRaisedButton(
+                    instanceNameController: _instanceNameController,
+                    title: Text('Join Instance'),
+                    onPressed: () => joinInstance(),
+                  ),
+                ],
+              ),
+              ActiveInstancesView(),
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-
-class InstanceNameRaisedButton extends StatelessWidget {
-  const InstanceNameRaisedButton({
-    Key key, @required TextEditingController instanceNameController, this.title,
-  })  : _instanceNameController = instanceNameController,
-        super(key: key);
-
-  final TextEditingController _instanceNameController;
-  final Widget title;
-
-  @override
-  Widget build(BuildContext context) {
-    return RaisedButton(
-      child: title,
-      onPressed: () {
-        createInstance();
-        final route = new MaterialPageRoute(
-          builder: (BuildContext context) =>
-              new InstancePage(value: _instanceNameController.text),
-        );
-        Navigator.of(context).push(route);
-
-      },
-    );
-  }
-
   void createInstance() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-
     fbDatabase
         .collection('instances')
         .add({'instanceName': _instanceNameController.text, 'users': user.uid});
   }
 
   void joinInstance() {}
+
+}
+
+
+class InstanceNameRaisedButton extends StatelessWidget {
+  const InstanceNameRaisedButton({
+    Key key, @required TextEditingController instanceNameController, this.title,this.onPressed
+  })  : _instanceNameController = instanceNameController,
+        super(key: key);
+
+  final TextEditingController _instanceNameController;
+  final Widget title;
+  final Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+      child: title,
+      onPressed: onPressed ,
+    );
+  }
+
 }
 
 class InstanceNameTextFormField extends StatelessWidget {
   const InstanceNameTextFormField({
     Key key,
     @required TextEditingController instanceNameController,
-  })  : _instanceNameController = instanceNameController,
+  })
+      : _instanceNameController = instanceNameController,
         super(key: key);
 
   final TextEditingController _instanceNameController;
 
   @override
   Widget build(BuildContext context) {
-
-   return Container(
+    return Container(
 //      alignment: Alignment.center,
       margin: EdgeInsets.symmetric(
           horizontal: 50, vertical: 7.5),
@@ -111,36 +122,21 @@ class InstanceNameTextFormField extends StatelessWidget {
         controller: _instanceNameController,
         textAlign: TextAlign.center,
         decoration: InputDecoration(
-          counterText: '',
+            counterText: '',
 //          contentPadding:
 //          EdgeInsets.only(left: 5, top: 5, bottom: 10),
-          border: InputBorder.none,
-          hintText: 'Join/Enter a Instance',
-          alignLabelWithHint: true
+            border: InputBorder.none,
+            hintText: 'Join/Enter a Instance',
+            alignLabelWithHint: true
         ),
         validator: (String value) {
           if (value.isEmpty) {
-            return 'Enter your email';
+            return 'Enter something';
           }
           return null;
         },
       ),
     );
-
-//    return TextField(
-//      controller: _instanceNameController,
-//      maxLengthEnforced: true,
-//      maxLength: 10,
-//      textAlign: TextAlign.center,
-//      textCapitalization: TextCapitalization.characters,
-//      textInputAction: TextInputAction.go,
-//      decoration: InputDecoration(
-//        border: OutlineInputBorder(),
-//        hintText: "name the instance",
-//        labelText: "create instance",
-//        alignLabelWithHint: true,
-//      ),
-//    );
   }
 }
 
@@ -159,31 +155,52 @@ class ActiveInstancesView extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return Text('Loading....');
-          default: return ListView(
+          default: return ListView.builder(
             physics: PageScrollPhysics(),
             shrinkWrap: true,
-            // scrollDirection: Axis.horizontal, //Change to horizontal possible
-            children: snapshot.data.documents.map((DocumentSnapshot document) {
+            itemCount: snapshot.data.documents.length,
+            itemBuilder: (context, index ) {
+              DocumentSnapshot document = snapshot.data.documents[index];
+//              String test = document['photos'][0];
               return Padding(
                 padding: const EdgeInsets.only(top:20.0,right:8.0, left: 8.0, bottom: 0.0),
                 child: Container(
-                    height: 250,
-                    decoration: BoxDecoration(border: Border(
-                        left: BorderSide( width:8.0,color: Colors.grey[400]),
-                        right: BorderSide( width:8.0,color: Colors.grey[400]),
-                        top:BorderSide( width:8.0,color: Colors.grey[400]))),
-                  child: GridTile( // put gridTile in InstacePageDetails
-                      header:Center(child: Text('FOOTER')),
-                      footer:Container(
-                      height: 80,
-                      color: Colors.grey[400],
-                      child: Center(child: Text(document['instanceName'],style: TextStyle(fontSize: 24.0),))),
-                      child: document['url'] != null ? Image.network(
-                        document['url'],fit: BoxFit.fill,): Text('')
+                  height: 250,
+                  decoration: BoxDecoration(border: Border(
+                      left: BorderSide( width:8.0,color: Colors.grey[400]),
+                      right: BorderSide( width:8.0,color: Colors.grey[400]),
+                      top:BorderSide( width:8.0,color: Colors.grey[400]))),
+                  child: GestureDetector(
+                      child: GridTile( // put gridTile in InstacePageDetails
+//                        header:Center(child: Text('FOOTER')),
+                          footer:Container(
+                              height: 80,
+                              color: Colors.grey[400],
+                              child: Center(child: Row(
+                                children: <Widget>[
+//                                  Text(test),
+                                  Text(document.documentID),
+                                  Text(document['instanceName'],
+                                      style: TextStyle(fontSize: 24.0)),
+                                ],
+                              ))),
+                          child: document['photoURL'] != null ? Image.network(
+                            document['photoURL'][0],fit: BoxFit.fill,): Text('')
+                      ),
+                      onTap: () =>
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => InstancePage(
+                              instanceId: document.documentID,
+                              instanceName: document['instanceName'])))
                   ),
                 ),
               );
-            }).toList(),
+            },
+
+            // scrollDirection: Axis.horizontal, //Change to horizontal possible
+//            children: snapshot.data.documents.map((DocumentSnapshot document) {
+//            var  test = document.data.values.contains('photos');
+//              return
+//            }).toList(),
           );
         }
       },
@@ -200,12 +217,16 @@ class TestNavBar extends StatefulWidget {
 class _TestNavBarState extends State<TestNavBar> {
 
   int _selectedIndex = 1;
-  List<Widget> _navOptions = [
+  List<Widget> _btmNavOptions = [
     PastInstance(),
     JoinCreatePage(),
     Gallery(),
     ];
-
+  List<Widget> _topNavOptions = [
+    TopAppBar(),
+    InstanceTopAppBar(),
+    GalleryTopAppBar(),
+  ];
 
 void _onItemTapped(int index) {
   setState(() {
@@ -215,9 +236,11 @@ void _onItemTapped(int index) {
 }
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<UserRepository>(context);
+    final FirebaseUser user = provider.user;
     return Scaffold(
       drawer: UserAccountDrawer(),
-      body: _navOptions.elementAt(_selectedIndex),
+      body: _btmNavOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTapped: _onItemTapped,),

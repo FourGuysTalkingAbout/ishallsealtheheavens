@@ -14,7 +14,6 @@ class _LoginWithEmailState extends State<LoginWithEmail> {
 
   @override
   Widget build(BuildContext context) {
-    final _key = GlobalKey<ScaffoldState>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

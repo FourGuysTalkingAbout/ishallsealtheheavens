@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'app_bar_top.dart';
 
 class InstanceTopAppBar extends AppBar {
-  InstanceTopAppBar({Key key, Widget leading, Widget bottom})
+  InstanceTopAppBar({Key key, Widget leading, Widget bottom, Widget title})
       : super(
           key: key,
           backgroundColor: Colors.deepPurple,
           leading: Builder(builder: (BuildContext context) {
             return new TopBarText();
           }),
-          title: TopBarTitle(),
+          title: title,
           centerTitle: true,
           bottom: InstanceSecondAppBar(),
         );
