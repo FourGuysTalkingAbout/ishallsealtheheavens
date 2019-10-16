@@ -26,6 +26,9 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
+  List<String> images = List<String>();
+
+
   openCamera() async {
     //TODO: implement a better naming convention for the 'imageName'
 //    final String imageName = '${Random().nextInt(100)}';
@@ -62,8 +65,9 @@ class _InstancePageState extends State<InstancePage> {
 //    var testing = db.collection('instances').document(widget.instanceId).setData({'url': url});
 //    List photoURLS;
 //    photoURLS.add(url);
+      // images.add(url);
     db.collection('instances').document(widget.instanceId).updateData({
-      'photoURL': FieldValue.arrayUnion([url])
+      'photoURL': FieldValue.arrayUnion([url]),
     });
 
 //    db.collection('instances').document(widget.instanceId).setData({'url': url}, merge: true);
@@ -111,86 +115,90 @@ class PhotoGridView extends StatelessWidget {
   final String instanceName;
   final String docId;
 
-  PhotoGridView({this.instanceName, this.docId});
+  PhotoGridView({this.instanceName, this.docId,});
 
-  getImages() {
-    db.collection('instances').where('instanceName', isEqualTo: docId).snapshots();
-    return ;
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: getImages(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    return FutureBuilder(
+      future: db.collection('instances').document(docId).get(),
+      builder: (context, snapshot) {
+        List<dynamic> instanceImages = List<dynamic>();
+        instanceImages.add(snapshot.data['photoURL']);
+
+         
         if (snapshot.hasError) return Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return Text('Loading...');
           default:
-//          List Images = snapshot.data['photoURL']
-            return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2),
-                itemBuilder: (context, index) {
-              List Images = snapshot.data.documents['photoURL'];
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            itemCount: instanceImages.length,
+            itemBuilder: (context, index) {
+            var document = snapshot.data;
 
-                  return
-            });
+              return Text(document['instanceName']);
+
+              
+            },
+          );
+       
         }
       },
     );
 
-    StreamBuilder<QuerySnapshot>(
-        stream: db
-            .collection('instances')
-            .document(docId)
-            .collection('photos')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return new Text('Loading...');
-            default:
-              return Column(
-                children: <Widget>[
-                  Expanded(
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: GridView.count(
-                        key: PageStorageKey<String>('Preseves scroll position'),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                        padding: EdgeInsets.all(4.0),
-                        // padding of the cards
-                        childAspectRatio: 1.0,
-                        // size of the card
-                        children: snapshot.data.documents
-                            .map((DocumentSnapshot document) {
-                          return GestureDetector(
-                            child: GridTile(
-                              child: Hero(
-                                  tag: document.documentID,
-                                  child: Image.network(document['url'],
-                                      fit: BoxFit.cover)),
-                            ),
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DetailsPage(
-                                        id: document.documentID,
-                                        imageUrl: document['url']))),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-          }
-        });
+    // StreamBuilder<QuerySnapshot>(
+    //     stream: db
+    //         .collection('instances')
+    //         .document(docId)
+    //         .collection('photos')
+    //         .snapshots(),
+    //     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    //       if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+    //       switch (snapshot.connectionState) {
+    //         case ConnectionState.waiting:
+    //           return new Text('Loading...');
+    //         default:
+    //           return Column(
+    //             children: <Widget>[
+    //               Expanded(
+    //                 child: SafeArea(
+    //                   top: false,
+    //                   bottom: false,
+    //                   child: GridView.count(
+    //                     key: PageStorageKey<String>('Preseves scroll position'),
+    //                     crossAxisCount: 2,
+    //                     mainAxisSpacing: 4.0,
+    //                     crossAxisSpacing: 4.0,
+    //                     padding: EdgeInsets.all(4.0),
+    //                     // padding of the cards
+    //                     childAspectRatio: 1.0,
+    //                     // size of the card
+    //                     children: snapshot.data.documents
+    //                         .map((DocumentSnapshot document) {
+    //                       return GestureDetector(
+    //                         child: GridTile(
+    //                           child: Hero(
+    //                               tag: document.documentID,
+    //                               child: Image.network(document['url'],
+    //                                   fit: BoxFit.cover)),
+    //                         ),
+    //                         onTap: () => Navigator.push(
+    //                             context,
+    //                             MaterialPageRoute(
+    //                                 builder: (context) => DetailsPage(
+    //                                     id: document.documentID,
+    //                                     imageUrl: document['url']))),
+    //                       );
+    //                     }).toList(),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ],
+    //           );
+    //       }
+    //     });
   }
 }
 

@@ -1,6 +1,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ishallsealtheheavens/gallery.dart';
 import 'package:ishallsealtheheavens/past_instance.dart';
 import 'app_bar_bottom.dart';
@@ -23,9 +24,12 @@ class JoinCreatePage extends StatelessWidget {
   final String title;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserRepository>(context);
+    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -69,10 +73,14 @@ class JoinCreatePage extends StatelessWidget {
     );
   }
   void createInstance() async {
+    final now = DateTime.now().toLocal();
+    final formatter = DateFormat.MMMMEEEEd().add_Hm();
+    final date = formatter.format(now);
+    
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     fbDatabase
         .collection('instances')
-        .add({'instanceName': _instanceNameController.text, 'users': user.uid});
+        .add({'instanceName': _instanceNameController.text, 'users': user.uid, 'date': FieldValue.serverTimestamp()});
   }
 
   void joinInstance() {}
