@@ -111,7 +111,7 @@ class BottomNavBar extends StatelessWidget {
       items: const <BottomNavigationBarItem> [
         BottomNavigationBarItem(icon: Icon(Icons.people),title: Text('')),
         BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/IconIcecream.png')),title: Text('')),
-        BottomNavigationBarItem(icon: Icon(Icons.collections),title: Text(''))
+        BottomNavigationBarItem(icon: Icon(Icons.collections),title: Text('')),
       ],
       selectedItemColor: Colors.black,
       currentIndex: currentIndex,

@@ -11,7 +11,7 @@ class InstanceTopAppBar extends AppBar {
           }),
           title: title,
           centerTitle: true,
-          bottom: InstanceSecondAppBar(),
+          bottom: BottomInstanceBar(),
         );
 }
 
@@ -25,7 +25,7 @@ class DrawerMenu extends StatelessWidget {
           new UserAccountsDrawerHeader(
               accountName: new Text('Name of Instance'), accountEmail: null),
           new ListTile(
-            leading: new InstanceInfo(), // Test divider
+            leading: new InstancesInfo(), // Test divider
           ),
           new Divider(
             color: Color(0xFF000000),
@@ -49,8 +49,8 @@ class DrawerMenu extends StatelessWidget {
   }
 }
 
-class InstanceInfo extends StatelessWidget {
-  const InstanceInfo({
+class InstancesInfo extends StatelessWidget {
+  const InstancesInfo({
     Key key,
   }) : super(key: key);
 
@@ -71,7 +71,7 @@ class InstanceInfo extends StatelessWidget {
 class DeleteInstance extends StatelessWidget {
   DeleteInstance({Key key}) : super(key: key);
 
-  PopUpMenu popUpConfirm = new PopUpMenu();
+  final PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +142,8 @@ class PopUpMenu {
   }
 }
 
-class InstanceSecondAppBar extends PreferredSize {
-  const InstanceSecondAppBar();
+class BottomInstanceBar extends PreferredSize {
+  const BottomInstanceBar();
 
   Widget build(BuildContext context) {
     return Container(
@@ -185,7 +185,7 @@ class EditIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var entranceCode = 'IN3CH';
+    String entranceCode = 'IN3CH';
     String instanceName = 'Name of In';
     String instanceDescription = '';
     int numberOfGuests;
