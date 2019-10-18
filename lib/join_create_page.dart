@@ -3,69 +3,95 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ishallsealtheheavens/gallery.dart';
-import 'package:ishallsealtheheavens/past_instance.dart';
-import 'app_bar_bottom.dart';
-import 'app_bar_past_instance.dart';
-import 'app_bar_top.dart';
-import 'app_bar_top_gallery.dart';
-import 'instance_page.dart';
-import 'logic/login_authProvider.dart';
-import 'user_account_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
-class JoinCreatePage extends StatelessWidget {
+import 'gallery.dart';
+import 'past_instance.dart';
+import 'app_bar_bottom.dart';
+import 'app_bar_top.dart';
+import 'instance_page.dart';
+import 'user_account_drawer.dart';
+import 'logic/login_authProvider.dart';
+
+class NavBar extends StatefulWidget {
+  @override
+  _NavBarState createState() => _NavBarState();
+}
+
+class _NavBarState extends State<NavBar> {
+  int _selectedIndex = 1;
+  List<Widget> _btmNavOptions = [
+    PastInstance(),
+    JoinCreatePage(),
+    Gallery(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: UserAccountDrawer(),
+      body: _btmNavOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _selectedIndex,
+        onTapped: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class JoinCreatePage extends StatefulWidget {
+
+  @override
+  _JoinCreatePageState createState() => _JoinCreatePageState();
+}
+
+class _JoinCreatePageState extends State<JoinCreatePage> {
+
   final TextEditingController _instanceNameController = TextEditingController();
-  JoinCreatePage({Key key, this.title, this.user}) : super(key: key);
-  final FirebaseUser user;
-  final String title;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserRepository>(context);
-
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: TopAppBar(),
-      //endDrawer: DrawerMenu(),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
-              InstanceNameTextFormField(
+              InstanceNameTextFormField( //todo: remove text after join/create button pressed.
                   instanceNameController: _instanceNameController),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  InstanceNameRaisedButton(
-                    instanceNameController: _instanceNameController,
-                    title: Text('Create Instance'),
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        createInstance(context: context, user: user.user.uid);
-//                        final route = MaterialPageRoute(
-//                          builder: (BuildContext context) => new InstancePage(
-//                            instanceName: _instanceNameController.text,
-//                          ),
-//                        );
-//                        Navigator.of(context).push(route);
-                      }
-                    },
+                  Container(
+                    width: 150,
+                    child: RaisedButton(
+                        child: Text('Create Instance'),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            createInstance(context: context, user: user.uid);
+                          }}),
                   ),
-                  InstanceNameRaisedButton(
-                      instanceNameController: _instanceNameController,
-                      title: Text('Join Instance'),
+                  Container(
+                    width: 150,
+                    child: RaisedButton(
+                      child: Text('Join Instance'),
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
-//                          Navigator.push(context, MaterialPageRoute(builder: (context) => InstancePage()));
-                          joinInstance(context: context, user: user.user.uid);
-                        }
-                      }),
-                ],
-              ),
+                          joinInstance(context: context, user: user.uid);
+                        }}),
+                  )
+                ]),
               ActiveInstancesView(),
             ],
           ),
@@ -75,31 +101,32 @@ class JoinCreatePage extends StatelessWidget {
   }
 
   createCode() {
-    Random code = Random.secure();
-    String CreateCryptoRandomString([int length = 32]) {
-      var values = List<int>.generate(length, (i) => code.nextInt(256));
+    Random code = Random();
+    String createCryptoRandomString([int length = 6]) {
+      var values = List<int>.generate(length, (i) => code.nextInt(15));
       return base64Url.encode(values);
     }
+    return createCryptoRandomString();
   }
 
   createInstance({String user, BuildContext context}) async {
-    DocumentReference docRef =
-        await db // turn into a transaction && add instanceCode random
-            .collection('instances')
-            .add({
+
+    DocumentReference docRef = await db.collection('instances').add({ // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
-      'users': FieldValue.arrayUnion([user])
+      'instanceCode': createCode(),
+      'users': FieldValue.arrayUnion([user]),
+      'date': FieldValue.serverTimestamp(),
+
+
+
     });
-    Navigator.push(
-        context,
-        MaterialPageRoute(
+    Navigator.push(context, MaterialPageRoute(
             builder: (context) => InstancePage(
                   instanceName: _instanceNameController.text,
                   instanceId: docRef.documentID,
                 )));
   }
 
-//  TODO: add error when instanceCode isn't correct or doesn't exists
   void joinInstance({String user, BuildContext context}) async {
     QuerySnapshot snapshot = await db
         .collection('instances')
@@ -109,35 +136,16 @@ class JoinCreatePage extends StatelessWidget {
     snapshot.documents[0].reference.updateData({
       'users': FieldValue.arrayUnion([user])
     });
-    Navigator.push(
-        context,
-        MaterialPageRoute(
+    Navigator.push(context, MaterialPageRoute(
             builder: (context) => InstancePage(
                   instanceName: snapshot.documents[0].data['instanceName'],
                   instanceId: snapshot.documents[0].documentID,
                 )));
   }
-}
-
-class InstanceNameRaisedButton extends StatelessWidget {
-  const InstanceNameRaisedButton(
-      {Key key,
-      @required TextEditingController instanceNameController,
-      this.title,
-      this.onPressed})
-      : _instanceNameController = instanceNameController,
-        super(key: key);
-
-  final TextEditingController _instanceNameController;
-  final Widget title;
-  final Function onPressed;
-
   @override
-  Widget build(BuildContext context) {
-    return RaisedButton(
-      child: title,
-      onPressed: onPressed,
-    );
+  void dispose () {
+    _instanceNameController.dispose();
+    super.dispose();
   }
 }
 
@@ -225,12 +233,8 @@ class ActiveInstancesView extends StatelessWidget {
                                 child: Center(
                                     child: Text(document['instanceName'],
                                         style: TextStyle(fontSize: 24.0)))),
-                            child: document['photoURL'] != null
-                                ? Image.network(
-                                    document['photoURL'][0],
-                                    fit: BoxFit.fill,
-                                  )
-                                : Text('')),
+                            child: document['photoURL'] != null ? Image.network(
+                              document['photoURL'][0],fit: BoxFit.fill,) : Text('')),
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -247,42 +251,4 @@ class ActiveInstancesView extends StatelessWidget {
   }
 }
 
-class TestNavBar extends StatefulWidget {
-  @override
-  _TestNavBarState createState() => _TestNavBarState();
-}
 
-class _TestNavBarState extends State<TestNavBar> {
-  int _selectedIndex = 1;
-  List<Widget> _btmNavOptions = [
-    PastInstance(),
-    JoinCreatePage(),
-    Gallery(),
-  ];
-
-  List<Widget> _topNavOptions = [
-    TopAppBar(),
-    InstanceTopAppBar(),
-    GalleryTopAppBar(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<UserRepository>(context);
-    final FirebaseUser user = provider.user;
-    return Scaffold(
-      drawer: UserAccountDrawer(),
-      body: _btmNavOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _selectedIndex,
-        onTapped: _onItemTapped,
-      ),
-    );
-  }
-}
