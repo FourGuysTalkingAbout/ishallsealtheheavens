@@ -30,9 +30,7 @@ class _PastInstanceState extends State<PastInstance> {
     return Scaffold(
         appBar: InstanceTopAppBar(),
         backgroundColor: partyBackgroundColor,
-        drawer: UserAccountDrawer(),
         endDrawer: DrawerMenu(),
-        bottomNavigationBar: CustomAppBar(),
         body: Center(
             child: ListView.builder(
           itemCount: instanceNames.length,

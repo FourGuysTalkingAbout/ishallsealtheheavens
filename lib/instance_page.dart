@@ -1,20 +1,26 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
+import 'package:provider/provider.dart';
 import 'app_bar_top_instance.dart';
-import 'app_bar_bottom.dart';
 import 'user_account_drawer.dart';
-
 import 'package:intl/intl.dart';
 
 final db = Firestore.instance;
 
 class InstancePage extends StatefulWidget {
-  final String value; //TODO: is this needed?
+//  final String value;
+  final String instanceName;
+  final String instanceId;
+  final bool firstPic;
 
-  InstancePage({Key key, this.value}) : super(key: key);
+  InstancePage({Key key, this.instanceName, this.instanceId, this.firstPic})
+      : super(key: key);
 
   @override
   _InstancePageState createState() => _InstancePageState();
@@ -43,13 +49,18 @@ class _InstancePageState extends State<InstancePage> {
 
     var url = await taskSnapshot.ref
         .getDownloadURL(); // takes the URL of the imageFile
+    saveToFireStore(url);
 
-    DocumentReference DocRef =
-        await db //uploads the URL into the collection photos
-            .collection('instances')
-            .document('instance1')
-            .collection('photos')
-            .add({'url': url});
+  }
+
+  saveToFireStore(String url) {
+    final DocumentReference postRef = db.document('instances/${widget.instanceId}');
+    db.runTransaction((Transaction tx) async {
+      DocumentSnapshot postSnapshot = await tx.get(postRef);
+      if (postSnapshot.exists) {
+        await tx.update(postRef, {'photoURL': FieldValue.arrayUnion([url])});
+      }
+    });
   }
 
   @override
@@ -58,11 +69,17 @@ class _InstancePageState extends State<InstancePage> {
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100), child: InstanceTopAppBar()),
+          preferredSize: Size.fromHeight(100),
+          child: InstanceTopAppBar(
+            title: Text(widget.instanceName),
+          )),
       endDrawer: DrawerMenu(),
       drawer: UserAccountDrawer(),
       body: Center(
-        child: PhotoGridView(),
+        child: PhotoGridView(
+          docId: widget.instanceId,
+          instanceName: widget.instanceName,
+        ),
 //        InstanceSecondAppBar()
       ),
       floatingActionButton: Padding(
@@ -77,71 +94,66 @@ class _InstancePageState extends State<InstancePage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: CustomAppBar(),
+//      bottomNavigationBar: CustomAppBar(),
     );
   }
 }
 
 class PhotoGridView extends StatelessWidget {
+  final String instanceName;
+  final String docId;
+
+  PhotoGridView({this.instanceName, this.docId});
+
+  Stream<List<dynamic>> getPics() {
+    DocumentReference docRef = db.collection('instances').document(docId);
+    return docRef.snapshots().map((document) {
+      List<dynamic> info = document.data['photoURL'].toList();
+      return info;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: db
-            .collection('instances')
-            .document('instance1')
-            .collection('photos')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return new Text('Loading...');
-            default:
-              return Column(
-                children: <Widget>[
-                  Expanded(
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: GridView.count(
-                        key: PageStorageKey<String>('Preseves scroll position'),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                        padding: EdgeInsets.all(4.0),
-                        // padding of the cards
-                        childAspectRatio: 1.0,
-                        // size of the card
-                        children: snapshot.data.documents
-                            .map((DocumentSnapshot document) {
-                          return GestureDetector(
-                            child: GridTile(
-                              child: Hero(
-                                  tag: document.documentID,
-                                  child: Image.network(document['url'],
-                                      fit: BoxFit.cover)),
-                            ),
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DetailsPage(
-                                        id: document.documentID,
-                                        imageUrl: document['url']))),
-                          );
-                        }).toList(),
-                      ),
-                    ),
+    return StreamBuilder(
+      stream: getPics(),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.hasError) {
+          return Container();
+        } else {
+          return GridView.builder(
+              itemCount: snapshot.data.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                  crossAxisCount: 2),
+              padding: EdgeInsets.all(8.0),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: GridTile(
+                    child: Hero(
+                        tag: snapshot.data[index],
+                        child: Image.network(snapshot.data[index],
+                            fit: BoxFit.cover)),
                   ),
-                ],
-              );
-          }
-        });
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DetailsPage(
+                              id: snapshot.data[index],
+                              imageUrl: snapshot.data[index]))),
+                );
+              });
+        }
+      },
+    );
   }
 }
 
 class DetailsPage extends StatelessWidget {
   final String imageUrl;
-  String id;
+  final String id;
 
   DetailsPage({this.imageUrl, this.id});
 

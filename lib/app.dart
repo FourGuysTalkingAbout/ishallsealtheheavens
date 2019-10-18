@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
+import 'package:provider/provider.dart';
 
 import 'gallery.dart';
 import 'instance_page.dart';
@@ -12,20 +14,38 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.pink,
+      debugShowCheckedModeBanner: false,
+      title: 'Base app',
+
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+      ),
+      home: ChangeNotifierProvider(
+        builder: (_) => UserRepository.instance(),
+        child: Consumer(
+          builder: (context, UserRepository user, _) {
+            switch (user.status) {
+              case Status.Uninitialized:
+                return Container();
+              case Status.Unauthenticated:
+              case Status.Authenticating:
+                return LoginButtons();
+              case Status.Authenticated:
+                return NavBar();
+            }
+            return Container();
+          },
         ),
-        initialRoute: '/', // home basically
-        routes: {
-          '/': (context) => LoginPage(),
-          'LoginEmail': (context) => LoginWithEmail(),
-          'SignupEmail': (context) => SignUpWithEmail(),
-          'JoinCreate': (context) => JoinCreatePage(),
-          'PastInst': (context) => PastInstance(),
-          'Instance': (context) => InstancePage(),
-          'Gallery': (context) => Gallery(),
-        },
-        title: 'Base app');
+      ), // home basically
+      routes: {
+//          '/': (context) => LoginPage(),
+        'LoginEmail': (context) => LoginWithEmail(),
+        'SignupEmail': (context) => SignUpWithEmail(),
+        'JoinCreate': (context) => JoinCreatePage(),
+        'PastInst': (context) => PastInstance(),
+        'Instance': (context) => InstancePage(),
+        'Gallery': (context) => Gallery(),
+      },
+    );
   }
 }
