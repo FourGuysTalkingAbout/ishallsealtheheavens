@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
             case Status.Authenticating:
               return LoginButtons();
             case Status.Authenticated:
-              return TestNavBar();
+              return NavBar();
           }
           return Container();
         },
