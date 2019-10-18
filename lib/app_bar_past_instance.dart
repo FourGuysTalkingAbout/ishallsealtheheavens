@@ -83,7 +83,7 @@ class InstanceInfo extends StatelessWidget {
 class DeleteInstance extends StatelessWidget {
   DeleteInstance({Key key}) : super(key: key);
 
-  PopUpMenu popUpConfirm = new PopUpMenu();
+  final PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -12,6 +13,7 @@ import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
 import 'user_account_drawer.dart';
+
 import 'logic/login_authProvider.dart';
 
 class NavBar extends StatefulWidget {
@@ -143,9 +145,18 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                 )));
   }
   @override
+
   void dispose () {
     _instanceNameController.dispose();
     super.dispose();
+
+  }
+
+  void createInstance() async {
+    final fbDatabase = Firestore.instance;
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    
+    fbDatabase.collection('instances').add({'instanceName': _instanceNameController.text, 'user': user.uid});
   }
 }
 
