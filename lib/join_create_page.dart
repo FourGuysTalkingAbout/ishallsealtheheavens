@@ -151,13 +151,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     super.dispose();
 
   }
-
-  void createInstance() async {
-    final fbDatabase = Firestore.instance;
-    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    
-    fbDatabase.collection('instances').add({'instanceName': _instanceNameController.text, 'user': user.uid});
-  }
 }
 
 class InstanceNameTextFormField extends StatelessWidget {
