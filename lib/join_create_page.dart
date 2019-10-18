@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ishallsealtheheavens/gallery.dart';
@@ -57,6 +60,7 @@ class JoinCreatePage extends StatelessWidget {
                       title: Text('Join Instance'),
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
+//                          Navigator.push(context, MaterialPageRoute(builder: (context) => InstancePage()));
                           joinInstance(context: context, user: user.user.uid);
                         }
                       }),
@@ -68,6 +72,14 @@ class JoinCreatePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  createCode() {
+    Random code = Random.secure();
+    String CreateCryptoRandomString([int length = 32]) {
+      var values = List<int>.generate(length, (i) => code.nextInt(256));
+      return base64Url.encode(values);
+    }
   }
 
   void createInstance({String user}) async {
@@ -89,10 +101,16 @@ class JoinCreatePage extends StatelessWidget {
     snapshot.documents[0].reference.updateData({
       'users': FieldValue.arrayUnion([user])
     });
-    final route = MaterialPageRoute(
-        builder: (BuildContext context) => InstancePage(
-            instanceName: snapshot.documents[0].data['instanceName']));
-    Navigator.of(context).push(route);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => InstancePage(
+                  instanceName: snapshot.documents[0].data['instanceName'],
+                )));
+//    final route = MaterialPageRoute(
+//        builder: (BuildContext context) => InstancePage(
+//            instanceName: snapshot.documents[0].data['instanceName']));
+//    Navigator.of(context).push(route);
   }
 }
 
@@ -200,14 +218,8 @@ class ActiveInstancesView extends StatelessWidget {
                                 height: 80,
                                 color: Colors.grey[400],
                                 child: Center(
-                                    child: Row(
-                                  children: <Widget>[
-//                                  Text(test),
-                                    Text(document.documentID),
-                                    Text(document['instanceName'],
-                                        style: TextStyle(fontSize: 24.0)),
-                                  ],
-                                ))),
+                                    child: Text(document['instanceName'],
+                                        style: TextStyle(fontSize: 24.0)))),
                             child: document['photoURL'] != null
                                 ? Image.network(
                                     document['photoURL'][0],
@@ -223,12 +235,6 @@ class ActiveInstancesView extends StatelessWidget {
                   ),
                 );
               },
-
-              // scrollDirection: Axis.horizontal, //Change to horizontal possible
-//            children: snapshot.data.documents.map((DocumentSnapshot document) {
-//            var  test = document.data.values.contains('photos');
-//              return
-//            }).toList(),
             );
         }
       },
