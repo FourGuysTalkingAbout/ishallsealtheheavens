@@ -45,13 +45,13 @@ class JoinCreatePage extends StatelessWidget {
                     title: Text('Create Instance'),
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
-                        createInstance(user: user.user.uid);
-                        final route = MaterialPageRoute(
-                          builder: (BuildContext context) => new InstancePage(
-                            instanceName: _instanceNameController.text,
-                          ),
-                        );
-                        Navigator.of(context).push(route);
+                        createInstance(context: context, user: user.user.uid);
+//                        final route = MaterialPageRoute(
+//                          builder: (BuildContext context) => new InstancePage(
+//                            instanceName: _instanceNameController.text,
+//                          ),
+//                        );
+//                        Navigator.of(context).push(route);
                       }
                     },
                   ),
@@ -82,13 +82,21 @@ class JoinCreatePage extends StatelessWidget {
     }
   }
 
-  void createInstance({String user}) async {
-    db // turn into a transaction && add instanceCode random
-        .collection('instances')
-        .add({
+  createInstance({String user, BuildContext context}) async {
+    DocumentReference docRef =
+        await db // turn into a transaction && add instanceCode random
+            .collection('instances')
+            .add({
       'instanceName': _instanceNameController.text,
       'users': FieldValue.arrayUnion([user])
     });
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => InstancePage(
+                  instanceName: _instanceNameController.text,
+                  instanceId: docRef.documentID,
+                )));
   }
 
 //  TODO: add error when instanceCode isn't correct or doesn't exists
@@ -106,11 +114,8 @@ class JoinCreatePage extends StatelessWidget {
         MaterialPageRoute(
             builder: (context) => InstancePage(
                   instanceName: snapshot.documents[0].data['instanceName'],
+                  instanceId: snapshot.documents[0].documentID,
                 )));
-//    final route = MaterialPageRoute(
-//        builder: (BuildContext context) => InstancePage(
-//            instanceName: snapshot.documents[0].data['instanceName']));
-//    Navigator.of(context).push(route);
   }
 }
 

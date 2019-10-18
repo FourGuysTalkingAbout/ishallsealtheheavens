@@ -49,10 +49,18 @@ class _InstancePageState extends State<InstancePage> {
 
     var url = await taskSnapshot.ref
         .getDownloadURL(); // takes the URL of the imageFile
+    saveToFireStore(url);
 
-    db.collection('instances').document(widget.instanceId).setData({
-      'photoURL': FieldValue.arrayUnion([url])
-    } ,merge: true); // change to transaction
+  }
+
+  saveToFireStore(String url) {
+    final DocumentReference postRef = db.document('instances/${widget.instanceId}');
+    db.runTransaction((Transaction tx) async {
+      DocumentSnapshot postSnapshot = await tx.get(postRef);
+      if (postSnapshot.exists) {
+        await tx.update(postRef, {'photoURL': FieldValue.arrayUnion([url])});
+      }
+    });
   }
 
   @override
@@ -101,8 +109,6 @@ class PhotoGridView extends StatelessWidget {
     DocumentReference docRef = db.collection('instances').document(docId);
     return docRef.snapshots().map((document) {
       List<dynamic> info = document.data['photoURL'].toList();
-      print(info);
-      print(info.length);
       return info;
     });
   }
