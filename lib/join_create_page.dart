@@ -146,6 +146,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   void dispose () {
     _instanceNameController.dispose();
     super.dispose();
+
   }
 }
 
