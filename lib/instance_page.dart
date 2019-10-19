@@ -149,12 +149,17 @@ class PhotoGridView extends StatelessWidget {
                   crossAxisCount: 2),
               padding: EdgeInsets.all(8.0),
               itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: GridTile(
+                return  GestureDetector(
+                  child: Card(
+                    elevation: 5.0,
                     child: Hero(
                         tag: snapshot.data[index],
-                        child: Image.network(snapshot.data[index],
-                            fit: BoxFit.cover)),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 14.0),
+                          child: Image.network(snapshot.data[index],
+                              fit: BoxFit.fill
+                          ),
+                        )),
                   ),
                   onTap: () => Navigator.push(
                       context,
