@@ -68,12 +68,24 @@ class _InstancePageState extends State<InstancePage> {
     });
   }
 
+  isActive() {
+    Future.delayed(const Duration(seconds: 3), () {
+      DocumentReference docRef = db.document('instances/${widget.instanceId}');
+      db.runTransaction((Transaction tx) async {
+        DocumentSnapshot postSnapshot = await tx.get(docRef);
+        if (postSnapshot.exists) {
+          await tx.update(docRef, {'active': false});
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+//    isActive(); // find way to set active to false or true
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[400],
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(100),
           child: InstanceTopAppBar(
@@ -118,7 +130,7 @@ class PhotoGridView extends StatelessWidget {
       return info;
     });
   }
-//  db.collection('instances').document(docId).snapshots(),
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -129,6 +141,7 @@ class PhotoGridView extends StatelessWidget {
           return Container();
         } else {
           return GridView.builder(
+             key: PageStorageKey<String>('Preseves scroll position'),
               itemCount: snapshot.data.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisSpacing: 4.0,
@@ -136,12 +149,17 @@ class PhotoGridView extends StatelessWidget {
                   crossAxisCount: 2),
               padding: EdgeInsets.all(8.0),
               itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: GridTile(
+                return  GestureDetector(
+                  child: Card(
+                    elevation: 5.0,
                     child: Hero(
                         tag: snapshot.data[index],
-                        child: Image.network(snapshot.data[index],
-                            fit: BoxFit.cover)),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 14.0),
+                          child: Image.network(snapshot.data[index],
+                              fit: BoxFit.fill
+                          ),
+                        )),
                   ),
                   onTap: () => Navigator.push(
                       context,
