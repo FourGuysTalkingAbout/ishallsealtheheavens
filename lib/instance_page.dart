@@ -85,7 +85,7 @@ class _InstancePageState extends State<InstancePage> {
 //    isActive(); // find way to set active to false or true
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[400],
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(100),
           child: InstanceTopAppBar(
@@ -141,6 +141,7 @@ class PhotoGridView extends StatelessWidget {
           return Container();
         } else {
           return GridView.builder(
+             key: PageStorageKey<String>('Preseves scroll position'),
               itemCount: snapshot.data.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisSpacing: 4.0,

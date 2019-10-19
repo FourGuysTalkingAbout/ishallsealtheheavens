@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'app_bar_past_instance.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-const Color partyBackgroundColor = Color(0xFFE5E5E5);
 
 
 class PastInstance extends StatefulWidget {
@@ -26,7 +25,6 @@ class _PastInstanceState extends State<PastInstance> {
      final now = DateTime.now().toLocal();
     final formatter = DateFormat.MMMMEEEEd().add_Hm();
     final date = formatter.format(now);
-
     return StreamBuilder<QuerySnapshot>(
       stream: db.collection('instances').where('users', arrayContains: user.uid).where('active', isEqualTo: false).orderBy('date', descending: true).snapshots(),
       builder: (context, snapshot) {
@@ -34,13 +32,17 @@ class _PastInstanceState extends State<PastInstance> {
         return CircularProgressIndicator();
       }
         return ListView.builder(
+          key: PageStorageKey<String>('Preseves scroll position'),
           itemCount: snapshot.data.documents.length,
           itemBuilder: (BuildContext context, int index) {
             DocumentSnapshot document = snapshot.data.documents[index];
-            var date = timeago.format(document['date'].toDate());
+            var timeAgo = timeago.format(document['date'].toDate());
             return CustomGridTile(
+              instanceId: document.documentID,
               instanceName: document['instanceName'],
-              instancePhoto: document['photoURL'].isEmpty ? null : document['photoURL'][0],
+              instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
+              document['photoURL'][0],fit: BoxFit.fill),
+              date: timeAgo,
             );
           },
         );
@@ -54,8 +56,9 @@ class _PastInstanceState extends State<PastInstance> {
     final date = formatter.format(now);
     
     return Scaffold(
+
         appBar: InstanceTopAppBar(),
-        backgroundColor: partyBackgroundColor,
+        backgroundColor: Colors.grey[400],
         endDrawer: DrawerMenu(),
         body: _buildGridList()
         );

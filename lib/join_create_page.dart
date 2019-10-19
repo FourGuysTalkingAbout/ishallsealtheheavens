@@ -1,14 +1,13 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
-
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ishallsealtheheavens/model/GridTile.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 import 'gallery.dart';
 import 'past_instance.dart';
@@ -215,43 +214,21 @@ class ActiveInstancesView extends StatelessWidget {
             return Text('Loading....');
           default:
             return ListView.builder(
+              key: PageStorageKey<String>('Preseves scroll position'),
               physics: PageScrollPhysics(),
               shrinkWrap: true,
               itemCount: snapshot.data.documents.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot document = snapshot.data.documents[index];
+                var timeAgo = timeago.format(document['date'].toDate());
+
 //            var snap = document.reference.collection('photos').snapshots();
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20.0, right: 25.0, left: 25.0, bottom: 0.0),
-                  child: Container(
-                    height: 250,
-                    decoration: BoxDecoration(
-                        border: Border(
-                            left: BorderSide(width: 8.0, color: Colors.white),
-                            right:BorderSide(width: 8.0, color: Colors.white),
-                            top: BorderSide(width: 8.0, color: Colors.white),
-                        ),
-                    ),
-                    child: GestureDetector(
-                        child: GridTile(
-                            // put gridTile in InstacePageDetails
-//                        header:Center(child: Text('FOOTER')),
-                            footer: Container(
-                                height: 60,
-                                color: Colors.white,
-                                child: Center(
-                                    child: Text(document['instanceName'],
-                                        style: TextStyle(fontSize: 24.0)))),
-                            child: document['photoURL'] != null ? Image.network(
-                              document['photoURL'][0],fit: BoxFit.fill,) : Container(color: Colors.black,)),
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InstancePage(
-                                    instanceId: document.documentID,
-                                    instanceName: document['instanceName'])))),
-                  ),
+                return CustomGridTile(
+                  instanceId: document.documentID,
+                  instanceName: document['instanceName'],
+                  instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
+                      document['photoURL'][0],fit: BoxFit.fill),
+                  date: timeAgo,
                 );
               },
             );
