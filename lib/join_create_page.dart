@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -61,14 +62,14 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   final TextEditingController _instanceNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  
 
   @override
   Widget build(BuildContext context) {
 
+
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[400],
       appBar: TopAppBar(),
       body: SingleChildScrollView(
         child: Form(
@@ -83,6 +84,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                   Container(
                     width: 150,
                     child: RaisedButton(
+                      color: Colors.white,
                         child: Text('Create Instance'),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
@@ -92,6 +94,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                   Container(
                     width: 150,
                     child: RaisedButton(
+                      color: Colors.white,
                       child: Text('Join Instance'),
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
@@ -124,6 +127,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
       'instanceCode': createCode(),
       'users': FieldValue.arrayUnion([user]),
       'date': FieldValue.serverTimestamp(),
+      'active': true,
 
     });
     Navigator.push(context, MaterialPageRoute(
@@ -170,7 +174,7 @@ class InstanceNameTextFormField extends StatelessWidget {
     return Container(
 //      alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 50, vertical: 7.5),
-      color: Color(0xffC4C4C4),
+      color: Colors.white,
       child: TextFormField(
         maxLength: 20,
         controller: _instanceNameController,
@@ -196,13 +200,13 @@ class InstanceNameTextFormField extends StatelessWidget {
 class ActiveInstancesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<UserRepository>(context);
-    FirebaseUser user = provider.user;
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
 
     return StreamBuilder<QuerySnapshot>(
       stream: db
           .collection('instances')
           .where("users", arrayContains: user.uid)
+          .where('active', isEqualTo: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return Text('Error: ${snapshot.error}');
@@ -219,29 +223,28 @@ class ActiveInstancesView extends StatelessWidget {
 //            var snap = document.reference.collection('photos').snapshots();
                 return Padding(
                   padding: const EdgeInsets.only(
-                      top: 20.0, right: 8.0, left: 8.0, bottom: 0.0),
+                      top: 20.0, right: 25.0, left: 25.0, bottom: 0.0),
                   child: Container(
                     height: 250,
                     decoration: BoxDecoration(
                         border: Border(
-                            left:
-                                BorderSide(width: 8.0, color: Colors.grey[400]),
-                            right:
-                                BorderSide(width: 8.0, color: Colors.grey[400]),
-                            top: BorderSide(
-                                width: 8.0, color: Colors.grey[400]))),
+                            left: BorderSide(width: 8.0, color: Colors.white),
+                            right:BorderSide(width: 8.0, color: Colors.white),
+                            top: BorderSide(width: 8.0, color: Colors.white),
+                        ),
+                    ),
                     child: GestureDetector(
                         child: GridTile(
                             // put gridTile in InstacePageDetails
 //                        header:Center(child: Text('FOOTER')),
                             footer: Container(
-                                height: 80,
-                                color: Colors.grey[400],
+                                height: 60,
+                                color: Colors.white,
                                 child: Center(
                                     child: Text(document['instanceName'],
                                         style: TextStyle(fontSize: 24.0)))),
                             child: document['photoURL'] != null ? Image.network(
-                              document['photoURL'][0],fit: BoxFit.fill,) : Text('')),
+                              document['photoURL'][0],fit: BoxFit.fill,) : Container(color: Colors.black,)),
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(

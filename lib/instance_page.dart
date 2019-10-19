@@ -68,9 +68,21 @@ class _InstancePageState extends State<InstancePage> {
     });
   }
 
+  isActive() {
+    Future.delayed(const Duration(seconds: 3), () {
+      DocumentReference docRef = db.document('instances/${widget.instanceId}');
+      db.runTransaction((Transaction tx) async {
+        DocumentSnapshot postSnapshot = await tx.get(docRef);
+        if (postSnapshot.exists) {
+          await tx.update(docRef, {'active': false});
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+//    isActive(); // find way to set active to false or true
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
@@ -118,7 +130,7 @@ class PhotoGridView extends StatelessWidget {
       return info;
     });
   }
-//  db.collection('instances').document(docId).snapshots(),
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
