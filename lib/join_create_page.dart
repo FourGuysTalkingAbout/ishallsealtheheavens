@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +15,7 @@ import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
 import 'user_account_drawer.dart';
+
 import 'logic/login_authProvider.dart';
 
 class NavBar extends StatefulWidget {
@@ -103,6 +107,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     );
   }
 
+
   createCode() {
     Random code = Random();
     String createCryptoRandomString([int length = 6]) {
@@ -113,6 +118,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   }
 
   createInstance({String user, BuildContext context}) async {
+
     DocumentReference docRef = await db.collection('instances').add({ // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
       'instanceCode': createCode(),
@@ -245,12 +251,6 @@ class ActiveInstancesView extends StatelessWidget {
                   ),
                 );
               },
-
-              // scrollDirection: Axis.horizontal, //Change to horizontal possible
-//            children: snapshot.data.documents.map((DocumentSnapshot document) {
-//            var  test = document.data.values.contains('photos');
-//              return
-//            }).toList(),
             );
         }
       },

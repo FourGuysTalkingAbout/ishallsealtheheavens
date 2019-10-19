@@ -6,12 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
-import 'package:ishallsealtheheavens/model/Instance.dart';
+
 import 'package:provider/provider.dart';
 import 'app_bar_top_instance.dart';
-import 'app_bar_bottom.dart';
 import 'user_account_drawer.dart';
-
 import 'package:intl/intl.dart';
 
 final db = Firestore.instance;
@@ -57,19 +55,17 @@ class _InstancePageState extends State<InstancePage> {
 
     var url = await taskSnapshot.ref
         .getDownloadURL(); // takes the URL of the imageFile
-    QuerySnapshot test = await db
-        .collection('instances')
-        .document(widget.instanceId)
-        .collection('photos')
-        .getDocuments();
 
-    db.collection('instances').document(widget.instanceId).updateData({
-      'photoURL': FieldValue.arrayUnion([url]) });
+    saveToFireStore(url);
   }
-
-
-  _setInstanceDisplay(String url) {
-    db.collection('instances').document(widget.instanceId).updateData({'photoURL': url});
+  saveToFireStore(String url) {
+    final DocumentReference postRef = db.document('instances/${widget.instanceId}');
+    db.runTransaction((Transaction tx) async {
+      DocumentSnapshot postSnapshot = await tx.get(postRef);
+      if (postSnapshot.exists) {
+        await tx.update(postRef, {'photoURL': FieldValue.arrayUnion([url])});
+      }
+    });
   }
 
 
@@ -109,115 +105,55 @@ class _InstancePageState extends State<InstancePage> {
   }
 }
 
-
-
 class PhotoGridView extends StatelessWidget {
   final String instanceName;
   final String docId;
 
   PhotoGridView({this.instanceName, this.docId});
 
-  Stream<InstanceInfo> getInstance() {
-    return db
-        .collection('instances')
-        .document('21NWNWwD4Apr9RVSbAes')
-        .get()
-        .then((snapshot) {
-      try {
-        return InstanceInfo.fromSnapshot(snapshot);
-      } catch (e) {
-        print(docId);
-        print(e);
-        return null;
-      }
-    }).asStream();
+  Stream<List<dynamic>> getPics() {
+    DocumentReference docRef = db.collection('instances').document(docId);
+    return docRef.snapshots().map((document) {
+      List<dynamic> info = document.data['photoURL'].toList();
+      return info;
+    });
   }
 //  db.collection('instances').document(docId).snapshots(),
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: db.collection('instances').document(docId).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot?.data == null ) return Text('Loading...');
-      DocumentSnapshot document = snapshot.data;
-      List<dynamic> test = List();
-      test.addAll(snapshot.data['photoURL']);
-        return GridView.builder(
-            itemCount: test.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 4.0,
-                crossAxisCount: 2),
-                padding: EdgeInsets.all(8.0),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                child: GridTile(
-                  child: Hero(
-                      tag: document['photoURL'][index],
-                      child: Image.network(document['photoURL'][index],
-                          fit: BoxFit.cover)),
-                ),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DetailsPage(
-                            id: document['photoURL'][index],
-                            imageUrl: document['photoURL'][index]))),
-              );
-            });
+      stream: getPics(),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.hasError) {
+          return Container();
+        } else {
+          return GridView.builder(
+              itemCount: snapshot.data.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                  crossAxisCount: 2),
+              padding: EdgeInsets.all(8.0),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: GridTile(
+                    child: Hero(
+                        tag: snapshot.data[index],
+                        child: Image.network(snapshot.data[index],
+                            fit: BoxFit.cover)),
+                  ),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DetailsPage(
+                              id: snapshot.data[index],
+                              imageUrl: snapshot.data[index]))),
+                );
+              });
+        }
       },
     );
-   return StreamBuilder<QuerySnapshot>(
-        stream: db
-            .collection('instances')
-            .document(docId)
-            .collection('photos')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return new Text('Loading...');
-            default:
-              return Column(
-                children: <Widget>[
-                  Expanded(
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: GridView.count(
-                        key: PageStorageKey<String>('Preseves scroll position'),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                        padding: EdgeInsets.all(4.0),
-                        // padding of the cards
-                        childAspectRatio: 1.0,
-                        // size of the card
-                        children: snapshot.data.documents
-                            .map((DocumentSnapshot document) {
-                          return GestureDetector(
-                            child: GridTile(
-                              child: Hero(
-                                  tag: document.documentID,
-                                  child: Image.network(document['url'],
-                                      fit: BoxFit.cover)),
-                            ),
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DetailsPage(
-                                        id: document.documentID,
-                                        imageUrl: document['url']))),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-          }
-        });
   }
 }
 
