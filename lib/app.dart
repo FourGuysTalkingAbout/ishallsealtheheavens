@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'gallery.dart';
 import 'instance_page.dart';
 import 'join_create_page.dart';
-import 'login_page.dart';
 import 'past_instance.dart';
 import 'login_with_email.dart';
 import 'signup_with_email.dart';
@@ -13,16 +12,12 @@ import 'signup_with_email.dart';
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Base app',
-
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-      ),
-      home: ChangeNotifierProvider(
-        builder: (_) => UserRepository.instance(),
-        child: Consumer(
+    return ChangeNotifierProvider(
+      builder: (_) => UserRepository.instance(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Base app',
+        home: Consumer(
           builder: (context, UserRepository user, _) {
             switch (user.status) {
               case Status.Uninitialized:
@@ -36,16 +31,41 @@ class App extends StatelessWidget {
             return Container();
           },
         ),
-      ), // home basically
-      routes: {
-//          '/': (context) => LoginPage(),
-        'LoginEmail': (context) => LoginWithEmail(),
-        'SignupEmail': (context) => SignUpWithEmail(),
-        'JoinCreate': (context) => JoinCreatePage(),
-        'PastInst': (context) => PastInstance(),
+        routes: {
+          'LoginEmail': (context) => LoginWithEmail(),
+          'SignupEmail': (context) => SignUpWithEmail(),
+          'JoinCreate': (context) => JoinCreatePage(),
+          'PastInst': (context) => PastInstance(),
         'Instance': (context) => InstancePage(),
-        'Gallery': (context) => Gallery(),
-      },
+          'Gallery': (context) => Gallery(),
+        },
+      ),
     );
   }
 }
+
+//
+//
+//class App extends StatelessWidget {
+//  @override
+//  Widget build(BuildContext context) {
+//    return MaterialApp(
+//      debugShowCheckedModeBanner: false,
+//      title: 'Base app',
+//
+//      theme: ThemeData(
+//        primarySwatch: Colors.pink,
+//      ),
+//      // home basically
+//      routes: {
+////          '/': (context) => LoginPage(),
+//        'LoginEmail': (context) => LoginWithEmail(),
+//        'SignupEmail': (context) => SignUpWithEmail(),
+//        'JoinCreate': (context) => JoinCreatePage(),
+//        'PastInst': (context) => PastInstance(),
+////        'Instance': (context) => InstancePage(),
+//        'Gallery': (context) => Gallery(),
+//      },
+//    );
+//  }
+//}

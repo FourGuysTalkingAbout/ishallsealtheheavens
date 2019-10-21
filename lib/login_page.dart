@@ -3,29 +3,6 @@ import 'package:ishallsealtheheavens/join_create_page.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      builder: (_) => UserRepository.instance(),
-      child: Consumer(
-        builder: (context, UserRepository user, _) {
-          switch (user.status) {
-            case Status.Uninitialized:
-              return Container();
-            case Status.Unauthenticated:
-            case Status.Authenticating:
-              return LoginButtons();
-            case Status.Authenticated:
-              return NavBar();
-          }
-          return Container();
-        },
-      ),
-    );
-  }
-}
 
 class LoginButtons extends StatelessWidget {
   final _auth = UserRepository.instance();
