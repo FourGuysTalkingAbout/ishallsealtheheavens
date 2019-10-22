@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ishallsealtheheavens/instance_page.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
-import 'package:ishallsealtheheavens/model/GridTile.dart';
+import 'package:ishallsealtheheavens/GridTile.dart';
 import 'package:provider/provider.dart';
 import 'app_bar_past_instance.dart';
 import 'package:timeago/timeago.dart' as timeago;

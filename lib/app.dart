@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'gallery.dart';
 import 'instance_page.dart';
 import 'join_create_page.dart';
+import 'login_page.dart';
 import 'past_instance.dart';
 import 'login_with_email.dart';
 import 'signup_with_email.dart';

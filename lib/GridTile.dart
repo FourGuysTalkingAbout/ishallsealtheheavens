@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../instance_page.dart';
+import 'instance_page.dart';
 
 
 class CustomGridTile extends StatelessWidget {

@@ -1,13 +1,11 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
+import 'package:ishallsealtheheavens/saveFile.dart';
+import 'package:path_provider/path_provider.dart';
 
-import 'package:provider/provider.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
 import 'package:intl/intl.dart';
@@ -17,12 +15,14 @@ final db = Firestore.instance;
 
 
 class InstancePage extends StatefulWidget {
+  final SaveFile saveFile;
+
 //  final String value;
   final String instanceName;
   final String instanceId;
   final bool firstPic;
 
-  InstancePage({Key key, this.instanceName, this.instanceId, this.firstPic})
+  InstancePage({Key key, this.instanceName, this.instanceId, this.firstPic, this.saveFile})
       : super(key: key);
 
   @override
@@ -42,6 +42,13 @@ class _InstancePageState extends State<InstancePage> {
 
     File imageFile = await ImagePicker.pickImage(
         source: ImageSource.camera); //returns a File after picture is taken
+
+
+    SaveFile().writeImage(imageFile);
+    // Directory appDocDir = await getApplicationDocumentsDirectory();
+    // String appDocPath = appDocDir.path;
+
+    // await imageFile.copy('$appDocPath/image1.png');
 
     //'images' is a folder in Firebase Storage,
     final StorageReference storageRef =
@@ -68,7 +75,8 @@ class _InstancePageState extends State<InstancePage> {
     });
   }
 
-  isActive() {
+  isActive() {// sets instance 'active' from true to false; making it appear in past Instance
+              //TODO: allow host to select how long instance stays active.
     Future.delayed(const Duration(seconds: 3), () {
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {

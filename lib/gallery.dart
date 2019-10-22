@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ishallsealtheheavens/instance_page.dart';
 import 'app_bar_bottom.dart';
-import 'user_account_drawer.dart';
 import 'app_bar_top_gallery.dart';
 
 class Gallery extends StatefulWidget {
@@ -41,3 +39,15 @@ class _GalleryState extends State<Gallery> {
     );
   }
 }
+
+class PhotosTakenList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+//      Image.asset(name)
+    ],
+    );
+  }
+}
+
+
