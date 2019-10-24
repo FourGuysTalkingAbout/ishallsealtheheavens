@@ -22,17 +22,13 @@ final saveFile = SaveFile();
 final userRepository = UserRepository.instance();
 
 class InstancePage extends StatefulWidget {
-//  final String value;
   final String instanceName;
   final String instanceId;
+  final String instanceCode;
   final bool firstPic;
 
-  InstancePage(
-      {Key key,
-      this.instanceName,
-      this.instanceId,
-      this.firstPic,
-      })
+
+  InstancePage({Key key, this.instanceName, this.instanceId, this.firstPic, this.instanceCode})
       : super(key: key);
 
   @override
@@ -132,6 +128,8 @@ class _InstancePageState extends State<InstancePage> {
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(100),
           child: InstanceTopAppBar(
+            instanceName: widget.instanceName,
+            instanceCode: widget.instanceCode,
             title: Text(widget.instanceName),
           )),
       endDrawer: DrawerMenu(),

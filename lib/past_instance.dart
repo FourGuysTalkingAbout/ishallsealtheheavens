@@ -38,6 +38,7 @@ class _PastInstanceState extends State<PastInstance> {
             DocumentSnapshot document = snapshot.data.documents[index];
             var timeAgo = timeago.format(document['date'].toDate());
             return CustomGridTile(
+              instanceCode: document['instanceCode'],
               instanceId: document.documentID,
               instanceName: document['instanceName'],
               instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(

@@ -2,16 +2,31 @@ import 'package:flutter/material.dart';
 import 'app_bar_top.dart';
 
 class InstanceTopAppBar extends AppBar {
-  InstanceTopAppBar({Key key, Widget leading, Widget bottom, Widget title})
+  InstanceTopAppBar(
+      {Key key,
+      Widget leading,
+      Widget bottom,
+      Widget title,
+      String instanceName,
+      String instanceCode,
+      })
       : super(
           key: key,
           backgroundColor: Colors.deepPurple,
-          leading: Builder(builder: (BuildContext context) {
-            return new TopBarText();
-          }),
+          leading: FlatButton(
+              onPressed: () => print('FS logo'),
+              child: Text("FS",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: 20.0,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white))),
           title: title,
           centerTitle: true,
-          bottom: BottomInstanceBar(),
+          bottom: BottomInstanceBar(
+              instanceName: instanceName,
+              instanceCode: instanceCode),
         );
 }
 
@@ -20,28 +35,28 @@ class DrawerMenu extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Drawer(
-      child: new ListView(
+      child: ListView(
         children: [
-          new UserAccountsDrawerHeader(
-              accountName: new Text('Name of Instance'), accountEmail: null),
-          new ListTile(
-            leading: new InstancesInfo(), // Test divider
+          UserAccountsDrawerHeader(
+              accountName: Text('Name of Instance'), accountEmail: null),
+          ListTile(
+            leading: InstancesInfo(), // Test divider
           ),
-          new Divider(
+          Divider(
             color: Color(0xFF000000),
           ),
-          new ListTile(
-            leading: new DeleteInstance(),
+          ListTile(
+            leading: DeleteInstance(),
           ),
-          new Divider(
+          Divider(
             color: Color(0xFF000000),
           ), // Test divider
-          new ListTile(
-              leading: new IconButton(
-                  icon: new Icon(Icons.search), onPressed: () => Text('Blah')),
+          ListTile(
+              leading: IconButton(
+                  icon: Icon(Icons.search), onPressed: () => Text('Blah')),
               title: TextField(),
               trailing: IconButton(
-                  icon: new Icon(Icons.play_arrow),
+                  icon: Icon(Icons.play_arrow),
                   onPressed: () => Text('Pressed')))
         ],
       ),
@@ -71,7 +86,7 @@ class InstancesInfo extends StatelessWidget {
 class DeleteInstance extends StatelessWidget {
   DeleteInstance({Key key}) : super(key: key);
 
-  final PopUpMenu popUpConfirm = new PopUpMenu();
+  final PopUpMenu popUpConfirm = PopUpMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +111,7 @@ class TopBarTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Text(
+    return Text(
       'Name of In',
       textAlign: TextAlign.center,
     );
@@ -143,7 +158,42 @@ class PopUpMenu {
 }
 
 class BottomInstanceBar extends PreferredSize {
-  const BottomInstanceBar();
+  final String instanceCode;
+  final String instanceName;
+
+  const BottomInstanceBar({this.instanceCode, this.instanceName});
+
+  Widget _buildCheckIcon() {
+    return IconButton(
+      icon: Icon(Icons.check),
+      iconSize: 35.0,
+      color: Colors.black,
+      onPressed: () => print('TEST MEE'),
+    );
+  }
+
+  Widget _buildDownArrow() {
+    return IconButton(
+        icon: Icon(Icons.arrow_downward),
+        iconSize: 35.0,
+        onPressed: () => print('test press'));
+  }
+
+  Widget _buildAdd() {
+    return IconButton(
+        icon: Icon(Icons.person_add),
+        iconSize: 35.0,
+        alignment: Alignment.center,
+        onPressed: () => print('Add people?'));
+  }
+
+  Widget _buildHost() {
+    return Text('  Host',
+        style: TextStyle(
+          fontSize: 25.0,
+          fontWeight: FontWeight.bold,
+        ));
+  }
 
   Widget build(BuildContext context) {
     return Container(
@@ -152,12 +202,12 @@ class BottomInstanceBar extends PreferredSize {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          new Row(
+          Row(
             children: [
-              new HostText(),
+              _buildHost(),
               Stack(
                 children: [
-                  new EditIcon(),
+                  _buildPopUpMenus(),
                   Align(
                     alignment: Alignment(1, 0.70),
                     child: Text('       Edit'),
@@ -166,52 +216,45 @@ class BottomInstanceBar extends PreferredSize {
               ),
             ],
           ),
-          new Row(
+          Row(
             children: [
-              CheckIconButton(),
-              AddContact(),
-              new Container(),
-              new CheckIcon(),
+              _buildDownArrow(),
+              _buildAdd(),
+              _buildCheckIcon(),
             ],
           )
         ],
       ),
     );
   }
-}
 
-class EditIcon extends StatelessWidget {
-  const EditIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    String entranceCode = 'IN3CH';
-    String instanceName = 'Name of In';
-    String instanceDescription = '';
-    int numberOfGuests;
-
+  Widget _buildPopUpMenus() {
     return PopupMenuButton(
         icon: Icon(Icons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
-                child: ListTile(
-                    //TODO:create a onpressed that edits 'instanceName'
-                    contentPadding: EdgeInsets.only(right: 0.0),
-                    leading: Text('Name:'),
-                    title: Text(
-                      '$instanceName',
-                      textScaleFactor: 1.2,
-                    )),
+                child: GestureDetector(
+                  child: ListTile(
+                      //TODO: create a onpressed that edits 'instanceName'
+                      contentPadding: EdgeInsets.only(right: 0.0),
+                      leading: Text('Name:'),
+                      title: Text('$instanceName', textScaleFactor: 1.2)),
+                  onTap: () {
+                    print('HELLO');
+                    _showDialog(context);
+                    Navigator.of(context).pop();
+                  },
+                ),
               ),
               PopupMenuDivider(),
               PopupMenuItem(
                 child: ListTile(
+                  contentPadding: EdgeInsets.only(right: 0.0),
+                  leading: Text('Entrance Code: '),
                   //TODO:create a onpressed that allows to edit 'entranceCode?
                   //TODO:make the 'entranceCode' bigger font
-                  title: Text('Entrance Code: $entranceCode '),
-                  contentPadding:
-                      EdgeInsets.only(left: 55.0), //todo:change back to 0.0
+                  title: Text(instanceCode),
                 ),
               ),
               PopupMenuDivider(),
@@ -240,56 +283,28 @@ class EditIcon extends StatelessWidget {
               ),
             ]);
   }
-}
 
-class HostText extends StatelessWidget {
-  const HostText();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text('  Host',
-        style: TextStyle(
-          fontSize: 25.0,
-          fontWeight: FontWeight.bold,
-        ));
-  }
-}
-
-class AddContact extends StatelessWidget {
-  const AddContact();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(Icons.person_add),
-        iconSize: 35.0,
-        alignment: Alignment.center,
-        onPressed: () => Text('Blah'));
-  }
-}
-
-class CheckIcon extends StatelessWidget {
-  const CheckIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.check),
-      iconSize: 35.0,
-      color: Colors.black,
-      onPressed: () => Text('TEST MEE'),
+  void _showDialog(BuildContext context) {
+    // flutter defined function
+    showDialog(
+      // context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text("Alert Dialog title"),
+          content: Text("Alert Dialog body"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            FlatButton(
+              child: Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+      context: context,
     );
-  }
-}
-
-class CheckIconButton extends StatelessWidget {
-  const CheckIconButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return new IconButton(
-        icon: Icon(Icons.arrow_downward),
-        iconSize: 35.0,
-        onPressed: () => Text('test press'));
   }
 }
