@@ -7,9 +7,11 @@ class CustomGridTile extends StatelessWidget {
   final String instanceName;
   final String instanceId;
   final Widget instancePhoto;
+  final String instanceCode;
   final String date;
 
-  CustomGridTile({this.instanceId, this.instanceName, this.instancePhoto, this.date});
+  CustomGridTile({this.instanceId, this.instanceName, this.instancePhoto, this.date, this.instanceCode});
+
 
   Widget build(BuildContext context) {
     return Padding(
@@ -52,6 +54,7 @@ class CustomGridTile extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => InstancePage(
+                        instanceCode: instanceCode,
                         instanceId: instanceId,
                         instanceName: instanceName))),
         ),

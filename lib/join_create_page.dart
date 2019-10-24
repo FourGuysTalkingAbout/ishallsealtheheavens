@@ -149,6 +149,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
             builder: (context) => InstancePage(
                   instanceName: snapshot.documents[0].data['instanceName'],
                   instanceId: snapshot.documents[0].documentID,
+                  instanceCode: snapshot.documents[0].data['instanceCode'],
                 )));
   }
   @override
@@ -224,6 +225,7 @@ class ActiveInstancesView extends StatelessWidget {
 
 //            var snap = document.reference.collection('photos').snapshots();
                 return CustomGridTile(
+                  instanceCode: document['instanceCode'],
                   instanceId: document.documentID,
                   instanceName: document['instanceName'],
                   instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
