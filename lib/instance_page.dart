@@ -121,16 +121,20 @@ class _InstancePageState extends State<InstancePage> {
 
   @override
   Widget build(BuildContext context) {
-//    isActive(); //TODO TURN ON WHEN READY
+
+//    FirebaseUser user = Provider.of<UserRepository>(context).user;
+//    print(user);
+//    isActive(); // find way to set active to false or true
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.grey[400],
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(100),
           child: InstanceTopAppBar(
+            title: Text(widget.instanceName),
+            instanceID: widget.instanceId,
             instanceName: widget.instanceName,
             instanceCode: widget.instanceCode,
-            title: Text(widget.instanceName),
           )),
       endDrawer: DrawerMenu(),
       drawer: UserAccountDrawer(),

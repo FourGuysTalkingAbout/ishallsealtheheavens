@@ -30,7 +30,11 @@ class TopBarText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new FlatButton(
-        onPressed: () => {},
+        onPressed: () {
+          print('DRAWER');
+          Scaffold.of(context).openDrawer();
+
+        },
         child: new Text("FS",
             style: TextStyle(
                 decoration: TextDecoration.underline,

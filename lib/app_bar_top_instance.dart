@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_bar_top.dart';
+import 'instance_page.dart';
 
 class InstanceTopAppBar extends AppBar {
   InstanceTopAppBar(
@@ -9,6 +10,7 @@ class InstanceTopAppBar extends AppBar {
       Widget title,
       String instanceName,
       String instanceCode,
+        String instanceID,
       })
       : super(
           key: key,
@@ -25,6 +27,7 @@ class InstanceTopAppBar extends AppBar {
           title: title,
           centerTitle: true,
           bottom: BottomInstanceBar(
+              instanceID :instanceID,
               instanceName: instanceName,
               instanceCode: instanceCode),
         );
@@ -160,8 +163,9 @@ class PopUpMenu {
 class BottomInstanceBar extends PreferredSize {
   final String instanceCode;
   final String instanceName;
+  final String instanceID;
 
-  const BottomInstanceBar({this.instanceCode, this.instanceName});
+  const BottomInstanceBar({this.instanceID, this.instanceCode, this.instanceName});
 
   Widget _buildCheckIcon() {
     return IconButton(
@@ -196,43 +200,54 @@ class BottomInstanceBar extends PreferredSize {
   }
 
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      color: Colors.grey[100],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+    return StreamBuilder(
+      stream: db.collection('instances').document(instanceID).snapshots(),
+      builder: (context, snapshot) {
+      if (snapshot.data != null) {
+        return  Container(
+          height: 50,
+          color: Colors.grey[100],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildHost(),
-              Stack(
+              Row(
                 children: [
-                  _buildPopUpMenus(),
-                  Align(
-                    alignment: Alignment(1, 0.70),
-                    child: Text('       Edit'),
-                  )
+                  _buildHost(),
+                  Stack(
+                    children: [
+                      _buildPopUpMenus(snapshot.data['instanceDescription']),
+                      Align(
+                        alignment: Alignment(1, 0.70),
+                        child: Text('       Edit'),
+                      )
+                    ],
+                  ),
                 ],
               ),
+              Row(
+                children: [
+                  _buildDownArrow(),
+                  _buildAdd(),
+                  _buildCheckIcon(),
+                ],
+              )
             ],
           ),
-          Row(
-            children: [
-              _buildDownArrow(),
-              _buildAdd(),
-              _buildCheckIcon(),
-            ],
-          )
-        ],
-      ),
+        );
+      } else {
+        return Container();
+      }
+      }
     );
   }
 
-  Widget _buildPopUpMenus() {
+  Widget _buildPopUpMenus(String description) {
+
     return PopupMenuButton(
         icon: Icon(Icons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+
               PopupMenuItem(
                 child: GestureDetector(
                   child: ListTile(
@@ -242,30 +257,42 @@ class BottomInstanceBar extends PreferredSize {
                       title: Text('$instanceName', textScaleFactor: 1.2)),
                   onTap: () {
                     print('HELLO');
-                    _showDialog(context);
+//                    _showDialog(context);
                     Navigator.of(context).pop();
                   },
                 ),
               ),
+
               PopupMenuDivider(),
+
               PopupMenuItem(
-                child: ListTile(
-                  contentPadding: EdgeInsets.only(right: 0.0),
-                  leading: Text('Entrance Code: '),
-                  //TODO:create a onpressed that allows to edit 'entranceCode?
-                  //TODO:make the 'entranceCode' bigger font
-                  title: Text(instanceCode),
+                child: GestureDetector(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                    leading: Text('Entrance Code: '),
+                    //TODO:create a onpressed that allows to edit 'entranceCode?
+                    //TODO:make the 'entranceCode' bigger font
+                    title: Text(instanceCode),
+                  ),
+//                  onTap: () => _neverSatisfied(context),
                 ),
               ),
               PopupMenuDivider(),
-              const PopupMenuItem(
-                child: ListTile(
-                  //TODO:create a dialog that is allows writing descriptions of instance
-                  title: Text('Set Description'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
+
+               PopupMenuItem(
+                child: GestureDetector(
+                  child: ListTile(
+                    //TODO:create a dialog that is allows writing descriptions of instance
+                    title: Text('Set Description'),
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                  ),
+                  onTap: () {
+                    _neverSatisfied(context, description).then((val) => Navigator.pop(context));
+                  },
                 ),
               ),
               PopupMenuDivider(),
+
               const PopupMenuItem(
                 //TODO: implement a way to limit guests in the instance
                 child: ListTile(
@@ -273,7 +300,9 @@ class BottomInstanceBar extends PreferredSize {
                   contentPadding: EdgeInsets.only(right: 0.0),
                 ),
               ),
+
               PopupMenuDivider(),
+
               const PopupMenuItem(
                 //TODO: is this a Text location or some sort of google maps thing?
                 child: ListTile(
@@ -283,8 +312,46 @@ class BottomInstanceBar extends PreferredSize {
               ),
             ]);
   }
-
-  void _showDialog(BuildContext context) {
+  Future<void> _neverSatisfied(BuildContext context, String description) async {
+    final myController = TextEditingController(
+      text: description
+    );
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Set Description of Instance'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  maxLines: 5,
+                  controller: myController,
+                  decoration: InputDecoration.collapsed(hintText: 'Enter a description'),
+                ),
+//                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Change'),
+              onPressed: () {
+                db.collection('instances').document(instanceID).updateData({'instanceDescription': myController.text});
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
+    );
+  }
+  void _showDialog() {
     // flutter defined function
     showDialog(
       // context: context,
@@ -304,7 +371,6 @@ class BottomInstanceBar extends PreferredSize {
           ],
         );
       },
-      context: context,
     );
   }
 }

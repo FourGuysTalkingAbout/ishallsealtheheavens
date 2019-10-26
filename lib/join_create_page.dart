@@ -120,17 +120,19 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   }
 
   createInstance({String user, BuildContext context}) async {
-
+    String instanceCode = createCode();
     DocumentReference docRef = await db.collection('instances').add({ // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
-      'instanceCode': createCode(),
+      'instanceCode': instanceCode,
       'users': FieldValue.arrayUnion([user]),
       'date': FieldValue.serverTimestamp(),
       'active': true,
+      'host': user,
 
     });
     Navigator.push(context, MaterialPageRoute(
             builder: (context) => InstancePage(
+                  instanceCode: instanceCode,
                   instanceName: _instanceNameController.text,
                   instanceId: docRef.documentID,
                 )));
@@ -156,7 +158,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   void dispose () {
     _instanceNameController.dispose();
     super.dispose();
-
   }
 }
 
