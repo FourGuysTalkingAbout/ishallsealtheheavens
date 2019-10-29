@@ -1,28 +1,38 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ishallsealtheheavens/detailsPage.dart';
 import 'package:ishallsealtheheavens/saveFile.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:path/path.dart';
 
+import 'logic/login_authProvider.dart';
+import 'saveFile.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
-import 'package:intl/intl.dart';
 
 final db = Firestore.instance;
-
-
+final saveFile = SaveFile();
+final userRepository = UserRepository.instance();
 
 class InstancePage extends StatefulWidget {
-  final SaveFile saveFile;
-
 //  final String value;
   final String instanceName;
   final String instanceId;
   final bool firstPic;
 
-  InstancePage({Key key, this.instanceName, this.instanceId, this.firstPic, this.saveFile})
+  InstancePage(
+      {Key key,
+      this.instanceName,
+      this.instanceId,
+      this.firstPic,
+      })
       : super(key: key);
 
   @override
@@ -30,6 +40,7 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
+
   List<String> images = List<String>();
 
 
@@ -38,45 +49,69 @@ class _InstancePageState extends State<InstancePage> {
 //    final String imageName = '${Random().nextInt(100)}';
     final now = DateTime.now().toLocal();
     final formatter = DateFormat.MMMMEEEEd().add_Hm();
-    final date = formatter.format(now);
+    final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
         source: ImageSource.camera); //returns a File after picture is taken
 
 
-    SaveFile().writeImage(imageFile);
-    // Directory appDocDir = await getApplicationDocumentsDirectory();
-    // String appDocPath = appDocDir.path;
+    StorageMetadata metaData = StorageMetadata(customMetadata:<String, String>{
+      'author': userRepository.user.displayName, 'instanceName': widget.instanceName
+    });
 
-    // await imageFile.copy('$appDocPath/image1.png');
+//    Directory appDocDir = await getApplicationDocumentsDirectory();
+//    String appDocPath = appDocDir.path;
+
+//    saveFile.writeImage(imageFile);
+
+//    await imageFile.copy('$appDocPath/image1.png');
 
     //'images' is a folder in Firebase Storage,
-    final StorageReference storageRef =
-        FirebaseStorage.instance.ref().child('images').child('$date');
+     final StorageReference storageRef =
+         FirebaseStorage.instance.ref().child('images').child('$currentDate.jpg');
 
-    final StorageUploadTask uploadTask =
-        storageRef.putFile(imageFile); // uploads file into Firebase Storage
+     final StorageUploadTask uploadTask =
+         storageRef.putFile(imageFile,metaData); // uploads file into Firebase Storage
 
-    final StorageTaskSnapshot taskSnapshot = await uploadTask
-        .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
+     final StorageTaskSnapshot taskSnapshot = await uploadTask
+         .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
 
-    var url = await taskSnapshot.ref
-        .getDownloadURL(); // takes the URL of the imageFile
+     var url = await taskSnapshot.ref
+         .getDownloadURL(); // takes the URL of the imageFile
 
-    saveToFireStore(url);
+     saveToInstance(url);
+     saveAsUserImage(url);
   }
-  saveToFireStore(String url) {
-    final DocumentReference postRef = db.document('instances/${widget.instanceId}');
+
+  saveToInstance(String url) {
+    final DocumentReference postRef =
+        db.document('instances/${widget.instanceId}');
     db.runTransaction((Transaction tx) async {
       DocumentSnapshot postSnapshot = await tx.get(postRef);
       if (postSnapshot.exists) {
-        await tx.update(postRef, {'photoURL': FieldValue.arrayUnion([url])});
+        await tx.update(postRef, {
+          'photoURL': FieldValue.arrayUnion([url])
+        });
       }
     });
   }
 
-  isActive() {// sets instance 'active' from true to false; making it appear in past Instance
-              //TODO: allow host to select how long instance stays active.
+  saveAsUserImage(String url){
+    final DocumentReference postRef = db.document('users/${userRepository.user.uid}');
+    db.runTransaction((Transaction tx) async {
+      DocumentSnapshot postSnapshot = await tx.get(postRef);
+      if(postSnapshot.exists) {
+        await tx.update(postRef, {
+          'userImages': FieldValue.arrayUnion([url])
+        });
+      }
+    });
+
+  }
+
+  isActive() {
+    //TODO sets instance 'active' from true to false; making it appear in past Instance
+    //TODO: allow host to set to not active anymore else run for 24 hours then close instance.
     Future.delayed(const Duration(seconds: 3), () {
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {
@@ -90,7 +125,7 @@ class _InstancePageState extends State<InstancePage> {
 
   @override
   Widget build(BuildContext context) {
-//    isActive(); // find way to set active to false or true
+//    isActive(); //TODO TURN ON WHEN READY
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.grey[400],
@@ -149,7 +184,7 @@ class PhotoGridView extends StatelessWidget {
           return Container();
         } else {
           return GridView.builder(
-             key: PageStorageKey<String>('Preseves scroll position'),
+              key: PageStorageKey<String>('Preseves scroll position'),
               itemCount: snapshot.data.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisSpacing: 4.0,
@@ -157,7 +192,7 @@ class PhotoGridView extends StatelessWidget {
                   crossAxisCount: 2),
               padding: EdgeInsets.all(8.0),
               itemBuilder: (context, index) {
-                return  GestureDetector(
+                return GestureDetector(
                   child: Card(
                     elevation: 5.0,
                     child: Hero(
@@ -165,8 +200,7 @@ class PhotoGridView extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 14.0),
                           child: Image.network(snapshot.data[index],
-                              fit: BoxFit.fill
-                          ),
+                              fit: BoxFit.fill),
                         )),
                   ),
                   onTap: () => Navigator.push(
@@ -174,7 +208,7 @@ class PhotoGridView extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => DetailsPage(
                               id: snapshot.data[index],
-                              imageUrl: snapshot.data[index]))),
+                              imageUrl: snapshot.data[index],))),
                 );
               });
         }
@@ -183,43 +217,5 @@ class PhotoGridView extends StatelessWidget {
   }
 }
 
-class DetailsPage extends StatelessWidget {
-  final String imageUrl;
-  final String id;
 
-  DetailsPage({this.imageUrl, this.id});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton:
-          FlatButton(onPressed: () => deleteData(), child: Icon(Icons.delete)),
-      body: GestureDetector(
-        child: Center(
-          child: Hero(
-            tag: id,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover, //TODO:might have to fix test needed
-              height: double.infinity, //TODO://might have to fix test needed
-              width: double.infinity, //TODO://might have to fix test needed
-            ),
-          ),
-        ),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
-  deleteData() {
-    db
-        .collection('instances')
-        .document('instance1')
-        .collection('photos')
-        .document(id)
-        .delete(); //TODO: ONLY DELETES IN DATABASE NOT STORAGE
-  }
-}

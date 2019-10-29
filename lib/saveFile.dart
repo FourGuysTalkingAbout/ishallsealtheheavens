@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-
 class SaveFile {
 
   Future<String> get _localPath async {
@@ -13,28 +12,33 @@ class SaveFile {
 
   Future<File> get _localFile async {
     final path = await _localPath;
+//    print(path);
     return File('$path/image1.png');
   }
 
   Future<File> writeImage(File file) async {
-    final file = await _localFile;
+    final filePath = await _localFile;
 
-    return  file.writeAsString('$file');
+    print('WRITING FILE');
+    return  filePath.writeAsString('$file');
   }
 
-  Future<String> readImage() async {
-    
-    try {
-      final file = await _localFile;
-
-      //read the file.
-      String contents = await file.readAsStringSync();
-      return contents;
-    } catch(e) {
-      //if empty return null
-      return null;
-    }
-  }
+//  Future<String> readImage() async {
+//
+//    try {
+//      final file = await _localFile;
+//
+//      //read the file.
+////      String contents = await file.readAsString();
+//     File contents = file.readAsStringSync(file);
+////      print(contents);
+//      return contents;
+//    } catch(e) {
+//      print('NOT WORKING');
+//      //if empty return null
+//      return null;
+//    }
+//  }
   //  Future<Io.File> getImageFromNetwork(String url) async {
 
   //    var cacheManager = await CacheManager.getInstance();
@@ -56,3 +60,4 @@ class SaveFile {
   //     ..writeAsBytesSync(encodePng(thumbnail));
   // }
 }
+
