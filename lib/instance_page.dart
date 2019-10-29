@@ -18,8 +18,10 @@ import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
 
 final db = Firestore.instance;
+
 final saveFile = SaveFile();
 final userRepository = UserRepository.instance();
+
 
 class InstancePage extends StatefulWidget {
   final String instanceName;
@@ -106,9 +108,8 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   isActive() {
-    //TODO sets instance 'active' from true to false; making it appear in past Instance
-    //TODO: allow host to set to not active anymore else run for 24 hours then close instance.
-    Future.delayed(const Duration(seconds: 3), () {
+
+    Future.delayed(const Duration(hours: 24), () {
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {
         DocumentSnapshot postSnapshot = await tx.get(docRef);
@@ -124,7 +125,7 @@ class _InstancePageState extends State<InstancePage> {
 
 //    FirebaseUser user = Provider.of<UserRepository>(context).user;
 //    print(user);
-//    isActive(); // find way to set active to false or true
+    isActive(); // find way to set active to false or true
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.grey[400],

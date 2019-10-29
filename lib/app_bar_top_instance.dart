@@ -215,7 +215,7 @@ class BottomInstanceBar extends PreferredSize {
                   _buildHost(),
                   Stack(
                     children: [
-                      _buildPopUpMenus(snapshot.data['instanceDescription']),
+                      _buildPopUpMenus(snapshot.data['instanceDescription'], snapshot.data['userLimit'].toString()),
                       Align(
                         alignment: Alignment(1, 0.70),
                         child: Text('       Edit'),
@@ -241,7 +241,9 @@ class BottomInstanceBar extends PreferredSize {
     );
   }
 
-  Widget _buildPopUpMenus(String description) {
+  Widget _buildPopUpMenus(String description, String userLimit) {
+    print(userLimit);
+    print(description);
 
     return PopupMenuButton(
         icon: Icon(Icons.edit),
@@ -287,17 +289,21 @@ class BottomInstanceBar extends PreferredSize {
                     contentPadding: EdgeInsets.only(right: 0.0),
                   ),
                   onTap: () {
-                    _neverSatisfied(context, description).then((val) => Navigator.pop(context));
+                    _changeDescription(context, description).then((val) => Navigator.pop(context));
                   },
                 ),
               ),
               PopupMenuDivider(),
 
-              const PopupMenuItem(
-                //TODO: implement a way to limit guests in the instance
-                child: ListTile(
-                  title: Text('Limit number of Guests'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
+               PopupMenuItem(
+                child: GestureDetector(
+                  child: ListTile(
+                    title: Text('Limit number of Guests'),
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                  ),
+                  onTap: () {
+                    _changeLimitUsers(context, userLimit).then((val) => Navigator.pop(context));
+                  },
                 ),
               ),
 
@@ -312,10 +318,50 @@ class BottomInstanceBar extends PreferredSize {
               ),
             ]);
   }
-  Future<void> _neverSatisfied(BuildContext context, String description) async {
+
+  _changeLimitUsers(BuildContext context, String userLimit) async {
     final myController = TextEditingController(
-      text: description
+        text: userLimit);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change Limit of Users'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  maxLines: 1,
+                  controller: myController,
+                  decoration: InputDecoration.collapsed(hintText: 'Change the number of user allowed'),
+                ),
+//                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Change'),
+              onPressed: () {
+                db.collection('instances').document(instanceID).updateData({'userLimit': myController.text});
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
     );
+  }
+
+  Future<void> _changeDescription(BuildContext context, String description) async {
+    final myController = TextEditingController(
+      text: description);
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -351,26 +397,5 @@ class BottomInstanceBar extends PreferredSize {
       },
     );
   }
-  void _showDialog() {
-    // flutter defined function
-    showDialog(
-      // context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: Text("Alert Dialog title"),
-          content: Text("Alert Dialog body"),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            FlatButton(
-              child: Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 }
