@@ -9,8 +9,9 @@ class CustomGridTile extends StatelessWidget {
   final Widget instancePhoto;
   final String instanceCode;
   final String date;
+  final Function onTap;
 
-  CustomGridTile({this.instanceId, this.instanceName, this.instancePhoto, this.date, this.instanceCode});
+  CustomGridTile({this.instanceId, this.instanceName, this.instancePhoto, this.date, this.instanceCode,this.onTap});
 
 
   Widget build(BuildContext context) {
@@ -49,14 +50,7 @@ class CustomGridTile extends StatelessWidget {
 //                Image.network(
 //                  instancePhoto,fit: BoxFit.fill,)
                   ),
-            onTap:
-                () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => InstancePage(
-                        instanceCode: instanceCode,
-                        instanceId: instanceId,
-                        instanceName: instanceName))),
+            onTap: onTap,
         ),
       ),
     );

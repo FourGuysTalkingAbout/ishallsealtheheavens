@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ishallsealtheheavens/GridTile.dart';
 import 'package:provider/provider.dart';
+import 'package:random_string/random_string.dart' as prefix0;
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'gallery.dart';
@@ -107,13 +108,8 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   }
 
   createCode() {
-    Random code = Random();
-    String createCryptoRandomString([int length = 6]) {
-      var values = List<int>.generate(length, (i) => code.nextInt(15));
-      return base64Url.encode(values);
-    }
 
-    return createCryptoRandomString();
+    return prefix0.randomAlpha(5);
   }
 
   createInstance({String user, BuildContext context}) async {
@@ -122,19 +118,18 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
       // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
       'instanceCode': instanceCode,
+      'userLimit': '10',
       'users': FieldValue.arrayUnion([user]),
       'date': FieldValue.serverTimestamp(),
       'active': true,
       'host': user,
     });
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => InstancePage(
-                  instanceCode: instanceCode,
-                  instanceName: _instanceNameController.text,
-                  instanceId: docRef.documentID,
-                )));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => InstancePage(
+              instanceCode: instanceCode,
+              instanceName: _instanceNameController.text,
+              instanceId: docRef.documentID,
+            )));
   }
 
   joinInstance({String user, BuildContext context}) async {
@@ -151,55 +146,72 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     bool premium = snapshot.documents[0].data['premium'];
     // if it's a premium instance then don't have a limit
     // if it's not a premium then return limit >= 10
-    if (snapshot.documents[0].data['premium'] == true ) {
-      int numberOfUsers = snapshot.documents[0].data['users'].length; //returns a int length of ['users'] data
-      int userLimit = int.parse(snapshot.documents[0].data['userLimit']); // default is 10. premium hosts can change number
+    if (snapshot.documents[0].data['premium'] == true) {
+      int numberOfUsers = snapshot.documents[0].data['users']
+          .length; //returns a int length of ['users'] data
+      int userLimit = int.parse(snapshot.documents[0]
+          .data['userLimit']); // default is 10. premium hosts can change number
 
-      if(numberOfUsers >= userLimit) {
-        return Scaffold.of(context).showSnackBar(snackBar); //deny user if limit is reached.
+      if (numberOfUsers >= userLimit) {
+        return Scaffold.of(context)
+            .showSnackBar(snackBar); //deny user if limit is reached.
       } else {
-        snapshot.documents[0].reference.updateData({'users': FieldValue.arrayUnion([user])});
+        snapshot.documents[0].reference.updateData({
+          'users': FieldValue.arrayUnion([user])
+        });
 
-        Navigator.push(context, MaterialPageRoute(
-            builder: (context) => InstancePage(
-              instanceName: snapshot.documents[0].data['instanceName'],
-              instanceId: snapshot.documents[0].documentID,
-              instanceCode: snapshot.documents[0].data['instanceCode'],
-            )));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InstancePage(
+                      instanceName: snapshot.documents[0].data['instanceName'],
+                      instanceId: snapshot.documents[0].documentID,
+                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                    )));
       }
 
-       snapshot.documents[0].reference.updateData({
+      snapshot.documents[0].reference.updateData({
         'users': FieldValue.arrayUnion([user])
       });
-       Navigator.push(
-           context,
-           MaterialPageRoute(
-               builder: (context) => InstancePage(
-                 instanceName: snapshot.documents[0].data['instanceName'],
-                 instanceId: snapshot.documents[0].documentID,
-                 instanceCode: snapshot.documents[0].data['instanceCode'],
-               )));
-
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => InstancePage(
+                    instanceName: snapshot.documents[0].data['instanceName'],
+                    instanceId: snapshot.documents[0].documentID,
+                    instanceCode: snapshot.documents[0].data['instanceCode'],
+                  )));
     } else if (snapshot.documents[0].data['premium'] == false) {
-      int numberOfUsers = snapshot.documents[0].data['users'].length; //returns a int length of ['users'] data
-      int userLimit = int.parse(snapshot.documents[0].data['userLimit']); // default is 10. premium hosts can change number
+      int numberOfUsers = snapshot.documents[0].data['users']
+          .length; //returns a int length of ['users'] data
+      int userLimit = int.parse(snapshot.documents[0]
+          .data['userLimit']); // default is 10. premium hosts can change number
 
-      if(numberOfUsers >= 10) {
-        return Scaffold.of(context).showSnackBar(snackBar); //deny user if limit is reached.
+      if (numberOfUsers >= 10) {
+        return Scaffold.of(context)
+            .showSnackBar(snackBar); //deny user if limit is reached.
       } else {
-        snapshot.documents[0].reference.updateData({'users': FieldValue.arrayUnion([user])});
+        snapshot.documents[0].reference.updateData({
+          'users': FieldValue.arrayUnion([user])
+        });
 
-        Navigator.push(context, MaterialPageRoute(
+        Navigator.push(
+            context,
+            MaterialPageRoute(
                 builder: (context) => InstancePage(
-                  instanceName: snapshot.documents[0].data['instanceName'],
-                  instanceId: snapshot.documents[0].documentID,
-                  instanceCode: snapshot.documents[0].data['instanceCode'],
-                )));
+                      instanceName: snapshot.documents[0].data['instanceName'],
+                      instanceId: snapshot.documents[0].documentID,
+                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                    )));
       }
     } else {
-      snapshot.documents[0].reference.updateData({'users': FieldValue.arrayUnion([user])});
+      snapshot.documents[0].reference.updateData({
+        'users': FieldValue.arrayUnion([user])
+      });
 
-      Navigator.push(context, MaterialPageRoute(
+      Navigator.push(
+          context,
+          MaterialPageRoute(
               builder: (context) => InstancePage(
                     instanceName: snapshot.documents[0].data['instanceName'],
                     instanceId: snapshot.documents[0].documentID,
@@ -210,7 +222,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
 
   @override
   void dispose() {
-    _instanceNameController.dispose();
+    _instanceNameController.clear();
     super.dispose();
   }
 }
@@ -276,9 +288,10 @@ class ActiveInstancesView extends StatelessWidget {
               itemCount: snapshot.data.documents.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot document = snapshot.data.documents[index];
-                var timeAgo = timeago.format(document['date'].toDate());
-
-//            var snap = document.reference.collection('photos').snapshots();
+                DateTime docTime = document['date'] != null
+                    ? document['date'].toDate()
+                    : DateTime.now();
+                var timeAgo = timeago.format(docTime);
                 return CustomGridTile(
                   instanceCode: document['instanceCode'],
                   instanceId: document.documentID,
@@ -289,7 +302,16 @@ class ActiveInstancesView extends StatelessWidget {
                       : Image.network(document['photoURL'][0],
                           fit: BoxFit.fill),
                   date: timeAgo,
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => InstancePage(
+                              instanceCode: document['instanceCode'],
+                              instanceId: document.documentID,
+                              instanceName: document['instanceName']))),
                 );
+
+//            var snap = document.reference.collection('photos').snapshots();
               },
             );
         }

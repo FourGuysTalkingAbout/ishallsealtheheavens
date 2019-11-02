@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ishallsealtheheavens/closed_instance.dart' as prefix0;
 import 'package:ishallsealtheheavens/instance_page.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
 import 'package:ishallsealtheheavens/GridTile.dart';
@@ -44,6 +45,13 @@ class _PastInstanceState extends State<PastInstance> {
               instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
               document['photoURL'][0],fit: BoxFit.fill),
               date: timeAgo,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => prefix0.ClosedInstancePage(
+                        instanceCode: document['instanceCode'],
+                        instanceId: document.documentID,
+                        instanceName: document['instanceName']))),
             );
           },
         );

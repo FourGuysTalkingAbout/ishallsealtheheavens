@@ -7,8 +7,10 @@ import 'package:ishallsealtheheavens/detailsPage.dart';
 import 'package:ishallsealtheheavens/instance_page.dart';
 import 'package:ishallsealtheheavens/saveFile.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'app_bar_bottom.dart';
 import 'app_bar_top_gallery.dart';
+import 'logic/login_authProvider.dart';
 
 enum GalleryView { Taken, All }
 
@@ -20,6 +22,7 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
@@ -39,10 +42,12 @@ class _GalleryState extends State<Gallery> {
 final saveFile = SaveFile();
 
 class PhotosTakenList extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+
 //Photos taken
-    FirebaseUser user = userRepository.user;
     return Column(
       children: <Widget>[
         Container(
