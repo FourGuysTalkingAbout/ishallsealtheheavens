@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'logic/login_authProvider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
+import 'logic/login_authProvider.dart';
+
+
 
 class UserAccountDrawer extends StatelessWidget {
   //  //TODO Fix Display name for Email Login
@@ -15,6 +15,7 @@ class UserAccountDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           //TODO:Made it look like the Figma Design, don't know if it's worth all the extra widgets.
+          //TODO: Figure out if more options are needed or not.
           DrawerHeader(
             margin: EdgeInsets.all(0.0),
             padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
@@ -27,10 +28,10 @@ class UserAccountDrawer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: AssetImage('images/apex_lestley.png'),
+                  backgroundImage: NetworkImage(user.user.photoUrl),
                   maxRadius: 50,
                 ),
-                Text('Kikashi-Sensei@hotmail.com\n' + user.user.email,
+                Text(user.user.email,
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
@@ -39,26 +40,24 @@ class UserAccountDrawer extends StatelessWidget {
             color: Color(0xff757575),
             height: 10.0,
           ),
-          ListTile(),
-          Divider(
-            color: Colors.black,
-          ),
+//          ListTile(),
+//          Divider(color: Colors.black),
           ListTile(
-            title: Text('Username: ' +
+            title: Text(
                 (user.user.displayName == null
                     ? 'Create a Username'
-                    : user.user.displayName)),
+                    : user.user.displayName))),
+          Divider(
+            color: Colors.black),
+          ListTile(
+            title: Text('Send Feedback'),
           ),
           Divider(
             color: Colors.black,
           ),
           ListTile(
-            title: Text('Name: ' + (user.user.uid)),
+            title: Text('Get Help'),
           ),
-          Divider(
-            color: Colors.black,
-          ),
-          ListTile(),
           Divider(
             color: Colors.black,
           ),

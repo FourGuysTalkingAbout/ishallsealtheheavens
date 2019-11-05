@@ -1,22 +1,20 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:random_string/random_string.dart' as prefix0;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ishallsealtheheavens/GridTile.dart';
-import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-
-import 'gallery.dart';
-import 'past_instance.dart';
-import 'app_bar_bottom.dart';
-import 'app_bar_top.dart';
-import 'instance_page.dart';
-import 'user_account_drawer.dart';
+import 'package:provider/provider.dart';
 
 import 'logic/login_authProvider.dart';
+import 'user_account_drawer.dart';
+import 'past_instance.dart';
+import 'instance_page.dart';
+import 'gallery_page.dart';
+import 'bottom_navbar.dart';
+import 'model/custom_gridtile.dart';
+import 'app_bar.dart';
 
 class NavBar extends StatefulWidget {
   @override
@@ -25,10 +23,17 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 1;
+
   List<Widget> _btmNavOptions = [
     PastInstance(),
     JoinCreatePage(),
     Gallery(),
+  ];
+
+  List<Widget> _appBarTitleOptions = [
+    Text('Past Instance'),
+    Text('Active Instances'),
+    Text('Gallery'),
   ];
 
   void _onItemTapped(int index) {
@@ -40,6 +45,10 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AllTopAppBar(
+        centerTitle: true,
+        title: _appBarTitleOptions.elementAt(_selectedIndex),
+      ),
       drawer: UserAccountDrawer(),
       body: _btmNavOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavBar(
@@ -51,56 +60,54 @@ class _NavBarState extends State<NavBar> {
 }
 
 class JoinCreatePage extends StatefulWidget {
-
   @override
   _JoinCreatePageState createState() => _JoinCreatePageState();
 }
 
 class _JoinCreatePageState extends State<JoinCreatePage> {
-
   final TextEditingController _instanceNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
   @override
   Widget build(BuildContext context) {
-
-
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     return Scaffold(
       backgroundColor: Colors.grey[400],
-      appBar: TopAppBar(),
+//      appBar: TopAppBar(),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
-              InstanceNameTextFormField( //todo: remove text after join/create button pressed.
+              InstanceNameTextFormField(
+                  //todo: remove text after join/create button pressed.
                   instanceNameController: _instanceNameController),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    width: 150,
-                    child: RaisedButton(
-                      color: Colors.white,
-                        child: Text('Create Instance'),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            createInstance(context: context, user: user.uid);
-                          }}),
-                  ),
-                  Container(
-                    width: 150,
-                    child: RaisedButton(
-                      color: Colors.white,
-                      child: Text('Join Instance'),
-                      onPressed: () {
-                        if (_formKey.currentState.validate()) {
-                          joinInstance(context: context, user: user.uid);
-                        }}),
-                  )
-                ]),
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      width: 150,
+                      child: RaisedButton(
+                          color: Colors.white,
+                          child: Text('Create Instance'),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              createInstance(context: context, user: user);
+                            }
+                          }),
+                    ),
+                    Container(
+                      width: 150,
+                      child: RaisedButton(
+                          color: Colors.white,
+                          child: Text('Join Instance'),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              joinInstance(context: context, user: user.uid);
+                            }
+                          }),
+                    )
+                  ]),
               ActiveInstancesView(),
             ],
           ),
@@ -109,53 +116,122 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     );
   }
 
-
   createCode() {
-    Random code = Random();
-    String createCryptoRandomString([int length = 6]) {
-      var values = List<int>.generate(length, (i) => code.nextInt(15));
-      return base64Url.encode(values);
-    }
-    return createCryptoRandomString();
+    return prefix0.randomAlpha(5);
   }
 
-  createInstance({String user, BuildContext context}) async {
-
-    DocumentReference docRef = await db.collection('instances').add({ // turn into a transaction && add instanceCode random
+  createInstance({FirebaseUser user, BuildContext context}) async {
+    String instanceCode = createCode();
+    DocumentReference docRef = await db.collection('instances').add({
+      // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
-      'instanceCode': createCode(),
-      'users': FieldValue.arrayUnion([user]),
+      'instanceCode': instanceCode,
+      'userLimit': '10',
+      'users': FieldValue.arrayUnion([user.displayName]),
       'date': FieldValue.serverTimestamp(),
       'active': true,
-
+      'host': user.uid,
     });
-    Navigator.push(context, MaterialPageRoute(
-            builder: (context) => InstancePage(
-                  instanceName: _instanceNameController.text,
-                  instanceId: docRef.documentID,
-                )));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => InstancePage(
+              instanceCode: instanceCode,
+              instanceName: _instanceNameController.text,
+              instanceId: docRef.documentID,
+            )));
   }
 
-  void joinInstance({String user, BuildContext context}) async {
+  joinInstance({String user, BuildContext context}) async {
     QuerySnapshot snapshot = await db
         .collection('instances')
         .where('instanceCode', isEqualTo: _instanceNameController.text)
         .getDocuments();
-    print(snapshot.documents.length);
-    snapshot.documents[0].reference.updateData({
-      'users': FieldValue.arrayUnion([user])
-    });
-    Navigator.push(context, MaterialPageRoute(
-            builder: (context) => InstancePage(
-                  instanceName: snapshot.documents[0].data['instanceName'],
-                  instanceId: snapshot.documents[0].documentID,
-                )));
-  }
-  @override
-  void dispose () {
-    _instanceNameController.dispose();
-    super.dispose();
 
+    final snackBar = SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        duration: Duration(seconds: 2),
+        content: Text('It\'s full right now. Try again later.'));
+
+    bool premium = snapshot.documents[0].data['premium'];
+    // if it's a premium instance then don't have a limit
+    // if it's not a premium then return limit >= 10
+    if (snapshot.documents[0].data['premium'] == true) {
+      int numberOfUsers = snapshot.documents[0].data['users']
+          .length; //returns a int length of ['users'] data
+      int userLimit = int.parse(snapshot.documents[0]
+          .data['userLimit']); // default is 10. premium hosts can change number
+
+      if (numberOfUsers >= userLimit) {
+        return Scaffold.of(context)
+            .showSnackBar(snackBar); //deny user if limit is reached.
+      } else {
+        snapshot.documents[0].reference.updateData({
+          'users': FieldValue.arrayUnion([user])
+        });
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InstancePage(
+                      instanceName: snapshot.documents[0].data['instanceName'],
+                      instanceId: snapshot.documents[0].documentID,
+                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                    )));
+      }
+
+      snapshot.documents[0].reference.updateData({
+        'users': FieldValue.arrayUnion([user])
+      });
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => InstancePage(
+                    instanceName: snapshot.documents[0].data['instanceName'],
+                    instanceId: snapshot.documents[0].documentID,
+                    instanceCode: snapshot.documents[0].data['instanceCode'],
+                  )));
+    } else if (snapshot.documents[0].data['premium'] == false) {
+      int numberOfUsers = snapshot.documents[0].data['users']
+          .length; //returns a int length of ['users'] data
+      int userLimit = int.parse(snapshot.documents[0]
+          .data['userLimit']); // default is 10. premium hosts can change number
+
+      if (numberOfUsers >= 10) {
+        return Scaffold.of(context)
+            .showSnackBar(snackBar); //deny user if limit is reached.
+      } else {
+        snapshot.documents[0].reference.updateData({
+          'users': FieldValue.arrayUnion([user])
+        });
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InstancePage(
+                      instanceName: snapshot.documents[0].data['instanceName'],
+                      instanceId: snapshot.documents[0].documentID,
+                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                    )));
+      }
+    } else {
+      snapshot.documents[0].reference.updateData({
+        'users': FieldValue.arrayUnion([user])
+      });
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => InstancePage(
+                    instanceName: snapshot.documents[0].data['instanceName'],
+                    instanceId: snapshot.documents[0].documentID,
+                    instanceCode: snapshot.documents[0].data['instanceCode'],
+                  )));
+    }
+  }
+
+  @override
+  void dispose() {
+    _instanceNameController.clear();
+    super.dispose();
   }
 }
 
@@ -171,17 +247,17 @@ class InstanceNameTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-//      alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 50, vertical: 7.5),
       color: Colors.white,
       child: TextFormField(
         maxLength: 20,
         controller: _instanceNameController,
         textAlign: TextAlign.center,
+        inputFormatters: [
+          WhitelistingTextInputFormatter(RegExp("[a-zA-Z --!]"))
+        ],
         decoration: InputDecoration(
             counterText: '',
-//          contentPadding:
-//          EdgeInsets.only(left: 5, top: 5, bottom: 10),
             border: InputBorder.none,
             hintText: 'Join/Enter a Instance',
             alignLabelWithHint: true),
@@ -204,7 +280,7 @@ class ActiveInstancesView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: db
           .collection('instances')
-          .where("users", arrayContains: user.uid)
+          .where("users", arrayContains: user.displayName)
           .where('active', isEqualTo: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -220,15 +296,27 @@ class ActiveInstancesView extends StatelessWidget {
               itemCount: snapshot.data.documents.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot document = snapshot.data.documents[index];
-                var timeAgo = timeago.format(document['date'].toDate());
-
-//            var snap = document.reference.collection('photos').snapshots();
+                DateTime docTime = document['date'] != null
+                    ? document['date'].toDate()
+                    : DateTime.now();
+                var timeAgo = timeago.format(docTime);
                 return CustomGridTile(
+                  instanceCode: document['instanceCode'],
                   instanceId: document.documentID,
                   instanceName: document['instanceName'],
-                  instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
-                      document['photoURL'][0],fit: BoxFit.fill),
+                  instancePhoto: document['photoURL'] == null ||
+                          document['photoURL'].isEmpty
+                      ? Container(color: Colors.black)
+                      : Image.network(document['photoURL'][0],
+                          fit: BoxFit.fill),
                   date: timeAgo,
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => InstancePage(
+                              instanceCode: document['instanceCode'],
+                              instanceId: document.documentID,
+                              instanceName: document['instanceName']))),
                 );
               },
             );
@@ -237,5 +325,3 @@ class ActiveInstancesView extends StatelessWidget {
     );
   }
 }
-
-

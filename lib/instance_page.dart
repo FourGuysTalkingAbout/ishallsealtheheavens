@@ -1,38 +1,28 @@
-import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ishallsealtheheavens/detailsPage.dart';
-import 'package:ishallsealtheheavens/saveFile.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:path/path.dart';
+import 'package:intl/intl.dart';
 
 import 'logic/login_authProvider.dart';
-import 'saveFile.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
+import 'details_page.dart';
+import 'save_files.dart';
 
-final db = Firestore.instance;
 final saveFile = SaveFile();
 final userRepository = UserRepository.instance();
 
 class InstancePage extends StatefulWidget {
-//  final String value;
   final String instanceName;
   final String instanceId;
-  final bool firstPic;
+  final String instanceCode;
 
-  InstancePage(
-      {Key key,
-      this.instanceName,
-      this.instanceId,
-      this.firstPic,
-      })
+  InstancePage({Key key, this.instanceName, this.instanceId, this.instanceCode})
       : super(key: key);
 
   @override
@@ -40,13 +30,10 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-
-  List<String> images = List<String>();
-
-
   openCamera() async {
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+
     //TODO: implement a better naming convention for the 'imageName'
-//    final String imageName = '${Random().nextInt(100)}';
     final now = DateTime.now().toLocal();
     final formatter = DateFormat.MMMMEEEEd().add_Hm();
     final currentDate = formatter.format(now);
@@ -54,33 +41,27 @@ class _InstancePageState extends State<InstancePage> {
     File imageFile = await ImagePicker.pickImage(
         source: ImageSource.camera); //returns a File after picture is taken
 
-
-    StorageMetadata metaData = StorageMetadata(customMetadata:<String, String>{
-      'author': userRepository.user.displayName, 'instanceName': widget.instanceName
+    StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
+      'author': user.displayName,
+      'instanceName': widget.instanceName
     });
 
-//    Directory appDocDir = await getApplicationDocumentsDirectory();
-//    String appDocPath = appDocDir.path;
+    final StorageReference storageRef = FirebaseStorage.instance
+        .ref()
+        .child('images')
+        .child('$currentDate.jpg');
 
-//    saveFile.writeImage(imageFile);
+    final StorageUploadTask uploadTask = storageRef.putFile(
+        imageFile, metaData); // uploads file into Firebase Storage
 
-//    await imageFile.copy('$appDocPath/image1.png');
+    final StorageTaskSnapshot taskSnapshot = await uploadTask
+        .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
 
-    //'images' is a folder in Firebase Storage,
-     final StorageReference storageRef =
-         FirebaseStorage.instance.ref().child('images').child('$currentDate.jpg');
+    var url = await taskSnapshot.ref
+        .getDownloadURL(); // takes the URL of the imageFile
 
-     final StorageUploadTask uploadTask =
-         storageRef.putFile(imageFile,metaData); // uploads file into Firebase Storage
-
-     final StorageTaskSnapshot taskSnapshot = await uploadTask
-         .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
-
-     var url = await taskSnapshot.ref
-         .getDownloadURL(); // takes the URL of the imageFile
-
-     saveToInstance(url);
-     saveAsUserImage(url);
+    saveToInstance(url);
+    saveAsUserImage(url);
   }
 
   saveToInstance(String url) {
@@ -96,23 +77,22 @@ class _InstancePageState extends State<InstancePage> {
     });
   }
 
-  saveAsUserImage(String url){
-    final DocumentReference postRef = db.document('users/${userRepository.user.uid}');
+  saveAsUserImage(String url) {
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+
+    final DocumentReference postRef = db.document('users/${user.uid}');
     db.runTransaction((Transaction tx) async {
       DocumentSnapshot postSnapshot = await tx.get(postRef);
-      if(postSnapshot.exists) {
+      if (postSnapshot.exists) {
         await tx.update(postRef, {
           'userImages': FieldValue.arrayUnion([url])
         });
       }
     });
-
   }
 
   isActive() {
-    //TODO sets instance 'active' from true to false; making it appear in past Instance
-    //TODO: allow host to set to not active anymore else run for 24 hours then close instance.
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(hours: 24), () {
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {
         DocumentSnapshot postSnapshot = await tx.get(docRef);
@@ -125,38 +105,45 @@ class _InstancePageState extends State<InstancePage> {
 
   @override
   Widget build(BuildContext context) {
-//    isActive(); //TODO TURN ON WHEN READY
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.grey[400],
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: InstanceTopAppBar(
-            title: Text(widget.instanceName),
-          )),
-      endDrawer: DrawerMenu(),
-      drawer: UserAccountDrawer(),
-      body: Center(
-        child: PhotoGridView(
-          docId: widget.instanceId,
-          instanceName: widget.instanceName,
-        ),
-//        InstanceSecondAppBar()
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 15.0),
-        child: IconButton(
-          icon: Icon(Icons.camera),
-          iconSize: 35.0,
-          //todo:should be better code to disable splash on button
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          onPressed: () => openCamera(),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-//      bottomNavigationBar: CustomAppBar(),
-    );
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+    isActive(); // instance 'active' should be false in db after 24hours of creation
+    return StreamBuilder(
+        stream:
+            db.collection('instances').document(widget.instanceId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) return Container();
+          String instanceName = snapshot.data['instanceName'];
+          bool hostCheck = snapshot.data['host'] == user.uid;
+          return Scaffold(
+            resizeToAvoidBottomPadding: false,
+            backgroundColor: Colors.grey[400],
+            appBar: PreferredSize(
+                preferredSize: Size.fromHeight(50.0),
+                child: InstanceAppBar(
+                    instanceID: widget.instanceId, title: Text(instanceName))),
+            drawer: UserAccountDrawer(),
+            body: Center(
+              child: PhotoGridView(
+                docId: widget.instanceId,
+                instanceName: widget.instanceName,
+              ),
+            ),
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 15.0),
+              child: IconButton(
+                icon: Icon(Icons.camera),
+                iconSize: 35.0,
+                //todo:should be better code to disable splash on button
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onPressed: () => openCamera(),
+              ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+          );
+        });
+
   }
 }
 
@@ -207,8 +194,9 @@ class PhotoGridView extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => DetailsPage(
-                              id: snapshot.data[index],
-                              imageUrl: snapshot.data[index],))),
+                                id: snapshot.data[index],
+                                imageUrl: snapshot.data[index],
+                              ))),
                 );
               });
         }
@@ -216,6 +204,3 @@ class PhotoGridView extends StatelessWidget {
     );
   }
 }
-
-
-

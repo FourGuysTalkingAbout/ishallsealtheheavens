@@ -1,295 +1,381 @@
 import 'package:flutter/material.dart';
-import 'app_bar_top.dart';
 
-class InstanceTopAppBar extends AppBar {
-  InstanceTopAppBar({Key key, Widget leading, Widget bottom, Widget title})
-      : super(
-          key: key,
-          backgroundColor: Colors.deepPurple,
-          leading: Builder(builder: (BuildContext context) {
-            return new TopBarText();
-          }),
-          title: title,
-          centerTitle: true,
-          bottom: BottomInstanceBar(),
-        );
-}
 
-class DrawerMenu extends StatelessWidget {
-  const DrawerMenu();
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: new ListView(
-        children: [
-          new UserAccountsDrawerHeader(
-              accountName: new Text('Name of Instance'), accountEmail: null),
-          new ListTile(
-            leading: new InstancesInfo(), // Test divider
-          ),
-          new Divider(
-            color: Color(0xFF000000),
-          ),
-          new ListTile(
-            leading: new DeleteInstance(),
-          ),
-          new Divider(
-            color: Color(0xFF000000),
-          ), // Test divider
-          new ListTile(
-              leading: new IconButton(
-                  icon: new Icon(Icons.search), onPressed: () => Text('Blah')),
-              title: TextField(),
-              trailing: IconButton(
-                  icon: new Icon(Icons.play_arrow),
-                  onPressed: () => Text('Pressed')))
-        ],
-      ),
-    );
-  }
-}
+import 'logic/login_authProvider.dart';
 
-class InstancesInfo extends StatelessWidget {
-  const InstancesInfo({
-    Key key,
-  }) : super(key: key);
+class InstanceAppBar extends StatelessWidget {
+  final String instanceID;
+  final Widget title;
+
+
+  const InstanceAppBar({Key key, this.instanceID, this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: () => Text(
-        "Test instance info",
-      ),
-      child: Text("Instance Info",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-    );
-  }
-}
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
 
-class DeleteInstance extends StatelessWidget {
-  DeleteInstance({Key key}) : super(key: key);
+    return StreamBuilder(
+        stream: db.collection('instances').document(instanceID).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Text('Loading...');
+            default:
+              String host = snapshot.data['host'] ?? '';
+              List users = snapshot.data['users'];
+              bool active = snapshot.data['active'];
+              bool hostCheck = (host == user.uid);
 
-  final PopUpMenu popUpConfirm = new PopUpMenu();
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: () => popUpConfirm.confirm(
-          context,
-          'Are you sure you want to delete this Instance?',
-          'Instance will be deleted '
-              'Your images/edits will be archived'),
-      child: Text("Delete Instance",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-    );
-  }
-}
-
-class TopBarTitle extends StatelessWidget {
-  const TopBarTitle({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text(
-      'Name of In',
-      textAlign: TextAlign.center,
-    );
-  }
-}
-
-class PopUpMenu {
-  // logic
-  _confirmResult(bool isYes, BuildContext context) {
-    if (isYes) {
-      print('test yes');
-      Navigator.pop(context);
-    } else {
-      print('test no');
-      Navigator.pop(context);
-    }
-  }
-
-  confirm(BuildContext context, String title, String description) {
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[Text(description)],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => _confirmResult(false, context),
-                child: Text('Cancel'),
-              ),
-              FlatButton(
-                onPressed: () => _confirmResult(true, context),
-                child: Text('Yes'),
-              )
-            ],
-          );
+              return AppBar(
+                centerTitle: true,
+                backgroundColor: Colors.deepPurple,
+                leading: _buildFSLogo(),
+                title: title,
+                actions: <Widget>[
+                  hostCheck == true && active == true
+                      ? _buildHostPopUpMenu(
+                          description: snapshot.data['instanceDescription'],
+                          userLimit: snapshot.data['userLimit'].toString(),
+                          instanceName: snapshot.data['instanceName'],
+                          instanceCode: snapshot.data['instanceCode'],
+                          users: users,
+                        )
+                      : _buildGuestPopUpMenu(
+                          description: snapshot.data['instanceDescription'],
+                          users: users)
+                ],
+              );
+          }
         });
   }
-}
 
-class BottomInstanceBar extends PreferredSize {
-  const BottomInstanceBar();
+  Widget _buildFSLogo() {
+    return Builder(
+      builder: (context) => FlatButton(
+          onPressed: () => Scaffold.of(context).openDrawer(),
+          child: Text("FS",
+              style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontSize: 20.0,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white))),
 
-  Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      color: Colors.grey[100],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          new Row(
-            children: [
-              new HostText(),
-              Stack(
-                children: [
-                  new EditIcon(),
-                  Align(
-                    alignment: Alignment(1, 0.70),
-                    child: Text('       Edit'),
-                  )
-                ],
-              ),
-            ],
-          ),
-          new Row(
-            children: [
-              CheckIconButton(),
-              AddContact(),
-              new Container(),
-              new CheckIcon(),
-            ],
-          )
-        ],
-      ),
     );
   }
-}
 
-class EditIcon extends StatelessWidget {
-  const EditIcon();
+  Widget _buildGuestPopUpMenu({String description, List users}) {
+    return PopupMenuButton(
+      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+        PopupMenuItem(
+          child: GestureDetector(
+              child: ListTile(title: Text('Users')),
+              onTap: () => _showUsers(
+                  context: context, users: users)), // add list of users
+        ),
+        PopupMenuItem(
+          child: GestureDetector(
+            child: ListTile(title: Text('Description')),
+            onTap: () => _readDescription(context, description ?? ''),
+          ),
+        ),
+      ],
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    String entranceCode = 'IN3CH';
-    String instanceName = 'Name of In';
-    String instanceDescription = '';
-    int numberOfGuests;
+  Widget _buildHostPopUpMenu(
+      {String description,
+      String userLimit,
+      List users,
+      String instanceName,
+      String instanceCode}) {
 
     return PopupMenuButton(
-        icon: Icon(Icons.edit),
+        icon: Icon(FontAwesomeIcons.edit),
         elevation: 23.0,
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
-                child: ListTile(
-                    //TODO:create a onpressed that edits 'instanceName'
-                    contentPadding: EdgeInsets.only(right: 0.0),
-                    leading: Text('Name:'),
-                    title: Text(
-                      '$instanceName',
-                      textScaleFactor: 1.2,
-                    )),
+                child: GestureDetector(
+                  child: ListTile(
+                      contentPadding: EdgeInsets.only(right: 0.0),
+                      leading: Text('Name:'),
+                      title: Text('$instanceName',
+                          style: Theme.of(context).textTheme.title)),
+                  onTap: () {
+                    _changeName(context, instanceName)
+                        .then((val) => Navigator.pop(context));
+
+                  },
+                ),
               ),
+
               PopupMenuDivider(),
+
               PopupMenuItem(
-                child: ListTile(
-                  //TODO:create a onpressed that allows to edit 'entranceCode?
-                  //TODO:make the 'entranceCode' bigger font
-                  title: Text('Entrance Code: $entranceCode '),
-                  contentPadding:
-                      EdgeInsets.only(left: 55.0), //todo:change back to 0.0
+                child: GestureDetector(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.only(left: 0.0),
+                    leading: Text('Entrance Code:'),
+                    //TODO:FUTURE create a onpressed that allows to edit 'entranceCode?
+                    //TODO:make the 'entranceCode' bigger font
+                    title: Text(instanceCode,
+                        style: Theme.of(context).textTheme.title),
+                  ),
                 ),
               ),
               PopupMenuDivider(),
-              const PopupMenuItem(
-                child: ListTile(
-                  //TODO:create a dialog that is allows writing descriptions of instance
-                  title: Text('Set Description'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
+
+              PopupMenuItem(
+                child: GestureDetector(
+                  child: ListTile(
+                    //TODO:create a dialog that is allows writing descriptions of instance
+                    title: Text('Description'),
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                  ),
+                  onTap: () {
+                    _changeDescription(context, description)
+                        .then((val) => Navigator.pop(context));
+                  },
                 ),
               ),
               PopupMenuDivider(),
-              const PopupMenuItem(
-                //TODO: implement a way to limit guests in the instance
-                child: ListTile(
-                  title: Text('Limit number of Guests'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
+
+              PopupMenuItem(
+                child: GestureDetector(
+                    child: ListTile(title: Text('Users')),
+                    onTap: () {
+                      _showUsers(context: context, users: users);
+//                  );
+                    }), // add list of users
+              ),
+
+              PopupMenuItem(
+                child: GestureDetector(
+                  child: ListTile(
+                    title: Text('Limit number of Guests'),
+                    contentPadding: EdgeInsets.only(right: 0.0),
+                  ),
+                  onTap: () {
+                    _changeLimitUsers(context, userLimit)
+                        .then((val) => Navigator.pop(context));
+                  },
                 ),
               ),
+//              PopupMenuDivider(),
+//
+//               PopupMenuItem(
+//                //TODO: Future set location of instance
+//                child: ListTile(
+//                  title: Text('Set Location'),
+//                  contentPadding: EdgeInsets.only(right: 0.0),
+//                ),
+//              ),
               PopupMenuDivider(),
-              const PopupMenuItem(
-                //TODO: is this a Text location or some sort of google maps thing?
-                child: ListTile(
-                  title: Text('Set Location'),
-                  contentPadding: EdgeInsets.only(right: 0.0),
-                ),
+//
+              PopupMenuItem(
+                //TODO: Future set location of instance
+                child: GestureDetector(
+                    child: ListTile(
+                      leading: Icon(FontAwesomeIcons.checkSquare),
+                      title: Text('End Instance'),
+                      contentPadding: EdgeInsets.only(right: 0.0),
+                    ),
+                    onTap: () {
+                      _endInstance(context);
+                    }),
               ),
             ]);
   }
-}
 
-class HostText extends StatelessWidget {
-  const HostText();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Text('  Host',
-        style: TextStyle(
-          fontSize: 25.0,
-          fontWeight: FontWeight.bold,
-        ));
-  }
-}
-
-class AddContact extends StatelessWidget {
-  const AddContact();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(Icons.person_add),
-        iconSize: 35.0,
-        alignment: Alignment.center,
-        onPressed: () => Text('Blah'));
-  }
-}
-
-class CheckIcon extends StatelessWidget {
-  const CheckIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.check),
-      iconSize: 35.0,
-      color: Colors.black,
-      onPressed: () => Text('TEST MEE'),
+  _changeLimitUsers(BuildContext context, String userLimit) async {
+    final limitTextController = TextEditingController(text: userLimit);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change Limit of Users'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  maxLines: 1,
+                  controller: limitTextController,
+                  decoration: InputDecoration.collapsed(
+                      hintText: 'Change the number of user allowed'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Change'),
+              onPressed: () {
+                db
+                    .collection('instances')
+                    .document(instanceID)
+                    .updateData({'userLimit': limitTextController.text});
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
     );
   }
-}
 
-class CheckIconButton extends StatelessWidget {
-  const CheckIconButton();
+  Future<void> _changeDescription(
+      BuildContext context, String description) async {
+    final descriptionController = TextEditingController(text: description);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Set Description of Instance'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  maxLines: 5,
+                  controller: descriptionController,
+                  decoration: InputDecoration.collapsed(
+                      hintText: 'Enter a description'),
+                ),
+//                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Set'),
+              onPressed: () {
+                db.collection('instances').document(instanceID).updateData(
+                    {'instanceDescription': descriptionController.text});
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return new IconButton(
-        icon: Icon(Icons.arrow_downward),
-        iconSize: 35.0,
-        onPressed: () => Text('test press'));
+  Future<void> _changeName(BuildContext context, String instanceName) async {
+    final instanceNameController = TextEditingController(text: instanceName);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change the name of your Instance'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  maxLines: 1,
+                  maxLength: 15,
+                  controller: instanceNameController,
+                  decoration: InputDecoration(
+                      counterText: '', hintText: 'Enter a a new name'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Change'),
+              onPressed: () {
+                db
+                    .collection('instances')
+                    .document(instanceID)
+                    .updateData({'instanceName': instanceNameController.text});
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future _endInstance(BuildContext context) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Do you want to end the instance?'),
+          content: Text('You can only view pictures after ending.'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                db
+                    .collection('instances')
+                    .document(instanceID)
+                    .updateData({'active': false});
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+            FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  _readDescription(BuildContext context, String description) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('What\'s this is about'),
+            content: Text(description),
+          );
+        });
+  }
+
+  _showUsers({BuildContext context, List users}) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Center(child: Text('Users In Here')),
+              content: Container(
+                height: 600,
+                width: 400,
+                child: ListView.builder(
+                    itemCount: users.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ListTile(title: Text(users[index]));
+                    }),
+              ));
+        });
   }
 }
