@@ -27,10 +27,10 @@ class UserAccountDrawer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: AssetImage('images/apex_lestley.png'),
+                  backgroundImage: NetworkImage(user.user.photoUrl),
                   maxRadius: 50,
                 ),
-                Text('Kikashi-Sensei@hotmail.com\n' + user.user.email,
+                Text(user.user.email,
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
@@ -39,26 +39,24 @@ class UserAccountDrawer extends StatelessWidget {
             color: Color(0xff757575),
             height: 10.0,
           ),
-          ListTile(),
-          Divider(
-            color: Colors.black,
-          ),
+//          ListTile(),
+//          Divider(color: Colors.black),
           ListTile(
-            title: Text('Username: ' +
+            title: Text(
                 (user.user.displayName == null
                     ? 'Create a Username'
-                    : user.user.displayName)),
+                    : user.user.displayName))),
+          Divider(
+            color: Colors.black),
+          ListTile(
+            title: Text('Send Feedback'),
           ),
           Divider(
             color: Colors.black,
           ),
           ListTile(
-            title: Text('Name: ' + (user.user.uid)),
+            title: Text('Get Help'),
           ),
-          Divider(
-            color: Colors.black,
-          ),
-          ListTile(),
           Divider(
             color: Colors.black,
           ),

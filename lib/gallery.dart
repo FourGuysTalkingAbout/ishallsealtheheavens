@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:ishallsealtheheavens/app_bar.dart';
 import 'package:ishallsealtheheavens/detailsPage.dart';
 import 'package:ishallsealtheheavens/instance_page.dart';
 import 'package:ishallsealtheheavens/saveFile.dart';
+import 'package:ishallsealtheheavens/user_account_drawer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'app_bar_bottom.dart';
-import 'app_bar_top_gallery.dart';
 import 'logic/login_authProvider.dart';
 
 enum GalleryView { Taken, All }
@@ -26,7 +27,8 @@ class _GalleryState extends State<Gallery> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
-      appBar: GalleryTopAppBar(),
+//      appBar: AllTopAppBar(),
+//      drawer: UserAccountDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -97,3 +99,70 @@ class PhotosTakenList extends StatelessWidget {
   }
 
 }
+
+class GallerySecondAppBar extends StatelessWidget {
+  const GallerySecondAppBar();
+
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(3.0),
+      height: 48.0,
+      width: 415.0,
+      color: Colors.grey[100],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+           Row(
+            children: [
+              _buildViewText(),
+              Stack(
+                children: [
+                  _buildViewIcon(),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewIcon() {
+
+    return PopupMenuButton(
+        icon: Icon(Icons.arrow_drop_down),
+        elevation: 23.0,
+        itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+          PopupMenuItem(
+            child: ListTile(
+              //TODO:create a onpressed that views taken and saved separately
+                contentPadding: EdgeInsets.only(right: 0.0),
+                title: Text(
+                  'Taken/Saved',
+                  textScaleFactor: 1.2,
+                )),
+          ),
+          PopupMenuDivider(),
+          PopupMenuItem(
+            child: ListTile(
+              //TODO:create a onpressed that allows view all chronologically
+              title: Text(
+                'All',
+                textScaleFactor: 1.2,
+              ),
+              contentPadding: EdgeInsets.only(right: 0.0),
+            ),
+          ),
+        ]);
+  }
+
+  Widget _buildViewText() {
+    return Text('  View',
+        style: TextStyle(
+          fontSize: 25.0,
+          fontWeight: FontWeight.bold,
+        ));
+  }
+}
+
+

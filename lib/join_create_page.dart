@@ -1,10 +1,10 @@
-import 'dart:convert';
-import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ishallsealtheheavens/GridTile.dart';
+import 'package:ishallsealtheheavens/app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart' as prefix0;
 import 'package:timeago/timeago.dart' as timeago;
@@ -15,8 +15,8 @@ import 'app_bar_bottom.dart';
 import 'app_bar_top.dart';
 import 'instance_page.dart';
 import 'user_account_drawer.dart';
-
 import 'logic/login_authProvider.dart';
+
 
 class NavBar extends StatefulWidget {
   @override
@@ -25,10 +25,17 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 1;
+
   List<Widget> _btmNavOptions = [
     PastInstance(),
     JoinCreatePage(),
     Gallery(),
+  ];
+
+  List<Widget> _AppBarTitleOptions = [
+    Text('Past Instance'),
+    Text('Active Instances'),
+    Text('Gallery'),
   ];
 
   void _onItemTapped(int index) {
@@ -40,6 +47,10 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AllTopAppBar(
+        centerTitle: true,
+        title: _AppBarTitleOptions.elementAt(_selectedIndex),
+      ),
       drawer: UserAccountDrawer(),
       body: _btmNavOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavBar(
@@ -64,7 +75,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     return Scaffold(
       backgroundColor: Colors.grey[400],
-      appBar: TopAppBar(),
+//      appBar: TopAppBar(),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -83,7 +94,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                           child: Text('Create Instance'),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
-                              createInstance(context: context, user: user.uid);
+                              createInstance(context: context, user: user);
                             }
                           }),
                     ),
@@ -112,17 +123,17 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     return prefix0.randomAlpha(5);
   }
 
-  createInstance({String user, BuildContext context}) async {
+  createInstance({FirebaseUser user, BuildContext context}) async {
     String instanceCode = createCode();
     DocumentReference docRef = await db.collection('instances').add({
       // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
       'instanceCode': instanceCode,
       'userLimit': '10',
-      'users': FieldValue.arrayUnion([user]),
+      'users': FieldValue.arrayUnion([user.displayName]),
       'date': FieldValue.serverTimestamp(),
       'active': true,
-      'host': user,
+      'host': user.uid,
     });
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => InstancePage(
@@ -246,6 +257,9 @@ class InstanceNameTextFormField extends StatelessWidget {
         maxLength: 20,
         controller: _instanceNameController,
         textAlign: TextAlign.center,
+        inputFormatters: [
+          WhitelistingTextInputFormatter(RegExp("[a-zA-Z --!]"))
+        ],
         decoration: InputDecoration(
             counterText: '',
 //          contentPadding:
@@ -272,7 +286,7 @@ class ActiveInstancesView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: db
           .collection('instances')
-          .where("users", arrayContains: user.uid)
+          .where("users", arrayContains: user.displayName)
           .where('active', isEqualTo: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

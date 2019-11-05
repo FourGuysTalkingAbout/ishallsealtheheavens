@@ -25,6 +25,8 @@ class WTFAPPBAR extends StatelessWidget {
               return Text('Loading...');
             default:
               String host = snapshot.data['host'] ?? '';
+              List users = snapshot.data['users'];
+
               bool hostCheck = host == user.uid;
               return AppBar(
                 centerTitle: true,
@@ -34,12 +36,16 @@ class WTFAPPBAR extends StatelessWidget {
                 actions: <Widget>[
                   hostCheck
                       ? _buildHostPopUpMenu(
-                          snapshot.data['instanceDescription'],
-                          snapshot.data['userLimit'].toString(),
-                          snapshot.data['instanceName'],
-                          snapshot.data['instanceCode'])
-                      : _buildGuestPopUpMenu(
-                          snapshot.data['instanceDescription'])
+                          description: snapshot.data['instanceDescription'],
+                          userLimit: snapshot.data['userLimit'].toString(),
+                          instanceName: snapshot.data['instanceName'],
+                          instanceCode: snapshot.data['instanceCode'],
+                          users: users,
+                       )
+
+                      : _buildGuestPopUpMenu(description: snapshot.data['instanceDescription'],
+                    users: users
+                          )
                 ],
               );
           }
@@ -68,15 +74,16 @@ class WTFAPPBAR extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestPopUpMenu(String description) {
+  Widget _buildGuestPopUpMenu({String description, List users}) {
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
         PopupMenuItem(
-          child: GestureDetector(child: Text('Users')),// add list of users
+          child: GestureDetector(child: ListTile(title: Text('Users')),
+          onTap: () => _showUsers(context: context, users: users)),// add list of users
         ),
         PopupMenuItem(
           child: GestureDetector(
-            child: Text('Description'),
+            child: ListTile(title: Text('Description')),
             onTap: () => _readDescription(context, description ?? ''),
           ),
         ),
@@ -84,8 +91,8 @@ class WTFAPPBAR extends StatelessWidget {
     );
   }
 
-  Widget _buildHostPopUpMenu(String description, String userLimit,
-      String instanceName, String instanceCode) {
+  Widget _buildHostPopUpMenu({String description, String userLimit, List users,
+      String instanceName, String instanceCode}) {
     return PopupMenuButton(
         icon: Icon(FontAwesomeIcons.edit),
         elevation: 23.0,
@@ -135,6 +142,17 @@ class WTFAPPBAR extends StatelessWidget {
                 ),
               ),
               PopupMenuDivider(),
+
+          PopupMenuItem(
+            child: GestureDetector(
+                child: ListTile(
+                    title: Text('Users')),
+                onTap: () {
+                  _showUsers(context: context, users: users);
+//                      .then((val) => Navigator.pop(context)
+//                  );
+                }),// add list of users
+          ),
 
               PopupMenuItem(
                 child: GestureDetector(
@@ -343,13 +361,22 @@ class WTFAPPBAR extends StatelessWidget {
         });
   }
 
-  _showUsers(BuildContext context, Widget content) {
+  _showUsers({BuildContext context, List users}) {
     return showDialog(
       context: context,
           builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('User'),
-          content: content,
+          title: Center(child: Text('Users In Here')),
+          content: Container(
+            height: 600,
+            width: 400,
+            child: ListView.builder(
+                itemCount: users.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+              return ListTile(title: Text(users[index]));
+            }),
+          )
         );
     }
     );
