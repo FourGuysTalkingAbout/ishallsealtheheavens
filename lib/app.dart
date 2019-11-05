@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
 import 'package:provider/provider.dart';
 
-import 'Gallery_Page.dart';
+import 'gallery_page.dart';
 import 'instance_page.dart';
 import 'join_create_page.dart';
 import 'login_page.dart';

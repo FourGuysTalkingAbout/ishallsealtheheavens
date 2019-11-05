@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'logic/login_authProvider.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
-import 'detailsPage.dart';
+import 'details_page.dart';
 
 final userRepository = UserRepository.instance();
 

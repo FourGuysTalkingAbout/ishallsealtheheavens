@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'logic/login_authProvider.dart';
 import 'closed_instance.dart';
-import 'GridTile.dart';
+import 'model/custom_gridtile.dart';
 
 
 class PastInstance extends StatefulWidget {

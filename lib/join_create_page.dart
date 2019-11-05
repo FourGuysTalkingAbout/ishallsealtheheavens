@@ -11,9 +11,9 @@ import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'past_instance.dart';
 import 'instance_page.dart';
-import 'Gallery_Page.dart';
-import 'bottomNavBar.dart';
-import 'GridTile.dart';
+import 'gallery_page.dart';
+import 'bottom_navbar.dart';
+import 'model/custom_gridtile.dart';
 import 'app_bar.dart';
 
 class NavBar extends StatefulWidget {

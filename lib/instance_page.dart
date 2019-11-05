@@ -11,8 +11,8 @@ import 'package:intl/intl.dart';
 import 'logic/login_authProvider.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
-import 'detailsPage.dart';
-import 'saveFile.dart';
+import 'details_page.dart';
+import 'save_files.dart';
 
 final saveFile = SaveFile();
 final userRepository = UserRepository.instance();

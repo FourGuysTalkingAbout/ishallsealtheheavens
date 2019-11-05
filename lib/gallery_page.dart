@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'logic/login_authProvider.dart';
-import 'detailsPage.dart';
-import 'saveFile.dart';
+import 'details_page.dart';
+import 'save_files.dart';
 
 enum GalleryView { Taken, All }
 
