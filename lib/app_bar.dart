@@ -28,3 +28,4 @@ class _FSLogo extends StatelessWidget {
                 color: Colors.white)));
   }
 }
+

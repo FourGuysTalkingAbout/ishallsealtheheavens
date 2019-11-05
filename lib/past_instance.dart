@@ -18,6 +18,7 @@ class PastInstance extends StatefulWidget {
 
 class _PastInstanceState extends State<PastInstance> {
 
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now().toLocal();
@@ -25,8 +26,6 @@ class _PastInstanceState extends State<PastInstance> {
     final date = formatter.format(now);
     
     return Scaffold(
-//        appBar: AllTopAppBar(),
-//        drawer: UserAccountDrawer(),
         backgroundColor: Colors.grey[400],
         body: _buildGridList()
         );
@@ -41,7 +40,7 @@ class _PastInstanceState extends State<PastInstance> {
         stream: db.collection('instances').where('users', arrayContains: user.displayName).where('active', isEqualTo: false).orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           }
           return ListView.builder(
             key: PageStorageKey<String>('Preseves scroll position'),

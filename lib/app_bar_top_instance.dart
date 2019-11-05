@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'logic/login_authProvider.dart';
 class InstanceAppBar extends StatelessWidget {
   final String instanceID;
   final Widget title;
+
 
   const InstanceAppBar({Key key, this.instanceID, this.title})
       : super(key: key);
@@ -64,6 +66,7 @@ class InstanceAppBar extends StatelessWidget {
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.bold,
                   color: Colors.white))),
+
     );
   }
 
@@ -92,6 +95,7 @@ class InstanceAppBar extends StatelessWidget {
       List users,
       String instanceName,
       String instanceCode}) {
+
     return PopupMenuButton(
         icon: Icon(FontAwesomeIcons.edit),
         elevation: 23.0,
@@ -106,6 +110,7 @@ class InstanceAppBar extends StatelessWidget {
                   onTap: () {
                     _changeName(context, instanceName)
                         .then((val) => Navigator.pop(context));
+
                   },
                 ),
               ),
