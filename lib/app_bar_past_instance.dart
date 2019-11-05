@@ -15,17 +15,14 @@ class InstanceTopAppBar extends AppBar {
 class TopBarText extends StatelessWidget{
 
   Widget build(BuildContext context ) {
-    return Row(
-      children: <Widget>[
-        Icon(Icons.arrow_back,size: 33.0,),
-        Text("FS",
-    style: TextStyle(
-    decoration: TextDecoration.underline,
-    fontSize: 20.0,
-    fontStyle: FontStyle.italic,
-    fontWeight: FontWeight.bold,
-    color: Colors.white))
-      ],
+    return Center(
+      child: Text("FS",
+      style: TextStyle(
+      decoration: TextDecoration.underline,
+      fontSize: 20.0,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.bold,
+      color: Colors.white)),
     );
   }
 }
@@ -86,7 +83,7 @@ class InstanceInfo extends StatelessWidget {
 class DeleteInstance extends StatelessWidget {
   DeleteInstance({Key key}) : super(key: key);
 
-  PopUpMenu popUpConfirm = new PopUpMenu();
+  final PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {

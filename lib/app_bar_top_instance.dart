@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'app_bar_top.dart';
 
 class InstanceTopAppBar extends AppBar {
-  InstanceTopAppBar({Key key, Widget leading, Widget bottom})
+  InstanceTopAppBar({Key key, Widget leading, Widget bottom, Widget title})
       : super(
           key: key,
           backgroundColor: Colors.deepPurple,
           leading: Builder(builder: (BuildContext context) {
             return new TopBarText();
           }),
-          title: TopBarTitle(),
+          title: title,
           centerTitle: true,
+          bottom: BottomInstanceBar(),
         );
 }
 
@@ -24,7 +25,7 @@ class DrawerMenu extends StatelessWidget {
           new UserAccountsDrawerHeader(
               accountName: new Text('Name of Instance'), accountEmail: null),
           new ListTile(
-            leading: new InstanceInfo(), // Test divider
+            leading: new InstancesInfo(), // Test divider
           ),
           new Divider(
             color: Color(0xFF000000),
@@ -48,8 +49,8 @@ class DrawerMenu extends StatelessWidget {
   }
 }
 
-class InstanceInfo extends StatelessWidget {
-  const InstanceInfo({
+class InstancesInfo extends StatelessWidget {
+  const InstancesInfo({
     Key key,
   }) : super(key: key);
 
@@ -70,7 +71,7 @@ class InstanceInfo extends StatelessWidget {
 class DeleteInstance extends StatelessWidget {
   DeleteInstance({Key key}) : super(key: key);
 
-  PopUpMenu popUpConfirm = new PopUpMenu();
+  final PopUpMenu popUpConfirm = new PopUpMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -141,14 +142,12 @@ class PopUpMenu {
   }
 }
 
-class InstanceSecondAppBar extends PreferredSize {
-  const InstanceSecondAppBar();
+class BottomInstanceBar extends PreferredSize {
+  const BottomInstanceBar();
 
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(3.0),
-      height: 48.0,
-      width: 415.0,
+      height: 50,
       color: Colors.grey[100],
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,7 +185,7 @@ class EditIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var entranceCode = 'IN3CH';
+    String entranceCode = 'IN3CH';
     String instanceName = 'Name of In';
     String instanceDescription = '';
     int numberOfGuests;
