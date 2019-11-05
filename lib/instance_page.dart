@@ -1,33 +1,28 @@
-import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ishallsealtheheavens/detailsPage.dart';
-import 'package:ishallsealtheheavens/saveFile.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import 'logic/login_authProvider.dart';
-import 'saveFile.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
+import 'detailsPage.dart';
+import 'saveFile.dart';
 
-final db = Firestore.instance;
 final saveFile = SaveFile();
 final userRepository = UserRepository.instance();
-
 
 class InstancePage extends StatefulWidget {
   final String instanceName;
   final String instanceId;
   final String instanceCode;
 
-
   InstancePage({Key key, this.instanceName, this.instanceId, this.instanceCode})
-
       : super(key: key);
 
   @override
@@ -35,11 +30,8 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-
   openCamera() async {
-    FirebaseUser user = Provider
-        .of<UserRepository>(context)
-        .user;
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
 
     //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
@@ -49,16 +41,17 @@ class _InstancePageState extends State<InstancePage> {
     File imageFile = await ImagePicker.pickImage(
         source: ImageSource.camera); //returns a File after picture is taken
 
-
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
-      'author': user.displayName, 'instanceName': widget.instanceName
+      'author': user.displayName,
+      'instanceName': widget.instanceName
     });
 
-    final StorageReference storageRef =
-    FirebaseStorage.instance.ref().child('images').child('$currentDate.jpg');
+    final StorageReference storageRef = FirebaseStorage.instance
+        .ref()
+        .child('images')
+        .child('$currentDate.jpg');
 
-    final StorageUploadTask uploadTask =
-    storageRef.putFile(
+    final StorageUploadTask uploadTask = storageRef.putFile(
         imageFile, metaData); // uploads file into Firebase Storage
 
     final StorageTaskSnapshot taskSnapshot = await uploadTask
@@ -73,7 +66,7 @@ class _InstancePageState extends State<InstancePage> {
 
   saveToInstance(String url) {
     final DocumentReference postRef =
-    db.document('instances/${widget.instanceId}');
+        db.document('instances/${widget.instanceId}');
     db.runTransaction((Transaction tx) async {
       DocumentSnapshot postSnapshot = await tx.get(postRef);
       if (postSnapshot.exists) {
@@ -85,9 +78,7 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   saveAsUserImage(String url) {
-    FirebaseUser user = Provider
-        .of<UserRepository>(context)
-        .user;
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
 
     final DocumentReference postRef = db.document('users/${user.uid}');
     db.runTransaction((Transaction tx) async {
@@ -114,15 +105,11 @@ class _InstancePageState extends State<InstancePage> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider
-        .of<UserRepository>(context)
-        .user;
-//    print(user);
-    isActive(); // find way to set active to false or true
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+    isActive(); // instance 'active' should be false in db after 24hours of creation
     return StreamBuilder(
-        stream: db.collection('instances')
-            .document(widget.instanceId)
-            .snapshots(),
+        stream:
+            db.collection('instances').document(widget.instanceId).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.data == null) return Container();
           String instanceName = snapshot.data['instanceName'];
@@ -132,17 +119,14 @@ class _InstancePageState extends State<InstancePage> {
             backgroundColor: Colors.grey[400],
             appBar: PreferredSize(
                 preferredSize: Size.fromHeight(50.0),
-                child: WTFAPPBAR(instanceID: widget.instanceId,
-                    title: Text(instanceName))),
-//          appBar: hostCheck ? _buildHostAppBar(instanceName) : _buildGuestAppBar(instanceName),
-//          endDrawer: DrawerMenu(),
+                child: InstanceAppBar(
+                    instanceID: widget.instanceId, title: Text(instanceName))),
             drawer: UserAccountDrawer(),
             body: Center(
               child: PhotoGridView(
                 docId: widget.instanceId,
                 instanceName: widget.instanceName,
               ),
-//        InstanceSecondAppBar()
             ),
             floatingActionButton: Padding(
               padding: const EdgeInsets.only(bottom: 15.0),
@@ -155,14 +139,11 @@ class _InstancePageState extends State<InstancePage> {
                 onPressed: () => openCamera(),
               ),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation
-                .centerDocked,
-//      bottomNavigationBar: CustomAppBar(),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
           );
-        }
-    );
+        });
   }
-
 }
 
 class PhotoGridView extends StatelessWidget {
@@ -212,8 +193,9 @@ class PhotoGridView extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => DetailsPage(
-                              id: snapshot.data[index],
-                              imageUrl: snapshot.data[index],))),
+                                id: snapshot.data[index],
+                                imageUrl: snapshot.data[index],
+                              ))),
                 );
               });
         }
@@ -221,6 +203,3 @@ class PhotoGridView extends StatelessWidget {
     );
   }
 }
-
-
-

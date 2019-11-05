@@ -1,19 +1,14 @@
-import 'dart:math';
+import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:ishallsealtheheavens/app_bar.dart';
-import 'package:ishallsealtheheavens/closed_instance.dart' as prefix0;
-import 'package:ishallsealtheheavens/instance_page.dart';
-import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
-import 'package:ishallsealtheheavens/GridTile.dart';
-import 'package:ishallsealtheheavens/user_account_drawer.dart';
-import 'package:provider/provider.dart';
-import 'app_bar_past_instance.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
+import 'logic/login_authProvider.dart';
+import 'closed_instance.dart';
+import 'GridTile.dart';
 
 
 class PastInstance extends StatefulWidget {
@@ -64,7 +59,7 @@ class _PastInstanceState extends State<PastInstance> {
                 onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => prefix0.ClosedInstancePage(
+                        builder: (context) => ClosedInstancePage(
                             instanceCode: document['instanceCode'],
                             instanceId: document.documentID,
                             instanceName: document['instanceName']))),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'logic/login_authProvider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
+import 'logic/login_authProvider.dart';
+
+
 
 class UserAccountDrawer extends StatelessWidget {
   //  //TODO Fix Display name for Email Login
@@ -15,6 +15,7 @@ class UserAccountDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           //TODO:Made it look like the Figma Design, don't know if it's worth all the extra widgets.
+          //TODO: Figure out if more options are needed or not.
           DrawerHeader(
             margin: EdgeInsets.all(0.0),
             padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),

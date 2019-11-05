@@ -1,16 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:ishallsealtheheavens/logic/login_authProvider.dart';
-import 'package:provider/provider.dart';
-import 'app_bar_top.dart';
-import 'instance_page.dart';
 
-class WTFAPPBAR extends StatelessWidget {
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import 'logic/login_authProvider.dart';
+
+class InstanceAppBar extends StatelessWidget {
   final String instanceID;
   final Widget title;
 
-  const WTFAPPBAR({Key key, this.instanceID, this.title}) : super(key: key);
+  const InstanceAppBar({Key key, this.instanceID, this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,38 +27,30 @@ class WTFAPPBAR extends StatelessWidget {
             default:
               String host = snapshot.data['host'] ?? '';
               List users = snapshot.data['users'];
+              bool active = snapshot.data['active'];
+              bool hostCheck = (host == user.uid);
 
-              bool hostCheck = host == user.uid;
               return AppBar(
                 centerTitle: true,
                 backgroundColor: Colors.deepPurple,
                 leading: _buildFSLogo(),
                 title: title,
                 actions: <Widget>[
-                  hostCheck
+                  hostCheck == true && active == true
                       ? _buildHostPopUpMenu(
                           description: snapshot.data['instanceDescription'],
                           userLimit: snapshot.data['userLimit'].toString(),
                           instanceName: snapshot.data['instanceName'],
                           instanceCode: snapshot.data['instanceCode'],
                           users: users,
-                       )
-
-                      : _buildGuestPopUpMenu(description: snapshot.data['instanceDescription'],
-                    users: users
-                          )
+                        )
+                      : _buildGuestPopUpMenu(
+                          description: snapshot.data['instanceDescription'],
+                          users: users)
                 ],
               );
           }
         });
-  }
-
-  Widget _buildHostText() {
-    return Text('  Host',
-        style: TextStyle(
-          fontSize: 25.0,
-          fontWeight: FontWeight.bold,
-        ));
   }
 
   Widget _buildFSLogo() {
@@ -78,8 +71,10 @@ class WTFAPPBAR extends StatelessWidget {
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
         PopupMenuItem(
-          child: GestureDetector(child: ListTile(title: Text('Users')),
-          onTap: () => _showUsers(context: context, users: users)),// add list of users
+          child: GestureDetector(
+              child: ListTile(title: Text('Users')),
+              onTap: () => _showUsers(
+                  context: context, users: users)), // add list of users
         ),
         PopupMenuItem(
           child: GestureDetector(
@@ -91,8 +86,12 @@ class WTFAPPBAR extends StatelessWidget {
     );
   }
 
-  Widget _buildHostPopUpMenu({String description, String userLimit, List users,
-      String instanceName, String instanceCode}) {
+  Widget _buildHostPopUpMenu(
+      {String description,
+      String userLimit,
+      List users,
+      String instanceName,
+      String instanceCode}) {
     return PopupMenuButton(
         icon: Icon(FontAwesomeIcons.edit),
         elevation: 23.0,
@@ -118,12 +117,11 @@ class WTFAPPBAR extends StatelessWidget {
                   child: ListTile(
                     contentPadding: EdgeInsets.only(left: 0.0),
                     leading: Text('Entrance Code:'),
-                    //TODO:create a onpressed that allows to edit 'entranceCode?
+                    //TODO:FUTURE create a onpressed that allows to edit 'entranceCode?
                     //TODO:make the 'entranceCode' bigger font
                     title: Text(instanceCode,
                         style: Theme.of(context).textTheme.title),
                   ),
-//                  onTap: () => _neverSatisfied(context),
                 ),
               ),
               PopupMenuDivider(),
@@ -143,16 +141,14 @@ class WTFAPPBAR extends StatelessWidget {
               ),
               PopupMenuDivider(),
 
-          PopupMenuItem(
-            child: GestureDetector(
-                child: ListTile(
-                    title: Text('Users')),
-                onTap: () {
-                  _showUsers(context: context, users: users);
-//                      .then((val) => Navigator.pop(context)
+              PopupMenuItem(
+                child: GestureDetector(
+                    child: ListTile(title: Text('Users')),
+                    onTap: () {
+                      _showUsers(context: context, users: users);
 //                  );
-                }),// add list of users
-          ),
+                    }), // add list of users
+              ),
 
               PopupMenuItem(
                 child: GestureDetector(
@@ -210,7 +206,6 @@ class WTFAPPBAR extends StatelessWidget {
                   decoration: InputDecoration.collapsed(
                       hintText: 'Change the number of user allowed'),
                 ),
-//                Text('You\’re like me. I’m never satisfied.'),
               ],
             ),
           ),
@@ -294,7 +289,6 @@ class WTFAPPBAR extends StatelessWidget {
                   decoration: InputDecoration(
                       counterText: '', hintText: 'Enter a a new name'),
                 ),
-//                Text('You\’re like me. I’m never satisfied.'),
               ],
             ),
           ),
@@ -363,22 +357,20 @@ class WTFAPPBAR extends StatelessWidget {
 
   _showUsers({BuildContext context, List users}) {
     return showDialog(
-      context: context,
-          builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(child: Text('Users In Here')),
-          content: Container(
-            height: 600,
-            width: 400,
-            child: ListView.builder(
-                itemCount: users.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-              return ListTile(title: Text(users[index]));
-            }),
-          )
-        );
-    }
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Center(child: Text('Users In Here')),
+              content: Container(
+                height: 600,
+                width: 400,
+                child: ListView.builder(
+                    itemCount: users.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ListTile(title: Text(users[index]));
+                    }),
+              ));
+        });
   }
 }

@@ -170,3 +170,4 @@ class UserRepository with ChangeNotifier {
 }
 
 final UserRepository authService = UserRepository.instance();
+final db = Firestore.instance;

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ishallsealtheheavens/GridTile.dart';
-import 'package:ishallsealtheheavens/app_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart' as prefix0;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:provider/provider.dart';
 
-import 'gallery.dart';
-import 'past_instance.dart';
-import 'app_bar_bottom.dart';
-import 'app_bar_top.dart';
-import 'instance_page.dart';
-import 'user_account_drawer.dart';
 import 'logic/login_authProvider.dart';
-
+import 'user_account_drawer.dart';
+import 'past_instance.dart';
+import 'instance_page.dart';
+import 'Gallery_Page.dart';
+import 'bottomNavBar.dart';
+import 'GridTile.dart';
+import 'app_bar.dart';
 
 class NavBar extends StatefulWidget {
   @override
@@ -32,7 +30,7 @@ class _NavBarState extends State<NavBar> {
     Gallery(),
   ];
 
-  List<Widget> _AppBarTitleOptions = [
+  List<Widget> _appBarTitleOptions = [
     Text('Past Instance'),
     Text('Active Instances'),
     Text('Gallery'),
@@ -49,7 +47,7 @@ class _NavBarState extends State<NavBar> {
     return Scaffold(
       appBar: AllTopAppBar(
         centerTitle: true,
-        title: _AppBarTitleOptions.elementAt(_selectedIndex),
+        title: _appBarTitleOptions.elementAt(_selectedIndex),
       ),
       drawer: UserAccountDrawer(),
       body: _btmNavOptions.elementAt(_selectedIndex),
@@ -119,7 +117,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   }
 
   createCode() {
-
     return prefix0.randomAlpha(5);
   }
 
@@ -250,7 +247,6 @@ class InstanceNameTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-//      alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 50, vertical: 7.5),
       color: Colors.white,
       child: TextFormField(
@@ -262,8 +258,6 @@ class InstanceNameTextFormField extends StatelessWidget {
         ],
         decoration: InputDecoration(
             counterText: '',
-//          contentPadding:
-//          EdgeInsets.only(left: 5, top: 5, bottom: 10),
             border: InputBorder.none,
             hintText: 'Join/Enter a Instance',
             alignLabelWithHint: true),
@@ -324,8 +318,6 @@ class ActiveInstancesView extends StatelessWidget {
                               instanceId: document.documentID,
                               instanceName: document['instanceName']))),
                 );
-
-//            var snap = document.reference.collection('photos').snapshots();
               },
             );
         }

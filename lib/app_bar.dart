@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AllTopAppBar extends AppBar {
-
 //change title when on specific Page
-  AllTopAppBar({Widget title, Widget leading, Widget bottom, Key key, bool centerTitle })
+  AllTopAppBar(
+      {Widget title, Widget leading, Widget bottom, Key key, bool centerTitle})
       : super(
-      backgroundColor: Colors.deepPurple,
-      centerTitle: centerTitle,
-      key: key,
-      title: title,
-      leading: _FSLogo(),
-      bottom : bottom,
-  );
+          backgroundColor: Colors.deepPurple,
+          centerTitle: centerTitle,
+          key: key,
+          title: title,
+          leading: _FSLogo(),
+          bottom: bottom,
+        );
 }
 
 class _FSLogo extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return FlatButton(
