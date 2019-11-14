@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'logic/login_authProvider.dart';
 import 'closed_instance.dart';
-import 'model/custom_gridtile.dart';
+import 'model/custom_card.dart';
 
 
 class PastInstance extends StatefulWidget {
@@ -52,8 +52,10 @@ class _PastInstanceState extends State<PastInstance> {
                 instanceCode: document['instanceCode'],
                 instanceId: document.documentID,
                 instanceName: document['instanceName'],
-                instancePhoto:  document['photoURL'] == null || document['photoURL'].isEmpty ? Container(color: Colors.black)  : Image.network(
-                    document['photoURL'][0],fit: BoxFit.fill),
+                instancePhoto:    document['photoURL'] == null ||
+                    document['photoURL'].isEmpty
+                    ? '' // Container(color: Colors.black)
+                    : document['photoURL'][0],
                 date: timeAgo,
                 onTap: () => Navigator.push(
                     context,

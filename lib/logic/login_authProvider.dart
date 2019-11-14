@@ -1,13 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated  }
+enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
 class UserRepository with ChangeNotifier {
-
   final FacebookLogin _facebookLogin = FacebookLogin();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final Firestore _db = Firestore.instance;
@@ -46,9 +47,9 @@ class UserRepository with ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
-    if (firebaseUser == null ) {
+    if (firebaseUser == null) {
       _status = Status.Unauthenticated;
-    }else {
+    } else {
       _user = firebaseUser;
       _status = Status.Authenticated;
     }
@@ -62,7 +63,8 @@ class UserRepository with ChangeNotifier {
 
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -77,12 +79,13 @@ class UserRepository with ChangeNotifier {
       return false;
     }
   }
+
   void updateUserData(FirebaseUser user) async {
     DocumentReference ref = _db.collection('users').document(user.uid);
 
     return ref.setData(
       {
-        'name':user.displayName,
+        'name': user.displayName,
         'uid': user.uid,
         'email': user.email,
         'photoURL': user.photoUrl,
@@ -104,9 +107,9 @@ class UserRepository with ChangeNotifier {
       FacebookAccessToken fbToken = fbLoginResult.accessToken;
 
       final AuthCredential fbCredential =
-      FacebookAuthProvider.getCredential(accessToken: fbToken.token);
-      final FirebaseUser user = (await _auth.signInWithCredential(fbCredential))
-          .user;
+          FacebookAuthProvider.getCredential(accessToken: fbToken.token);
+      final FirebaseUser user =
+          (await _auth.signInWithCredential(fbCredential)).user;
       updateUserData(user);
       return true;
     } catch (e) {
@@ -123,21 +126,21 @@ class UserRepository with ChangeNotifier {
     print('fb logout');
   }
 
-
   /////////////////////SIGN UP/LOGIN WITH EMAIL/////////////
   Future<bool> signInWithEmail(String email, String password) async {
     try {
       _status = Status.Authenticating;
       notifyListeners();
 
-    FirebaseUser user = (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;
-    assert(user != null);
-    assert(await user.getIdToken() != null);
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
-    updateUserData(user);
-    return true;
-
+      FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+              email: email, password: password))
+          .user;
+      assert(user != null);
+      assert(await user.getIdToken() != null);
+      final FirebaseUser currentUser = await _auth.currentUser();
+      assert(user.uid == currentUser.uid);
+      updateUserData(user);
+      return true;
     } catch (e) {
       print(e);
       _status = Status.Unauthenticated;
@@ -148,11 +151,11 @@ class UserRepository with ChangeNotifier {
 
   //TODO create a displayname for when they signup via email
   Future<bool> registerWithEmail(String email, String password) async {
-    try{
+    try {
       _status = Status.Authenticating;
       notifyListeners();
-      FirebaseUser user = (await FirebaseAuth.instance.
-      createUserWithEmailAndPassword(email: email, password: password))
+      FirebaseUser user = (await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(email: email, password: password))
           .user;
       assert(user != null);
       assert(await user.getIdToken() != null);
@@ -167,6 +170,43 @@ class UserRepository with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> anonymouslySignIn() async {
+    try {
+      _status = Status.Authenticating;
+      notifyListeners();
+      FirebaseUser user =
+          (await FirebaseAuth.instance.signInAnonymously()).user;
+      assert(user != null);
+      assert(user.isAnonymous);
+      assert(!user.isEmailVerified);
+      assert(await user.getIdToken() != null);
+
+      if (Platform.isIOS) {
+        assert(user.providerData.isEmpty);
+      } else if (Platform.isAndroid) {
+        assert(user.providerData.length == 1);
+        assert(user.providerData[0].providerId == 'firebase');
+        assert(user.providerData[0].uid != null);
+        assert(user.providerData[0].displayName == null);
+        assert(user.providerData[0].photoUrl == null);
+        assert(user.providerData[0].email == null);
+      }else {
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+        return true;
+      }
+
+
+    } catch (error) {
+      print(error);
+      _status = Status.Unauthenticated;
+      notifyListeners();
+      return false;
+    }
+  }
+
+
 }
 
 final UserRepository authService = UserRepository.instance();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ishallsealtheheavens/gallery_page.dart';
 
 import 'package:random_string/random_string.dart' as prefix0;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,9 +12,8 @@ import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
 import 'past_instance.dart';
 import 'instance_page.dart';
-import 'gallery_page.dart';
 import 'bottom_navbar.dart';
-import 'model/custom_gridtile.dart';
+import 'model/custom_card.dart';
 import 'app_bar.dart';
 
 class NavBar extends StatefulWidget {
@@ -27,12 +27,15 @@ class _NavBarState extends State<NavBar> {
   List<Widget> _btmNavOptions = [
     PastInstance(),
     JoinCreatePage(),
-    Gallery(),
+    TabBarView(children: <Widget>[
+      Gallery(),
+      Center(child: Text('Page 2'))
+  ])
   ];
 
   List<Widget> _appBarTitleOptions = [
     Text('Past Instance'),
-    Text('Active Instances'),
+    Text('Active Instance'),
     Text('Gallery'),
   ];
 
@@ -44,16 +47,24 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AllTopAppBar(
-        centerTitle: true,
-        title: _appBarTitleOptions.elementAt(_selectedIndex),
-      ),
-      drawer: UserAccountDrawer(),
-      body: _btmNavOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _selectedIndex,
-        onTapped: _onItemTapped,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AllTopAppBar(
+          centerTitle: true,
+          title: _appBarTitleOptions.elementAt(_selectedIndex),
+          bottom: _selectedIndex == 2 ? TabBar(
+            tabs: <Widget>[
+              Tab(text: 'Photos Taken/Saved'),
+              Tab(text: 'All Photos')],
+          ) : null
+          ),
+        drawer: UserAccountDrawer(),
+        body:  _btmNavOptions.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavBar(
+          currentIndex: _selectedIndex,
+          onTapped: _onItemTapped,
+        ),
       ),
     );
   }
@@ -73,7 +84,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     return Scaffold(
       backgroundColor: Colors.grey[400],
-//      appBar: TopAppBar(),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -290,6 +300,7 @@ class ActiveInstancesView extends StatelessWidget {
             return Text('Loading....');
           default:
             return ListView.builder(
+              padding: EdgeInsets.all(20.0),
               key: PageStorageKey<String>('Preseves scroll position'),
               physics: PageScrollPhysics(),
               shrinkWrap: true,
@@ -304,11 +315,8 @@ class ActiveInstancesView extends StatelessWidget {
                   instanceCode: document['instanceCode'],
                   instanceId: document.documentID,
                   instanceName: document['instanceName'],
-                  instancePhoto: document['photoURL'] == null ||
-                          document['photoURL'].isEmpty
-                      ? Container(color: Colors.black)
-                      : Image.network(document['photoURL'][0],
-                          fit: BoxFit.fill),
+                  instancePhoto: document['photoURL'] == null || document['photoURL'].isEmpty
+                      ? '' : document['photoURL'][0],
                   date: timeAgo,
                   onTap: () => Navigator.push(
                       context,

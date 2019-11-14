@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -39,7 +40,7 @@ class _InstancePageState extends State<InstancePage> {
     final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
-        source: ImageSource.camera); //returns a File after picture is taken
+        source: ImageSource.camera, maxWidth: 640, maxHeight: 480); //returns a File after picture is taken
 
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
@@ -53,6 +54,7 @@ class _InstancePageState extends State<InstancePage> {
 
     final StorageUploadTask uploadTask = storageRef.putFile(
         imageFile, metaData); // uploads file into Firebase Storage
+//    saveFile.writeFile(imageFile.readAsStringSync());
 
     final StorageTaskSnapshot taskSnapshot = await uploadTask
         .onComplete; // waits for 'uploadTask' to complete then creates a snapshot
@@ -114,6 +116,7 @@ class _InstancePageState extends State<InstancePage> {
           if (snapshot.data == null) return Container();
           String instanceName = snapshot.data['instanceName'];
           bool hostCheck = snapshot.data['host'] == user.uid;
+
           return Scaffold(
             resizeToAvoidBottomPadding: false,
             backgroundColor: Colors.grey[400],
@@ -122,7 +125,8 @@ class _InstancePageState extends State<InstancePage> {
                 child: InstanceAppBar(
                     instanceID: widget.instanceId, title: Text(instanceName))),
             drawer: UserAccountDrawer(),
-            body: Center(
+            body: Container(
+              height: MediaQuery.of(context).size.height / 1.20,
               child: PhotoGridView(
                 docId: widget.instanceId,
                 instanceName: widget.instanceName,
@@ -139,8 +143,7 @@ class _InstancePageState extends State<InstancePage> {
                 onPressed: () => openCamera(),
               ),
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           );
         });
 
@@ -186,7 +189,9 @@ class PhotoGridView extends StatelessWidget {
                         tag: snapshot.data[index],
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 14.0),
-                          child: Image.network(snapshot.data[index],
+                          child: CachedNetworkImage(imageUrl: snapshot.data[index],
+                            placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(Icons.error),
                               fit: BoxFit.fill),
                         )),
                   ),

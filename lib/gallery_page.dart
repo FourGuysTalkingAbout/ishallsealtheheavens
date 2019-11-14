@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class _GalleryState extends State<Gallery> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            GallerySecondAppBar(),
+//            GallerySecondAppBar(),
             PhotosTakenList(),
           ],
         ),
@@ -72,9 +73,12 @@ class PhotosTakenList extends StatelessWidget {
                                       child: Padding(
                                         padding:
                                         const EdgeInsets.only(bottom: 14.0),
-                                        child: Image.network(
-                                            snapshot.data['userImages'][index],
-                                            fit: BoxFit.fill),
+                                        child: CachedNetworkImage(
+                                            imageUrl:snapshot.data['userImages'][index],
+                                            fit: BoxFit.fill,
+                                            errorWidget: (context, url, error) => Container(color: Colors.black,
+                                                child:Center(child: Text('Photo does not exists anymore', style: TextStyle(color: Colors.white),))),
+                                            placeholder: (context, url) => CircularProgressIndicator(),),
                                       )),
                                 ),
                               ),

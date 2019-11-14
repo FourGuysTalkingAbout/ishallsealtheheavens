@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flushbar/flushbar.dart';
@@ -76,17 +76,17 @@ class DetailsPage extends StatelessWidget {
                 ),
               ),
               body: GestureDetector(
-                child: Center(
-                  child: Hero(
-                    tag: id,
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover, //TODO:might have to fix test needed
-                      height: double
-                          .infinity, //TODO://might have to fix test needed
-                      width: double
-                          .infinity, //TODO://might have to fix test needed
-                    ),
+                child: Hero(
+                  tag: id,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.fill, //TODO:might have to fix test needed
+                    height: MediaQuery.of(context)
+                        .size
+                        .height, //TODO://might have to fix test needed
+                    width: MediaQuery.of(context)
+                        .size
+                        .width, //TODO://might have to fix test needed
                   ),
                 ),
                 onTap: () {
