@@ -26,6 +26,7 @@ class _GalleryState extends State<Gallery> {
           children: <Widget>[
 //            GallerySecondAppBar(),
             PhotosTakenList(),
+            SavedPhotosList(),
           ],
         ),
       ),
@@ -41,11 +42,79 @@ class PhotosTakenList extends StatelessWidget {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
 
 //Photos taken
+    return Padding(
+      padding: const EdgeInsets.only(top:25.0, bottom: 25.0),
+      child: Column(
+        children: <Widget>[
+          Container(
+              padding: EdgeInsets.all(12.0),
+              child: Text('Photos Taken', style: Theme.of(context).textTheme.title)),
+          StreamBuilder(
+              stream: db.collection('users').document(user.uid).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return Text('Loading....');
+                  default:
+                    return Container(
+                        height: 200,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            key: PageStorageKey<String>(
+                                'Preseves scroll position'),
+                            itemCount: snapshot.data['userImages'] != null ? snapshot.data['userImages'].length : 0,
+                            padding: EdgeInsets.all(8.0),
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                child: Container(
+                                  width: 200,
+                                  child: Card(
+                                    elevation: 5.0,
+                                    child: Hero(
+                                        tag: snapshot.data['userImages'][index],
+                                        child: Padding(
+                                          padding:
+                                          const EdgeInsets.only(bottom: 14.0),
+                                          child: CachedNetworkImage(
+                                              imageUrl:snapshot.data['userImages'][index],
+                                              fit: BoxFit.fill,
+                                              errorWidget: (context, url, error) => Container(color: Colors.black,
+                                                  child:Center(child: Text('Photo does not exists anymore', style: TextStyle(color: Colors.white),))),
+                                              placeholder: (context, url) => CircularProgressIndicator()),
+                                        )),
+                                  ),
+                                ),
+                                onTap: () =>
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DetailsPage(
+                                                    id: snapshot.data['userImages'][index],
+                                                    imageUrl: snapshot.data['userImages'][index],
+                                                    ))),
+                              );
+                            }));
+                }
+              }),
+        ],
+      ),
+    );
+  }
+}
+
+class SavedPhotosList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
+
+//Photos taken
     return Column(
       children: <Widget>[
         Container(
             padding: EdgeInsets.all(12.0),
-            child: Text('Photos Taken', style: Theme.of(context).textTheme.title)),
+            child: Text('Saved Photos', style: Theme.of(context).textTheme.title)),
         StreamBuilder(
             stream: db.collection('users').document(user.uid).snapshots(),
             builder: (context, snapshot) {
@@ -60,7 +129,7 @@ class PhotosTakenList extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           key: PageStorageKey<String>(
                               'Preseves scroll position'),
-                          itemCount: snapshot.data['userImages'].length,
+                          itemCount: snapshot.data['userImages'] != null ? snapshot.data['userImages'].length : 0,
                           padding: EdgeInsets.all(8.0),
                           itemBuilder: (context, index) {
                             return GestureDetector(
@@ -78,7 +147,7 @@ class PhotosTakenList extends StatelessWidget {
                                             fit: BoxFit.fill,
                                             errorWidget: (context, url, error) => Container(color: Colors.black,
                                                 child:Center(child: Text('Photo does not exists anymore', style: TextStyle(color: Colors.white),))),
-                                            placeholder: (context, url) => CircularProgressIndicator(),),
+                                            placeholder: (context, url) => CircularProgressIndicator()),
                                       )),
                                 ),
                               ),
@@ -88,11 +157,9 @@ class PhotosTakenList extends StatelessWidget {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               DetailsPage(
-                                                  id: snapshot
-                                                      .data['userImages'][index],
-                                                  imageUrl: snapshot
-                                                      .data['userImages']
-                                                  [index]))),
+                                                id: snapshot.data['userImages'][index],
+                                                imageUrl: snapshot.data['userImages'][index],
+                                              ))),
                             );
                           }));
               }

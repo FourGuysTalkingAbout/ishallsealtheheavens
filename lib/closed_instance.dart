@@ -103,6 +103,7 @@ class PhotoGridView extends StatelessWidget {
                           builder: (context) => DetailsPage(
                                 id: snapshot.data[index],
                                 imageUrl: snapshot.data[index],
+                                docID: docId,
                               ))),
                 );
               });

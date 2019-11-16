@@ -113,7 +113,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                           child: Text('Join Instance'),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
-                              joinInstance(context: context, user: user.uid);
+                              joinInstance(context: context, user: user.displayName);
                             }
                           }),
                     )

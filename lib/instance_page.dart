@@ -40,8 +40,8 @@ class _InstancePageState extends State<InstancePage> {
     final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
-        source: ImageSource.camera, maxWidth: 640, maxHeight: 480); //returns a File after picture is taken
-
+      //TODO Find proper resolution of pictures
+        source: ImageSource.camera); //returns a File after picture is taken
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
       'instanceName': widget.instanceName
@@ -195,17 +195,25 @@ class PhotoGridView extends StatelessWidget {
                               fit: BoxFit.fill),
                         )),
                   ),
-                  onTap: () => Navigator.push(
+                  onTap: () =>
+                      Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => DetailsPage(
                                 id: snapshot.data[index],
                                 imageUrl: snapshot.data[index],
+                                docID: docId,
                               ))),
+
                 );
               });
         }
       },
     );
+  }
+
+  _deleteImage(String name) {
+    db.collection('instances').document(docId).updateData({'photoURL': FieldValue.arrayRemove([name])});
+    print('I PRESSED IT');
   }
 }

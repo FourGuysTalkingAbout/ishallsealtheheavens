@@ -370,6 +370,7 @@ class InstanceAppBar extends StatelessWidget {
                 height: 600,
                 width: 400,
                 child: ListView.builder(
+                    padding: EdgeInsets.all(0.0),
                     itemCount: users.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
