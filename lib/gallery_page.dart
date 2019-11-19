@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -105,65 +108,45 @@ class PhotosTakenList extends StatelessWidget {
 }
 
 class SavedPhotosList extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
 
-//Photos taken
+  createDirectory() async {
+    String baseDir  = (await getApplicationDocumentsDirectory()).path;
+     Directory(baseDir+ '/hello').create(recursive: true).then((Directory directory) {
+      print(directory);
+    });
+//    bool dirExists = await dir.exists();
+////    if (b)
+////    dir.create();
+////    final test = Directory('$appPath/hello');
+//   List hello = test.listSync(recursive: true);
+
+//    print(hello);
+
+  }
+
+  checkDirectory() async {
+    String dir = (await getApplicationDocumentsDirectory()).path;
+
+    var test = Directory('$dir/hello');
+
+    List hello = test.listSync(recursive:  true);
+    print(hello);
+  }
+  checkDirectory();
+//    createDirectory();
+
+
+//Photos saved to device
     return Column(
       children: <Widget>[
         Container(
             padding: EdgeInsets.all(12.0),
             child: Text('Saved Photos', style: Theme.of(context).textTheme.title)),
-        StreamBuilder(
-            stream: db.collection('users').document(user.uid).snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return Text('Loading....');
-                default:
-                  return Container(
-                      height: 200,
-                      child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          key: PageStorageKey<String>(
-                              'Preseves scroll position'),
-                          itemCount: snapshot.data['userImages'] != null ? snapshot.data['userImages'].length : 0,
-                          padding: EdgeInsets.all(8.0),
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              child: Container(
-                                width: 200,
-                                child: Card(
-                                  elevation: 5.0,
-                                  child: Hero(
-                                      tag: snapshot.data['userImages'][index],
-                                      child: Padding(
-                                        padding:
-                                        const EdgeInsets.only(bottom: 14.0),
-                                        child: CachedNetworkImage(
-                                            imageUrl:snapshot.data['userImages'][index],
-                                            fit: BoxFit.fill,
-                                            errorWidget: (context, url, error) => Container(color: Colors.black,
-                                                child:Center(child: Text('Photo does not exists anymore', style: TextStyle(color: Colors.white),))),
-                                            placeholder: (context, url) => CircularProgressIndicator()),
-                                      )),
-                                ),
-                              ),
-                              onTap: () =>
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              DetailsPage(
-                                                id: snapshot.data['userImages'][index],
-                                                imageUrl: snapshot.data['userImages'][index],
-                                              ))),
-                            );
-                          }));
-              }
-            }),
+
       ],
     );
   }

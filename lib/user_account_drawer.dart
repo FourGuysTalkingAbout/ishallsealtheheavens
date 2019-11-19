@@ -31,7 +31,7 @@ class UserAccountDrawer extends StatelessWidget {
                   backgroundImage: NetworkImage(user.user.photoUrl),
                   maxRadius: 50,
                 ),
-                Text(user.user.email,
+                Text(user.user.email ?? '',
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),

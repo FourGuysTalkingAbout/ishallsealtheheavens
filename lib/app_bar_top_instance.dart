@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 
@@ -48,7 +49,8 @@ class InstanceAppBar extends StatelessWidget {
                         )
                       : _buildGuestPopUpMenu(
                           description: snapshot.data['instanceDescription'],
-                          users: users)
+                          users: users,
+                          user: user)
                 ],
               );
           }
@@ -70,7 +72,7 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestPopUpMenu({String description, List users}) {
+  Widget _buildGuestPopUpMenu({String description, List users, FirebaseUser user}) {
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
         PopupMenuItem(
@@ -85,6 +87,13 @@ class InstanceAppBar extends StatelessWidget {
             onTap: () => _readDescription(context, description ?? ''),
           ),
         ),
+        PopupMenuItem(
+          child: GestureDetector(
+            child: ListTile(
+              title: Text('Leave Instance')),
+            onTap: () => _leaveInstance(context, user),
+          ),
+        )
       ],
     );
   }
@@ -349,6 +358,32 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
+  _leaveInstance(BuildContext context, FirebaseUser user ) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to leave?'),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+            MaterialButton(
+              child: Text('Confirm'),
+              onPressed: () async{
+                //removes user displayName from 'users' array in the instance.
+                await db.collection('instances').document(instanceID).updateData({'users': FieldValue.arrayRemove([user.displayName])});
+
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }),
+            MaterialButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel')),
+          ],),
+        );
+      }
+    );
+  }
+
   _readDescription(BuildContext context, String description) {
     return showDialog(
         context: context,
@@ -359,6 +394,7 @@ class InstanceAppBar extends StatelessWidget {
           );
         });
   }
+
 
   _showUsers({BuildContext context, List users}) {
     return showDialog(

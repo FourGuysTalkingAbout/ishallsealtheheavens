@@ -103,6 +103,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               createInstance(context: context, user: user);
+                              _instanceNameController.clear();
                             }
                           }),
                     ),
@@ -114,6 +115,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               joinInstance(context: context, user: user.displayName);
+                              _instanceNameController.clear();
                             }
                           }),
                     )
@@ -273,7 +275,7 @@ class InstanceNameTextFormField extends StatelessWidget {
             alignLabelWithHint: true),
         validator: (String value) {
           if (value.isEmpty) {
-            return 'Enter something';
+            return 'Enter Code';
           }
           return null;
         },
