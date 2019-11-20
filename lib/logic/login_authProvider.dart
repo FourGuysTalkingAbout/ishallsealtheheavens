@@ -21,6 +21,7 @@ class UserRepository with ChangeNotifier {
   }
 
   Status get status => _status;
+
   FirebaseUser get user => _user;
 
   Future<bool> signIn(String email, String password) async {
@@ -64,7 +65,7 @@ class UserRepository with ChangeNotifier {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -90,6 +91,7 @@ class UserRepository with ChangeNotifier {
         'email': user.email,
         'photoURL': user.photoUrl,
         'lastSeen': DateTime.now(),
+        'userImages': FieldValue.arrayUnion([])
       },
       merge: true,
     );
@@ -107,7 +109,7 @@ class UserRepository with ChangeNotifier {
       FacebookAccessToken fbToken = fbLoginResult.accessToken;
 
       final AuthCredential fbCredential =
-          FacebookAuthProvider.getCredential(accessToken: fbToken.token);
+      FacebookAuthProvider.getCredential(accessToken: fbToken.token);
       final FirebaseUser user =
           (await _auth.signInWithCredential(fbCredential)).user;
       updateUserData(user);
@@ -133,7 +135,7 @@ class UserRepository with ChangeNotifier {
       notifyListeners();
 
       FirebaseUser user = (await _auth.signInWithEmailAndPassword(
-              email: email, password: password))
+          email: email, password: password))
           .user;
       assert(user != null);
       assert(await user.getIdToken() != null);
@@ -155,7 +157,7 @@ class UserRepository with ChangeNotifier {
       _status = Status.Authenticating;
       notifyListeners();
       FirebaseUser user = (await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(email: email, password: password))
+          .createUserWithEmailAndPassword(email: email, password: password))
           .user;
       assert(user != null);
       assert(await user.getIdToken() != null);
@@ -175,8 +177,8 @@ class UserRepository with ChangeNotifier {
     try {
       _status = Status.Authenticating;
       notifyListeners();
-      FirebaseUser user =
-          (await FirebaseAuth.instance.signInAnonymously()).user;
+      FirebaseUser user = (await FirebaseAuth.instance.signInAnonymously()).user;
+
       assert(user != null);
       assert(user.isAnonymous);
       assert(!user.isEmailVerified);
@@ -191,13 +193,13 @@ class UserRepository with ChangeNotifier {
         assert(user.providerData[0].displayName == null);
         assert(user.providerData[0].photoUrl == null);
         assert(user.providerData[0].email == null);
-      }else {
+      } else {
         final FirebaseUser currentUser = await _auth.currentUser();
         assert(user.uid == currentUser.uid);
         return true;
       }
-
-
+      updateUserData(user);
+      return true;
     } catch (error) {
       print(error);
       _status = Status.Unauthenticated;
@@ -205,9 +207,8 @@ class UserRepository with ChangeNotifier {
       return false;
     }
   }
-
-
 }
+
 
 final UserRepository authService = UserRepository.instance();
 final db = Firestore.instance;

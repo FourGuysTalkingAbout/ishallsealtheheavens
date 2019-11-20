@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'logic/login_authProvider.dart';
 import 'closed_instance.dart';
-import 'model/custom_card.dart';
+import 'custom_card.dart';
 
 
 class PastInstance extends StatefulWidget {
@@ -37,7 +37,7 @@ class _PastInstanceState extends State<PastInstance> {
     final formatter = DateFormat.MMMMEEEEd().add_Hm();
     final date = formatter.format(now);
     return StreamBuilder<QuerySnapshot>(
-        stream: db.collection('instances').where('users', arrayContains: user.displayName).where('active', isEqualTo: false).orderBy('date', descending: true).snapshots(),
+        stream: db.collection('instances').where('users', arrayContains: user.uid).where('active', isEqualTo: false).orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -48,7 +48,7 @@ class _PastInstanceState extends State<PastInstance> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot document = snapshot.data.documents[index];
               var timeAgo = timeago.format(document['date'].toDate());
-              return CustomGridTile(
+              return CustomCard(
                 instanceCode: document['instanceCode'],
                 instanceId: document.documentID,
                 instanceName: document['instanceName'],

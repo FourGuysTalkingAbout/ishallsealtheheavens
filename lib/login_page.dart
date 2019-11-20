@@ -74,7 +74,9 @@ class LoginButtons extends StatelessWidget {
                       onPressed: () => {},
                       color: Color(0xff673AB7),
                       textColor: Color(0xffFFC107),
-                      child: Text('No Account \n View Only'),
+                      child: GestureDetector(
+                          child: Text('No Account \n View Only'),
+                          onTap: () => _auth.anonymouslySignIn()),
                     ),
                   ),
                 ),

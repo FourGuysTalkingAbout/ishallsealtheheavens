@@ -54,13 +54,15 @@ class PhotosTakenList extends StatelessWidget {
                 case ConnectionState.waiting:
                   return Text('Loading....');
                 default:
+                  List images = snapshot.data['userImages'];
+
                   return Container(
                       height: 200,
                       child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           key: PageStorageKey<String>(
                               'Preseves scroll position'),
-                          itemCount: snapshot.data['userImages'].length,
+                          itemCount: images.length,
                           padding: EdgeInsets.all(8.0),
                           itemBuilder: (context, index) {
                             return GestureDetector(

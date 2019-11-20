@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class CustomGridTile extends StatelessWidget {
+class CustomCard extends StatelessWidget {
   final String instanceName;
   final String instanceId;
   final String instancePhoto;
@@ -9,7 +9,7 @@ class CustomGridTile extends StatelessWidget {
   final String date;
   final Function onTap;
 
-  CustomGridTile(
+  CustomCard(
       {this.instanceId,
       this.instanceName,
       this.instancePhoto,

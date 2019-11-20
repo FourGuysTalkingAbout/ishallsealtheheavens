@@ -113,38 +113,41 @@ class _InstancePageState extends State<InstancePage> {
         stream:
             db.collection('instances').document(widget.instanceId).snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.data == null) return Container();
-          String instanceName = snapshot.data['instanceName'];
-          bool hostCheck = snapshot.data['host'] == user.uid;
+            if (snapshot.data == null) return Container();
+            String instanceName = snapshot.data['instanceName'];
+            bool hostCheck = snapshot.data['host'] == user.uid;
 
-          return Scaffold(
-            resizeToAvoidBottomPadding: false,
-            backgroundColor: Colors.grey[400],
-            appBar: PreferredSize(
-                preferredSize: Size.fromHeight(50.0),
-                child: InstanceAppBar(
-                    instanceID: widget.instanceId, title: Text(instanceName))),
-            drawer: UserAccountDrawer(),
-            body: Container(
-              height: MediaQuery.of(context).size.height / 1.20,
-              child: PhotoGridView(
-                docId: widget.instanceId,
-                instanceName: widget.instanceName,
+
+            return Scaffold(
+              resizeToAvoidBottomPadding: false,
+              backgroundColor: Colors.grey[400],
+              appBar: PreferredSize(
+                  preferredSize: Size.fromHeight(50.0),
+                  child: InstanceAppBar(
+                      instanceID: widget.instanceId, title: Text(instanceName))),
+              drawer: UserAccountDrawer(),
+              body: Container(
+                height: MediaQuery.of(context).size.height / 1.20,
+                child: PhotoGridView(
+                  docId: widget.instanceId,
+                  instanceName: widget.instanceName,
+                ),
               ),
-            ),
-            floatingActionButton: Padding(
-              padding: const EdgeInsets.only(bottom: 15.0),
-              child: IconButton(
-                icon: Icon(Icons.camera),
-                iconSize: 35.0,
-                //todo:should be better code to disable splash on button
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: () => openCamera(),
+              floatingActionButton: Padding(
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: IconButton(
+                  icon: Icon(Icons.camera),
+                  iconSize: 35.0,
+                  //todo:should be better code to disable splash on button
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onPressed: () => openCamera(),
+                ),
               ),
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          );
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            );
+
+
         });
 
   }
