@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class DeviceImage extends StatelessWidget {
@@ -18,14 +19,14 @@ class DeviceImage extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
           child: Image.file(file,
-            fit: isPortrait ? BoxFit.fill : BoxFit.cover,
+            fit: isPortrait ? BoxFit.cover : BoxFit.fill,
           ),
         ),
       ),
       floatingActionButton: Row(
         children: <Widget>[
           FlatButton(
-            child: Icon(Icons.delete),
+            child: Icon(FontAwesomeIcons.trash, color: Colors.white),
             onPressed: () {
               deleteImage();
               Navigator.pop(context);

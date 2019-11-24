@@ -176,15 +176,14 @@ class _GalleryState extends State<Gallery> {
 class AllPhotosList extends StatelessWidget {
 
   getUserImages(FirebaseUser user) async  {
-    List allImages = [];
+    List allImages = []; // create empty list
 
     Directory externalDirectory = Directory('storage/emulated/0/ISSTH'); //
-    externalDirectory.listSync(recursive: true).forEach((file) => allImages.add(file));
+    externalDirectory.listSync(recursive: true).forEach((file) => allImages.add(file)); // add images from local device to allImage list
 
    DocumentSnapshot snapshot = await db.collection('users').document(user.uid).get();
    List networkImage = snapshot.data['userImages'];
-   networkImage.forEach((file) => allImages.add(file));
-
+   networkImage.forEach((file) => allImages.add(file)); // add images from db to allImage list
 
    return allImages;
 
@@ -193,38 +192,43 @@ class AllPhotosList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
-//    getUserImages(user);
     return FutureBuilder(
       future: getUserImages(user),
       builder: (context, snapshot) {
-        print(snapshot.data);
-        return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 2.0),
-            itemCount: snapshot.data.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                child: Card(
-                  elevation: 5.0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 14.0),
+        switch(snapshot.connectionState) {
+          case ConnectionState.waiting: return Text('Loading...');
+          default:return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, mainAxisSpacing: 2.0),
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: Card(
+                    elevation: 5.0,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 14.0),
                       child: snapshot.data[index] is File ? Image.file(snapshot.data[index], fit: BoxFit.fill) :
-                     CachedNetworkImage(
-                        imageUrl: snapshot.data[index],
-                        placeholder: (context, url) => CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        fit: BoxFit.fill),
+                      CachedNetworkImage(
+                          imageUrl: snapshot.data[index],
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                          fit: BoxFit.fill),
+                    ),
                   ),
-                ),
-                onTap: () =>
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DetailsPage(
-                            ))),
+                  onTap: () =>
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => snapshot.data[index] is File ? DeviceImage(file: snapshot.data[index]) :DetailsPage(
+                                id: snapshot.data[index]
+                                [index],
+                                imageUrl: snapshot
+                                    .data[index],
+                              ))),
 
-              );
-            });
+                );
+              });
+        }
       }
     );
   }

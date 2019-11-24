@@ -40,7 +40,6 @@ class DetailsPage extends StatelessWidget {
             String name = storageMetadata.customMetadata['author'];
             String instanceName = storageMetadata.customMetadata['instanceName'];
             String host = storageMetadata.customMetadata['host'];
-            print(imageName);
 
 
             return Scaffold(
@@ -83,7 +82,7 @@ class DetailsPage extends StatelessWidget {
                       ),
                     ),
                     FlatButton(
-                      child: Icon(Icons.file_download),
+                      child: Icon(FontAwesomeIcons.download, color: Colors.white),
                       onPressed: () => _downloadImage(imageName),
                     )
                   ],
