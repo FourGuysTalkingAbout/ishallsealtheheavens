@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ishallsealtheheavens/gallery_page.dart';
@@ -7,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
@@ -22,6 +25,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
+
   int _selectedIndex = 1;
 
   List<Widget> _btmNavOptions = [
@@ -29,7 +33,7 @@ class _NavBarState extends State<NavBar> {
     JoinCreatePage(),
     TabBarView(children: <Widget>[
       Gallery(),
-      Center(child: Text('Page 2'))
+      AllPhotosList(),
   ])
   ];
 
@@ -44,9 +48,16 @@ class _NavBarState extends State<NavBar> {
       _selectedIndex = index;
     });
   }
+  @override
+  void initState() {
+    super.initState();
+    createDeviceDirectory();
+    requestWritePermission();
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -67,6 +78,25 @@ class _NavBarState extends State<NavBar> {
         ),
       ),
     );
+  }
+
+  requestWritePermission() async {
+    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+//    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+//    print('Permission: $permission');
+  }
+  createDeviceDirectory()  {
+    final dir = Directory('storage/emulated/0/ISSTH');
+    dir.exists().then((isThere) {
+      if(isThere) {
+        print('Directory already created');
+        return;
+      }
+      else {
+        print('creating directory');
+        Directory('storage/emulated/0/ISSTH').createSync(recursive: true); //creates the Directory
+      }
+    });
   }
 }
 
@@ -292,7 +322,7 @@ class ActiveInstancesView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: db
           .collection('instances')
-          .where("users", arrayContains: user.displayName)
+          .where("users", arrayContains: user.displayName,)
           .where('active', isEqualTo: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

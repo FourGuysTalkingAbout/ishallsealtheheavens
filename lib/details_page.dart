@@ -1,9 +1,14 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image/image.dart' as Image;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flushbar/flushbar.dart';
@@ -26,13 +31,18 @@ class DetailsPage extends StatelessWidget {
           if (snapshot.data == null) {
             return Container();
           } else {
+
             StorageMetadata storageMetadata = snapshot.data;
             String when = timeago.format(DateTime.fromMillisecondsSinceEpoch(
                     storageMetadata.creationTimeMillis)
                 .toLocal());
-
+            String imageName = storageMetadata.name;
             String name = storageMetadata.customMetadata['author'];
             String instanceName = storageMetadata.customMetadata['instanceName'];
+            String host = storageMetadata.customMetadata['host'];
+            print(imageName);
+
+
             return Scaffold(
 //              endDrawer: detailsDrawer(),
               floatingActionButtonLocation:
@@ -62,7 +72,7 @@ class DetailsPage extends StatelessWidget {
                           )..show(context);
                         }),
                     Visibility(
-                      visible: name == user.displayName, // if user took photo then show delete button
+                      visible: name == user.displayName || host == user.uid, // if user took photo then show delete button
                       child: FlatButton(
                           child: Icon(FontAwesomeIcons.trash,color: Colors.white,),
                           onPressed: () {
@@ -71,6 +81,10 @@ class DetailsPage extends StatelessWidget {
                             Navigator.pop(context);
                           }
                       ),
+                    ),
+                    FlatButton(
+                      child: Icon(Icons.file_download),
+                      onPressed: () => _downloadImage(imageName),
                     )
                   ],
                 ),
@@ -90,7 +104,6 @@ class DetailsPage extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-//
                   Navigator.pop(context);
                 },
               ),
@@ -121,6 +134,24 @@ class DetailsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  _downloadImage(String imageName) async {
+    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+
+    var imageFile = await DefaultCacheManager().getSingleFile(imageUrl);
+     Image.Image image = Image.decodeImage(imageFile.readAsBytesSync());
+     Image.Image thumbnail = Image.copyResize(image, width: 200, height: 200); //find use for it instead of downloading the full image download small scale
+    bool checkIfExists = await File('storage/emulated/0/ISSTH/$imageName').exists();
+    File savedImage = File('storage/emulated/0/ISSTH/$imageName')..writeAsBytesSync(Image.encodeJpg(image));
+
+    if(checkIfExists) {
+      print('already saved');
+      return null;
+    } else  {
+      print('Saving.');
+      return savedImage;
+    }
   }
 
   // find way to access

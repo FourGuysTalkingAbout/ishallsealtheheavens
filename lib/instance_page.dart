@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -31,20 +32,23 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-  openCamera() async {
+
+  openCamera(String host) async {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
+    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
 
     //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
-    final formatter = DateFormat.MMMMEEEEd().add_Hm();
+    final formatter = DateFormat.MMMMEEEEd().add_Hm().add_s();
     final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
       //TODO Find proper resolution of pictures
-        source: ImageSource.camera); //returns a File after picture is taken
+        source: ImageSource.camera,imageQuality: 100); //returns a File after picture is taken
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
-      'instanceName': widget.instanceName
+      'instanceName': widget.instanceName,
+      'host': host
     });
 
     final StorageReference storageRef = FirebaseStorage.instance
@@ -94,11 +98,13 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   isActive() {
-    Future.delayed(const Duration(hours: 24), () {
+    Future.delayed(const Duration(hours: 2), () {
+      print(widget.instanceId);
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {
         DocumentSnapshot postSnapshot = await tx.get(docRef);
         if (postSnapshot.exists) {
+          print(docRef);
           await tx.update(docRef, {'active': false});
         }
       });
@@ -115,6 +121,7 @@ class _InstancePageState extends State<InstancePage> {
         builder: (context, snapshot) {
           if (snapshot.data == null) return Container();
           String instanceName = snapshot.data['instanceName'];
+          String host = snapshot.data['host'];
           bool hostCheck = snapshot.data['host'] == user.uid;
 
           return Scaffold(
@@ -140,7 +147,7 @@ class _InstancePageState extends State<InstancePage> {
                 //todo:should be better code to disable splash on button
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                onPressed: () => openCamera(),
+                onPressed: () => openCamera(snapshot.data['host']),
               ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
