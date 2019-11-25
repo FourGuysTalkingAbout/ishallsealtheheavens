@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ishallsealtheheavens/gallery_page.dart';
@@ -7,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'logic/login_authProvider.dart';
 import 'user_account_drawer.dart';
@@ -22,6 +25,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
+
   int _selectedIndex = 1;
 
   List<Widget> _btmNavOptions = [
@@ -29,7 +33,7 @@ class _NavBarState extends State<NavBar> {
     JoinCreatePage(),
     TabBarView(children: <Widget>[
       Gallery(),
-      Center(child: Text('Page 2'))
+      AllPhotosList(),
   ])
   ];
 
@@ -44,32 +48,58 @@ class _NavBarState extends State<NavBar> {
       _selectedIndex = index;
     });
   }
+  @override
+  void initState() {
+    super.initState();
+    requestWritePermission();
+    createDeviceDirectory();
+  }
 
 
   @override
   Widget build(BuildContext context) {
+//    PermissionHandler().openAppSettings();
 
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
-            appBar: AllTopAppBar(
-              centerTitle: true,
-              title: _appBarTitleOptions.elementAt(_selectedIndex),
-              bottom: _selectedIndex == 2 ? TabBar(
-                tabs: <Widget>[
-                  Tab(text: 'Photos Taken/Saved'),
-                  Tab(text: 'All Photos')],
-              ) : null
-              ),
-            drawer:  UserAccountDrawer(),
-            body:  _btmNavOptions.elementAt(_selectedIndex),
-            bottomNavigationBar: BottomNavBar(
-              currentIndex: _selectedIndex,
-              onTapped: _onItemTapped,
-            ),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AllTopAppBar(
+          centerTitle: true,
+          title: _appBarTitleOptions.elementAt(_selectedIndex),
+          bottom: _selectedIndex == 2 ? TabBar(
+            tabs: <Widget>[
+              Tab(text: 'Photos Taken/Saved'),
+              Tab(text: 'All Photos')],
+          ) : null
           ),
-        );
+        drawer: UserAccountDrawer(),
+        body:  _btmNavOptions.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavBar(
+          currentIndex: _selectedIndex,
+          onTapped: _onItemTapped,
+        ),
+      ),
+    );
+  }
+
+  requestWritePermission() async {
+    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage, PermissionGroup.camera]);
+    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    print('Permission: $permission');
+  }
+  createDeviceDirectory()  {
+    final dir = Directory('storage/emulated/0/ISSTH');
+    dir.exists().then((isThere) {
+      if(isThere) {
+        print('Directory already created');
+        return;
       }
+      else {
+        print('creating directory');
+        Directory('storage/emulated/0/ISSTH').createSync(recursive: true); //creates the Directory
+      }
+    });
+  }
 }
 
 class JoinCreatePage extends StatefulWidget {
@@ -99,6 +129,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
+
                     buildCreateButton(user),
                     buildJoinButton(user),
                   ]),
@@ -120,6 +151,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
           onPressed: () {
             if (_formKey.currentState.validate()) {
               joinInstance(context: context, user: user);
+              _instanceNameController.clear();
             }
           }),
     );
@@ -133,6 +165,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
           onPressed: () {
             if (_formKey.currentState.validate()) {
               createInstance(context: context, user: user);
+              _instanceNameController.clear();
             }
           }),
     );
@@ -317,7 +350,7 @@ class InstanceNameTextFormField extends StatelessWidget {
             alignLabelWithHint: true),
         validator: (String value) {
           if (value.isEmpty) {
-            return 'Enter something';
+            return 'Enter Code';
           }
           return null;
         },

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 
@@ -72,7 +73,8 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestPopUpMenu({String description, List users, int guests}) {
+  Widget _buildGuestPopUpMenu({String description, List users, int guests FirebaseUser user}) {
+
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
         PopupMenuItem(
@@ -87,6 +89,13 @@ class InstanceAppBar extends StatelessWidget {
             onTap: () => _readDescription(context, description ?? ''),
           ),
         ),
+        PopupMenuItem(
+          child: GestureDetector(
+            child: ListTile(
+              title: Text('Leave Instance')),
+            onTap: () => _leaveInstance(context, user),
+          ),
+        )
       ],
     );
   }
@@ -351,6 +360,32 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
+  _leaveInstance(BuildContext context, FirebaseUser user ) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to leave?'),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+            MaterialButton(
+              child: Text('Confirm'),
+              onPressed: () async{
+                //removes user displayName from 'users' array in the instance.
+                await db.collection('instances').document(instanceID).updateData({'users': FieldValue.arrayRemove([user.displayName])});
+
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }),
+            MaterialButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel')),
+          ],),
+        );
+      }
+    );
+  }
+
   _readDescription(BuildContext context, String description) {
     return showDialog(
         context: context,
@@ -361,6 +396,7 @@ class InstanceAppBar extends StatelessWidget {
           );
         });
   }
+
 
   _showUsers({BuildContext context, List users, int guests}) {
     return showDialog(
@@ -378,6 +414,7 @@ class InstanceAppBar extends StatelessWidget {
                 height: 600,
                 width: 400,
                 child: ListView.builder(
+                    padding: EdgeInsets.all(0.0),
                     itemCount: users.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {

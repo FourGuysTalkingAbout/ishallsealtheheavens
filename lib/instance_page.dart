@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -31,20 +32,23 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-  openCamera() async {
+
+  openCamera(String host) async {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
+    var requestCameraPermission = await PermissionHandler().requestPermissions([PermissionGroup.camera]); // request to use device camera
 
     //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
-    final formatter = DateFormat.MMMMEEEEd().add_Hm();
+    final formatter = DateFormat.MMMMEEEEd().add_Hm().add_s();
     final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
-        source: ImageSource.camera, maxWidth: 640, maxHeight: 480); //returns a File after picture is taken
-
+      //TODO Find proper resolution of pictures
+        source: ImageSource.camera,imageQuality: 100); //returns a File after picture is taken
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
-      'instanceName': widget.instanceName
+      'instanceName': widget.instanceName,
+      'host': host
     });
 
     final StorageReference storageRef = FirebaseStorage.instance
@@ -94,11 +98,13 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   isActive() {
-    Future.delayed(const Duration(hours: 24), () {
+    Future.delayed(const Duration(hours: 2), () {
+      print(widget.instanceId);
       DocumentReference docRef = db.document('instances/${widget.instanceId}');
       db.runTransaction((Transaction tx) async {
         DocumentSnapshot postSnapshot = await tx.get(docRef);
         if (postSnapshot.exists) {
+          print(docRef);
           await tx.update(docRef, {'active': false});
         }
       });
@@ -113,35 +119,38 @@ class _InstancePageState extends State<InstancePage> {
         stream:
             db.collection('instances').document(widget.instanceId).snapshots(),
         builder: (context, snapshot) {
-            if (snapshot.data == null) return Container();
-            String instanceName = snapshot.data['instanceName'];
-            bool hostCheck = snapshot.data['host'] == user.uid;
+          if (snapshot.data == null) return Container();
+          String instanceName = snapshot.data['instanceName'];
+          String host = snapshot.data['host'];
+          bool hostCheck = snapshot.data['host'] == user.uid;
 
-
-            return Scaffold(
-              resizeToAvoidBottomPadding: false,
-              backgroundColor: Colors.grey[400],
-              appBar: PreferredSize(
-                  preferredSize: Size.fromHeight(50.0),
-                  child: InstanceAppBar(
-                      instanceID: widget.instanceId, title: Text(instanceName))),
-              drawer: UserAccountDrawer(),
-              body: Container(
-                height: MediaQuery.of(context).size.height / 1.20,
-                child: PhotoGridView(
-                  docId: widget.instanceId,
-                  instanceName: widget.instanceName,
-                ),
+          return Scaffold(
+            resizeToAvoidBottomPadding: false,
+            backgroundColor: Colors.grey[400],
+            appBar: PreferredSize(
+                preferredSize: Size.fromHeight(50.0),
+                child: InstanceAppBar(
+                    instanceID: widget.instanceId, title: Text(instanceName))),
+            drawer: UserAccountDrawer(),
+            body: Container(
+              height: MediaQuery.of(context).size.height / 1.20,
+              child: PhotoGridView(
+                docId: widget.instanceId,
+                instanceName: widget.instanceName,
               ),
-              floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 15.0),
+            ),
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 15.0),
+              child: Visibility(
+                visible: !user.isAnonymous, //if user is anon don't allow upload.
+
                 child: IconButton(
                   icon: Icon(Icons.camera),
                   iconSize: 35.0,
                   //todo:should be better code to disable splash on button
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onPressed: () => openCamera(),
+                  onPressed: () => openCamera(host),
                 ),
               ),
               floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -198,17 +207,25 @@ class PhotoGridView extends StatelessWidget {
                               fit: BoxFit.fill),
                         )),
                   ),
-                  onTap: () => Navigator.push(
+                  onTap: () =>
+                      Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => DetailsPage(
                                 id: snapshot.data[index],
                                 imageUrl: snapshot.data[index],
+                                docID: docId,
                               ))),
+
                 );
               });
         }
       },
     );
+  }
+
+  _deleteImage(String name) {
+    db.collection('instances').document(docId).updateData({'photoURL': FieldValue.arrayRemove([name])});
+    print('I PRESSED IT');
   }
 }

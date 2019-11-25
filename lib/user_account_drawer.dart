@@ -11,6 +11,7 @@ class UserAccountDrawer extends StatelessWidget {
 //  //TODO allow Email/login to create display name
   @override
   Widget build(BuildContext context) {
+
     final FirebaseUser user = Provider.of<UserRepository>(context).user;
 
     if (user.isAnonymous) {

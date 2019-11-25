@@ -1,6 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image/image.dart' as Image;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flushbar/flushbar.dart';
 
@@ -9,40 +18,32 @@ import 'logic/login_authProvider.dart';
 class DetailsPage extends StatelessWidget {
   final String imageUrl;
   final String id;
+  final String docID;
 
-  DetailsPage({this.imageUrl, this.id});
+  DetailsPage({this.imageUrl, this.id, this.docID});
 
   @override
   Widget build(BuildContext context) {
-    getMetaData() async {
-      StorageReference storageRef =
-          await FirebaseStorage.instance.getReferenceFromUrl(imageUrl);
-      String hello = await storageRef.getName();
-      StorageMetadata storageMetadata = await FirebaseStorage.instance
-          .ref()
-          .child('images/$hello')
-          .getMetadata();
-      return storageMetadata;
-    }
-
+    FirebaseUser user = Provider.of<UserRepository>(context).user;
     return FutureBuilder(
         future: getMetaData(),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
-            return CircularProgressIndicator();
+            return Container();
           } else {
+
             StorageMetadata storageMetadata = snapshot.data;
             String when = timeago.format(DateTime.fromMillisecondsSinceEpoch(
                     storageMetadata.creationTimeMillis)
                 .toLocal());
-            print(DateTime.fromMillisecondsSinceEpoch(
-                    storageMetadata.creationTimeMillis)
-                .toLocal());
+            String imageName = storageMetadata.name;
             String name = storageMetadata.customMetadata['author'];
-            String instanceName =
-                storageMetadata.customMetadata['instanceName'];
+            String instanceName = storageMetadata.customMetadata['instanceName'];
+            String host = storageMetadata.customMetadata['host'];
+
+
             return Scaffold(
-              endDrawer: detailsDrawer(),
+//              endDrawer: detailsDrawer(),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
               floatingActionButton: Builder(
@@ -69,9 +70,24 @@ class DetailsPage extends StatelessWidget {
                             duration: Duration(seconds: 2),
                           )..show(context);
                         }),
-                    FlatButton(
-                        child: Icon(Icons.delete),
-                        onPressed: () => print('delete')),
+                    Visibility(
+                      visible: name == user.displayName || host == user.uid, // if user took photo then show delete button
+                      child: FlatButton(
+                          child: Icon(FontAwesomeIcons.trash,color: Colors.white,),
+                          onPressed: () {
+                            deleteInsideInstance(docID, user.uid);
+                            deleteImageFromGallery(user.uid);
+                            Navigator.pop(context);
+                          }
+                      ),
+                    ),
+                    Visibility(
+                      visible: !user.isAnonymous, //if user is not anonymous allow download.
+                      child: FlatButton(
+                        child: Icon(FontAwesomeIcons.download, color: Colors.white),
+                        onPressed: () => _downloadImage(imageName),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -98,6 +114,16 @@ class DetailsPage extends StatelessWidget {
         });
   }
 
+  getMetaData() async {
+    StorageReference storageRef = await FirebaseStorage.instance.getReferenceFromUrl(imageUrl);
+    String imageName = await storageRef.getName();
+    StorageMetadata storageMetadata = await FirebaseStorage.instance
+        .ref()
+        .child('images/$imageName')
+        .getMetadata();
+    return storageMetadata;
+  }
+
   Widget detailsDrawer() {
     return Drawer(
       child: ListView(
@@ -112,13 +138,43 @@ class DetailsPage extends StatelessWidget {
     );
   }
 
-  deleteData() {
-    //TODO FIX DELETE FUNCTION.
-    db
-        .collection('instances')
-        .document('instance1')
-        .collection('photos')
-        .document(id)
-        .delete(); //TODO: ONLY DELETES IN DATABASE NOT STORAGE
+  _downloadImage(String imageName) async {
+    var requestStoragePermission = await PermissionHandler().requestPermissions([PermissionGroup.storage]); //request allow write to external storage.
+
+    var imageFile = await DefaultCacheManager().getSingleFile(imageUrl);
+     Image.Image image = Image.decodeImage(imageFile.readAsBytesSync());
+     Image.Image thumbnail = Image.copyResize(image, width: 200, height: 200); //find use for it instead of downloading the full image download small scale
+    bool checkIfExists = await File('storage/emulated/0/ISSTH/$imageName').exists();
+    File savedImage = File('storage/emulated/0/ISSTH/$imageName')..writeAsBytesSync(Image.encodeJpg(image));
+
+    if(checkIfExists) {
+      print('already saved');
+      return null;
+    } else  {
+      print('Saving.');
+      return savedImage;
+    }
+  }
+
+  // find way to access
+  deleteInsideInstance(String docID, String user) async { //
+    StorageReference storageRef = await FirebaseStorage.instance.getReferenceFromUrl(imageUrl); // references Image to FirebaseStorage
+
+    final DocumentReference instRef = db.document('instances/$docID');
+    final DocumentReference userRef = db.document('users/$user');
+
+    db.runTransaction((Transaction tx) async {
+       await tx.update(instRef,  {'photoURL': FieldValue.arrayRemove([imageUrl])}); //removes from instance collection
+
+    });
+//    storageRef.delete(); // will delete the Image from Firebase Storage. No longer exists
+  }
+
+  deleteImageFromGallery(String user) async {
+    final DocumentReference userRef = db.document('users/$user');
+
+    db.runTransaction((Transaction tx) async {
+      await tx.update(userRef,  {'userImages': FieldValue.arrayRemove([imageUrl])}); //removes from user collection but not instance
+    });
   }
 }
