@@ -143,18 +143,20 @@ class _InstancePageState extends State<InstancePage> {
               padding: const EdgeInsets.only(bottom: 15.0),
               child: Visibility(
                 visible: !user.isAnonymous, //if user is anon don't allow upload.
+
                 child: IconButton(
                   icon: Icon(Icons.camera),
                   iconSize: 35.0,
                   //todo:should be better code to disable splash on button
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onPressed: () => openCamera(snapshot.data['host']),
+                  onPressed: () => openCamera(host),
                 ),
               ),
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          );
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            );
+
+
         });
 
   }

@@ -16,7 +16,7 @@ import 'user_account_drawer.dart';
 import 'past_instance.dart';
 import 'instance_page.dart';
 import 'bottom_navbar.dart';
-import 'model/custom_card.dart';
+import 'custom_card.dart';
 import 'app_bar.dart';
 
 class NavBar extends StatefulWidget {
@@ -54,6 +54,7 @@ class _NavBarState extends State<NavBar> {
     requestWritePermission();
     createDeviceDirectory();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +114,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
+
     return Scaffold(
       backgroundColor: Colors.grey[400],
       body: SingleChildScrollView(
@@ -123,34 +125,15 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
               InstanceNameTextFormField(
                   //todo: remove text after join/create button pressed.
                   instanceNameController: _instanceNameController),
-              Row(
+                user.isAnonymous ? Center(child: buildJoinButton(user)):
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Container(
-                      width: 150,
-                      child: RaisedButton(
-                          color: Colors.white,
-                          child: Text('Create Instance'),
-                          onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              createInstance(context: context, user: user);
-                              _instanceNameController.clear();
-                            }
-                          }),
-                    ),
-                    Container(
-                      width: 150,
-                      child: RaisedButton(
-                          color: Colors.white,
-                          child: Text('Join Instance'),
-                          onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              joinInstance(context: context, user: user.displayName);
-                              _instanceNameController.clear();
-                            }
-                          }),
-                    )
+
+                    buildCreateButton(user),
+                    buildJoinButton(user),
                   ]),
+              Text(user.displayName?? ''),
               ActiveInstancesView(),
             ],
           ),
@@ -158,6 +141,37 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
       ),
     );
   }
+
+  Widget buildJoinButton(FirebaseUser user) {
+    return Container(
+      width: 150,
+      child: RaisedButton(
+          color: Colors.white,
+          child: Text('Join Instance'),
+          onPressed: () {
+            if (_formKey.currentState.validate()) {
+              joinInstance(context: context, user: user);
+              _instanceNameController.clear();
+            }
+          }),
+    );
+  }
+  Widget buildCreateButton(FirebaseUser user) {
+    return   Container(
+      width: 150,
+      child: RaisedButton(
+          color: Colors.white,
+          child: Text('Create Instance'),
+          onPressed: () {
+            if (_formKey.currentState.validate()) {
+              createInstance(context: context, user: user);
+              _instanceNameController.clear();
+            }
+          }),
+    );
+  }
+
+
 
   createCode() {
     return prefix0.randomAlpha(5);
@@ -169,8 +183,10 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
       // turn into a transaction && add instanceCode random
       'instanceName': _instanceNameController.text,
       'instanceCode': instanceCode,
+      'guests': 0,
       'userLimit': '10',
-      'users': FieldValue.arrayUnion([user.displayName]),
+      'users': FieldValue.arrayUnion([user.uid]),
+      'userNames': FieldValue.arrayUnion([user.displayName]),
       'date': FieldValue.serverTimestamp(),
       'active': true,
       'host': user.uid,
@@ -183,54 +199,64 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
             )));
   }
 
-  joinInstance({String user, BuildContext context}) async {
+
+
+  joinInstance({FirebaseUser user, BuildContext context}) async {
     QuerySnapshot snapshot = await db
         .collection('instances')
         .where('instanceCode', isEqualTo: _instanceNameController.text)
         .getDocuments();
+
+    String instanceName = snapshot.documents[0].data['instanceName'];
+    String instanceId = snapshot.documents[0].documentID;
+    String instanceCode = snapshot.documents[0].data['instanceCode'];
+    bool premium = snapshot.documents[0].data['premium'];
+
 
     final snackBar = SnackBar(
         behavior: SnackBarBehavior.fixed,
         duration: Duration(seconds: 2),
         content: Text('It\'s full right now. Try again later.'));
 
-    bool premium = snapshot.documents[0].data['premium'];
+
+
     // if it's a premium instance then don't have a limit
     // if it's not a premium then return limit >= 10
     if (snapshot.documents[0].data['premium'] == true) {
-      int numberOfUsers = snapshot.documents[0].data['users']
-          .length; //returns a int length of ['users'] data
-      int userLimit = int.parse(snapshot.documents[0]
-          .data['userLimit']); // default is 10. premium hosts can change number
+      int numberOfUsers = snapshot.documents[0].data['users'].length; //returns a int length of ['users'] data
+      int userLimit = int.parse(snapshot.documents[0].data['userLimit']); // default is 10. premium hosts can change number
 
       if (numberOfUsers >= userLimit) {
         return Scaffold.of(context)
             .showSnackBar(snackBar); //deny user if limit is reached.
       } else {
         snapshot.documents[0].reference.updateData({
-          'users': FieldValue.arrayUnion([user])
+          'users': FieldValue.arrayUnion([user.uid]),
+          'userNames': FieldValue.arrayUnion([user.displayName]),
+
         });
 
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => InstancePage(
-                      instanceName: snapshot.documents[0].data['instanceName'],
-                      instanceId: snapshot.documents[0].documentID,
-                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                      instanceName: instanceName,
+                      instanceId: instanceId,
+                      instanceCode: instanceCode,
                     )));
       }
 
       snapshot.documents[0].reference.updateData({
-        'users': FieldValue.arrayUnion([user])
+        'users': FieldValue.arrayUnion([user.uid]),
+        'userNames': FieldValue.arrayUnion([user.displayName]),
       });
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => InstancePage(
-                    instanceName: snapshot.documents[0].data['instanceName'],
-                    instanceId: snapshot.documents[0].documentID,
-                    instanceCode: snapshot.documents[0].data['instanceCode'],
+                    instanceName: instanceName,
+                    instanceId: instanceId,
+                    instanceCode: instanceCode,
                   )));
     } else if (snapshot.documents[0].data['premium'] == false) {
       int numberOfUsers = snapshot.documents[0].data['users']
@@ -243,33 +269,52 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
             .showSnackBar(snackBar); //deny user if limit is reached.
       } else {
         snapshot.documents[0].reference.updateData({
-          'users': FieldValue.arrayUnion([user])
+          'users': FieldValue.arrayUnion([user.uid]),
+          'userNames': FieldValue.arrayUnion([user.displayName]),
+
         });
 
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => InstancePage(
-                      instanceName: snapshot.documents[0].data['instanceName'],
-                      instanceId: snapshot.documents[0].documentID,
-                      instanceCode: snapshot.documents[0].data['instanceCode'],
+                      instanceName: instanceName,
+                      instanceId: instanceId,
+                      instanceCode: instanceCode,
                     )));
       }
-    } else {
+    } else if (user.isAnonymous){
       snapshot.documents[0].reference.updateData({
-        'users': FieldValue.arrayUnion([user])
+        'guests': FieldValue.increment(1),
+        'users': FieldValue.arrayUnion([user.uid]),
       });
 
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => InstancePage(
-                    instanceName: snapshot.documents[0].data['instanceName'],
-                    instanceId: snapshot.documents[0].documentID,
-                    instanceCode: snapshot.documents[0].data['instanceCode'],
+                instanceName: instanceName,
+                instanceId: instanceId,
+                instanceCode: instanceCode,
+              )));
+
+    } else{
+      snapshot.documents[0].reference.updateData({
+        'users': FieldValue.arrayUnion([user.uid]),
+        'userNames': FieldValue.arrayUnion([user.displayName])
+      });
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => InstancePage(
+                instanceName: instanceName,
+                instanceId: instanceId,
+                instanceCode: instanceCode,
                   )));
     }
   }
+
 
   @override
   void dispose() {
@@ -286,7 +331,6 @@ class InstanceNameTextFormField extends StatelessWidget {
         super(key: key);
 
   final TextEditingController _instanceNameController;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -323,7 +367,7 @@ class ActiveInstancesView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: db
           .collection('instances')
-          .where("users", arrayContains: user.displayName,)
+          .where("users", arrayContains: user.uid,)
           .where('active', isEqualTo: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -339,15 +383,21 @@ class ActiveInstancesView extends StatelessWidget {
               shrinkWrap: true,
               itemCount: snapshot.data.documents.length,
               itemBuilder: (context, index) {
+
                 DocumentSnapshot document = snapshot.data.documents[index];
+                String instanceCode = document['instanceCode'];
+                String instanceId = document.documentID;
+                String instanceName = document['instanceName'];
+
                 DateTime docTime = document['date'] != null
                     ? document['date'].toDate()
                     : DateTime.now();
                 var timeAgo = timeago.format(docTime);
-                return CustomGridTile(
-                  instanceCode: document['instanceCode'],
-                  instanceId: document.documentID,
-                  instanceName: document['instanceName'],
+
+                return CustomCard(
+                  instanceCode: instanceCode,
+                  instanceId: instanceId,
+                  instanceName: instanceName,
                   instancePhoto: document['photoURL'] == null || document['photoURL'].isEmpty
                       ? '' : document['photoURL'][0],
                   date: timeAgo,
@@ -355,9 +405,9 @@ class ActiveInstancesView extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => InstancePage(
-                              instanceCode: document['instanceCode'],
-                              instanceId: document.documentID,
-                              instanceName: document['instanceName']))),
+                              instanceCode: instanceCode,
+                              instanceId: instanceId,
+                              instanceName: instanceName))),
                 );
               },
             );

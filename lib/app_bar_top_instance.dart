@@ -29,9 +29,11 @@ class InstanceAppBar extends StatelessWidget {
               return Text('Loading...');
             default:
               String host = snapshot.data['host'] ?? '';
-              List users = snapshot.data['users'];
+              List users = snapshot.data['userNames'];
+              int guests = snapshot.data['Guests'];
               bool active = snapshot.data['active'];
               bool hostCheck = (host == user.uid);
+
 
               return AppBar(
                 centerTitle: true,
@@ -49,8 +51,7 @@ class InstanceAppBar extends StatelessWidget {
                         )
                       : _buildGuestPopUpMenu(
                           description: snapshot.data['instanceDescription'],
-                          users: users,
-                          user: user)
+                          users: users, guests: guests)
                 ],
               );
           }
@@ -72,14 +73,15 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestPopUpMenu({String description, List users, FirebaseUser user}) {
+  Widget _buildGuestPopUpMenu({String description, List users, int guests FirebaseUser user}) {
+
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
         PopupMenuItem(
           child: GestureDetector(
               child: ListTile(title: Text('Users')),
               onTap: () => _showUsers(
-                  context: context, users: users)), // add list of users
+                  context: context, users: users, guests: guests)), // add list of users
         ),
         PopupMenuItem(
           child: GestureDetector(
@@ -396,12 +398,18 @@ class InstanceAppBar extends StatelessWidget {
   }
 
 
-  _showUsers({BuildContext context, List users}) {
+  _showUsers({BuildContext context, List users, int guests}) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-              title: Center(child: Text('Users In Here')),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text('Users'),
+                  Text('Guests: $guests',style: Theme.of(context).textTheme.subtitle,)
+                ],
+              ),
               content: Container(
                 height: 600,
                 width: 400,
@@ -410,7 +418,7 @@ class InstanceAppBar extends StatelessWidget {
                     itemCount: users.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return ListTile(title: Text(users[index]));
+                      return ListTile(title: Text(users == null ? 'Guest' : users[index]));
                     }),
               ));
         });
