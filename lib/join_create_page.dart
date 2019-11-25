@@ -51,12 +51,13 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
-    createDeviceDirectory();
     requestWritePermission();
+    createDeviceDirectory();
   }
 
   @override
   Widget build(BuildContext context) {
+//    PermissionHandler().openAppSettings();
 
     return DefaultTabController(
       length: 2,
@@ -81,9 +82,9 @@ class _NavBarState extends State<NavBar> {
   }
 
   requestWritePermission() async {
-    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-//    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-//    print('Permission: $permission');
+    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage, PermissionGroup.camera]);
+    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    print('Permission: $permission');
   }
   createDeviceDirectory()  {
     final dir = Directory('storage/emulated/0/ISSTH');

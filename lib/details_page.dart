@@ -81,9 +81,12 @@ class DetailsPage extends StatelessWidget {
                           }
                       ),
                     ),
-                    FlatButton(
-                      child: Icon(FontAwesomeIcons.download, color: Colors.white),
-                      onPressed: () => _downloadImage(imageName),
+                    Visibility(
+                      visible: !user.isAnonymous, //if user is not anonymous allow download.
+                      child: FlatButton(
+                        child: Icon(FontAwesomeIcons.download, color: Colors.white),
+                        onPressed: () => _downloadImage(imageName),
+                      ),
                     )
                   ],
                 ),
@@ -136,7 +139,7 @@ class DetailsPage extends StatelessWidget {
   }
 
   _downloadImage(String imageName) async {
-    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    var requestStoragePermission = await PermissionHandler().requestPermissions([PermissionGroup.storage]); //request allow write to external storage.
 
     var imageFile = await DefaultCacheManager().getSingleFile(imageUrl);
      Image.Image image = Image.decodeImage(imageFile.readAsBytesSync());

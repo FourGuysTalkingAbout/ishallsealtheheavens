@@ -35,7 +35,7 @@ class _InstancePageState extends State<InstancePage> {
 
   openCamera(String host) async {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
-    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    var requestCameraPermission = await PermissionHandler().requestPermissions([PermissionGroup.camera]); // request to use device camera
 
     //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
@@ -141,13 +141,16 @@ class _InstancePageState extends State<InstancePage> {
             ),
             floatingActionButton: Padding(
               padding: const EdgeInsets.only(bottom: 15.0),
-              child: IconButton(
-                icon: Icon(Icons.camera),
-                iconSize: 35.0,
-                //todo:should be better code to disable splash on button
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: () => openCamera(snapshot.data['host']),
+              child: Visibility(
+                visible: !user.isAnonymous, //if user is anon don't allow upload.
+                child: IconButton(
+                  icon: Icon(Icons.camera),
+                  iconSize: 35.0,
+                  //todo:should be better code to disable splash on button
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onPressed: () => openCamera(snapshot.data['host']),
+                ),
               ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
