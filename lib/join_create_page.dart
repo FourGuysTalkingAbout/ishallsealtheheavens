@@ -133,7 +133,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
                     buildCreateButton(user),
                     buildJoinButton(user),
                   ]),
-              Text(user.displayName?? ''),
               ActiveInstancesView(),
             ],
           ),

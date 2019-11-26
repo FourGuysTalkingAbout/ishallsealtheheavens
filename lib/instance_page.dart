@@ -152,7 +152,7 @@ class _InstancePageState extends State<InstancePage> {
                   highlightColor: Colors.transparent,
                   onPressed: () => openCamera(host),
                 ),
-              ),
+              )),
               floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             );
 

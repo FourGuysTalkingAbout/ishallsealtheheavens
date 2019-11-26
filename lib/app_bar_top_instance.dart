@@ -73,7 +73,7 @@ class InstanceAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestPopUpMenu({String description, List users, int guests FirebaseUser user}) {
+  Widget _buildGuestPopUpMenu({String description, List users, int guests, FirebaseUser user}) {
 
     return PopupMenuButton(
       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
