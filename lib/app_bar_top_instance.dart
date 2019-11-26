@@ -51,7 +51,7 @@ class InstanceAppBar extends StatelessWidget {
                         )
                       : _buildGuestPopUpMenu(
                           description: snapshot.data['instanceDescription'],
-                          users: users, guests: guests)
+                          users: users, guests: guests, user: user)
                 ],
               );
           }
@@ -373,7 +373,7 @@ class InstanceAppBar extends StatelessWidget {
               child: Text('Confirm'),
               onPressed: () async{
                 //removes user displayName from 'users' array in the instance.
-                await db.collection('instances').document(instanceID).updateData({'users': FieldValue.arrayRemove([user.displayName])});
+                await db.collection('instances').document(instanceID).updateData({'users': FieldValue.arrayRemove([user.uid])});
 
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }),
