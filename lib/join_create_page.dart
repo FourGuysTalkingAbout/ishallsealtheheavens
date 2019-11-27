@@ -125,8 +125,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
     List images = Directory(tempdir).listSync(recursive: true);
     print(images);
   }
-//  printImages();
-    print(user.uid);
+
     return Scaffold(
       backgroundColor: Colors.grey[400],
       body: SingleChildScrollView(

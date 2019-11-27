@@ -30,7 +30,8 @@ class InstanceAppBar extends StatelessWidget {
             default:
               String host = snapshot.data['host'] ?? '';
               List users = snapshot.data['userNames'];
-              int guests = snapshot.data['Guests'];
+              String description = snapshot.data['instanceDescription'];
+              int guests = snapshot.data['guests'];
               bool active = snapshot.data['active'];
               bool hostCheck = (host == user.uid);
 
@@ -43,14 +44,14 @@ class InstanceAppBar extends StatelessWidget {
                 actions: <Widget>[
                   hostCheck == true && active == true
                       ? _buildHostPopUpMenu(
-                          description: snapshot.data['instanceDescription'],
+                          description: description,
                           userLimit: snapshot.data['userLimit'].toString(),
                           instanceName: snapshot.data['instanceName'],
                           instanceCode: snapshot.data['instanceCode'],
-                          users: users,
+                          users: users, guests: guests,context: context
                         )
                       : _buildGuestPopUpMenu(
-                          description: snapshot.data['instanceDescription'],
+                          description: description,
                           users: users, guests: guests, user: user)
                 ],
               );
@@ -86,7 +87,7 @@ class InstanceAppBar extends StatelessWidget {
         PopupMenuItem(
           child: GestureDetector(
             child: ListTile(title: Text('Description')),
-            onTap: () => _readDescription(context, description ?? ''),
+            onTap: () => _readDescription(context, description?? ''),
           ),
         ),
         PopupMenuItem(
@@ -102,24 +103,27 @@ class InstanceAppBar extends StatelessWidget {
 
   Widget _buildHostPopUpMenu(
       {String description,
+        BuildContext context,
       String userLimit,
       List users,
+        int guests,
       String instanceName,
       String instanceCode}) {
 
     return PopupMenuButton(
         icon: Icon(FontAwesomeIcons.edit),
         elevation: 23.0,
-        itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+        itemBuilder: (BuildContext popupContext) => <PopupMenuEntry>[
               PopupMenuItem(
                 child: GestureDetector(
                   child: ListTile(
                       contentPadding: EdgeInsets.only(right: 0.0),
                       leading: Text('Name:'),
                       title: Text('$instanceName',
-                          style: Theme.of(context).textTheme.title)),
-                  onTap: () {
+                          style: Theme.of(popupContext).textTheme.title)),
+                  onTap: () async {
                     _changeName(context, instanceName)
+//                    whenComplete(() => Navigator.pop(context));
                         .then((val) => Navigator.pop(context));
 
                   },
@@ -161,7 +165,7 @@ class InstanceAppBar extends StatelessWidget {
                 child: GestureDetector(
                     child: ListTile(title: Text('Users')),
                     onTap: () {
-                      _showUsers(context: context, users: users);
+                      _showUsers(context: context, users: users, guests: guests);
 //                  );
                     }), // add list of users
               ),
@@ -173,8 +177,8 @@ class InstanceAppBar extends StatelessWidget {
                     contentPadding: EdgeInsets.only(right: 0.0),
                   ),
                   onTap: () {
-                    _changeLimitUsers(context, userLimit)
-                        .then((val) => Navigator.pop(context));
+                    _changeLimitUsers(context, userLimit);
+//                        .then((val) => Navigator.pop(context));
                   },
                 ),
               ),
@@ -316,6 +320,7 @@ class InstanceAppBar extends StatelessWidget {
                     .collection('instances')
                     .document(instanceID)
                     .updateData({'instanceName': instanceNameController.text});
+                instanceNameController.clear();
                 Navigator.of(context).pop();
               },
             ),
