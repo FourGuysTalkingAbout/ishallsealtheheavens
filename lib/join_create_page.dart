@@ -116,17 +116,7 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
-
-  printImages() async {
-    var tempdir = (await getTemporaryDirectory()).path;
-//
-//    Directory(tempdir).deleteSync(recursive: true);
-//
-    List images = Directory(tempdir).listSync(recursive: true);
-    print(images);
-  }
-//  printImages();
-    print(user.uid);
+    
     return Scaffold(
       backgroundColor: Colors.grey[400],
       body: SingleChildScrollView(
