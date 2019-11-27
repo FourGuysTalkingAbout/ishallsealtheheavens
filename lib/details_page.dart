@@ -43,7 +43,6 @@ class DetailsPage extends StatelessWidget {
 
 
             return Scaffold(
-//              endDrawer: detailsDrawer(),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
               floatingActionButton: Builder(

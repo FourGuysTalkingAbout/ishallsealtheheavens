@@ -14,9 +14,7 @@ import 'logic/login_authProvider.dart';
 import 'app_bar_top_instance.dart';
 import 'user_account_drawer.dart';
 import 'details_page.dart';
-import 'save_files.dart';
 
-final saveFile = SaveFile();
 final userRepository = UserRepository.instance();
 
 class InstancePage extends StatefulWidget {
@@ -37,14 +35,12 @@ class _InstancePageState extends State<InstancePage> {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     var requestCameraPermission = await PermissionHandler().requestPermissions([PermissionGroup.camera]); // request to use device camera
 
-    //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
     final formatter = DateFormat.MMMMEEEEd().add_Hm().add_s();
     final currentDate = formatter.format(now);
 
     File imageFile = await ImagePicker.pickImage(
-      //TODO Find proper resolution of pictures
-        source: ImageSource.camera,imageQuality: 100); //returns a File after picture is taken
+        source: ImageSource.camera, imageQuality: 100); //returns a File after picture is taken
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
       'instanceName': widget.instanceName,
@@ -147,7 +143,6 @@ class _InstancePageState extends State<InstancePage> {
                 child: IconButton(
                   icon: Icon(Icons.camera),
                   iconSize: 35.0,
-                  //todo:should be better code to disable splash on button
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onPressed: () => openCamera(host),

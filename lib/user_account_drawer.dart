@@ -20,7 +20,6 @@ class UserAccountDrawer extends StatelessWidget {
       return Drawer(
         child: ListView(
           children: <Widget>[
-            //TODO:Made it look like the Figma Design, don't know if it's worth all the extra widgets.
             //TODO: Figure out if more options are needed or not.
             DrawerHeader(
               margin: EdgeInsets.all(0.0),
