@@ -51,7 +51,6 @@ class _DetailsPageState extends State<DetailsPage> {
             String host = storageMetadata.customMetadata['host'];
 
             return Scaffold(
-//              endDrawer: detailsDrawer(),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
               floatingActionButton: Visibility(

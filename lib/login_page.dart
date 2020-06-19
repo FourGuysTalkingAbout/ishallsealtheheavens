@@ -97,7 +97,6 @@ class LoginButtonContainer extends Container {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       width: 213,

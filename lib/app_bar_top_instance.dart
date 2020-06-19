@@ -137,8 +137,6 @@ class InstanceAppBar extends StatelessWidget {
                   child: ListTile(
                     contentPadding: EdgeInsets.only(left: 0.0),
                     leading: Text('Entrance Code:'),
-                    //TODO:FUTURE create a onpressed that allows to edit 'entranceCode?
-                    //TODO:make the 'entranceCode' bigger font
                     title: Text(instanceCode,
                         style: Theme.of(context).textTheme.title),
                   ),
@@ -149,7 +147,6 @@ class InstanceAppBar extends StatelessWidget {
               PopupMenuItem(
                 child: GestureDetector(
                   child: ListTile(
-                    //TODO:create a dialog that is allows writing descriptions of instance
                     title: Text('Description'),
                     contentPadding: EdgeInsets.only(right: 0.0),
                   ),
@@ -194,7 +191,6 @@ class InstanceAppBar extends StatelessWidget {
               PopupMenuDivider(),
 //
               PopupMenuItem(
-                //TODO: Future set location of instance
                 child: GestureDetector(
                     child: ListTile(
                       leading: Icon(FontAwesomeIcons.checkSquare),

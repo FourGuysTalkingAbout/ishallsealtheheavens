@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ishallsealtheheavens/gallery_page.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:random_string/random_string.dart' as prefix0;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -88,8 +87,7 @@ class _NavBarState extends State<NavBar> {
 //    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
     print('Permission: $permissions');
   }
-  createDeviceDirectory()  async {
-
+  createDeviceDirectory()  {
     final dir = Directory('storage/emulated/0/ISSTH');
     dir.exists().then((isThere) {
       if(isThere) {
@@ -116,16 +114,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
-
-  printImages() async {
-    var tempdir = (await getTemporaryDirectory()).path;
-//
-//    Directory(tempdir).deleteSync(recursive: true);
-//
-    List images = Directory(tempdir).listSync(recursive: true);
-    print(images);
-  }
-
     return Scaffold(
       backgroundColor: Colors.grey[400],
       body: SingleChildScrollView(
@@ -134,7 +122,6 @@ class _JoinCreatePageState extends State<JoinCreatePage> {
           child: Column(
             children: <Widget>[
               InstanceNameTextFormField(
-                  //todo: remove text after join/create button pressed.
                   instanceNameController: _instanceNameController),
                 user.isAnonymous ? Center(child: buildJoinButton(user)):
                 Row(

@@ -290,7 +290,6 @@ class GallerySecondAppBar extends StatelessWidget {
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
                 child: ListTile(
-                    //TODO:create a onpressed that views taken and saved separately
                     contentPadding: EdgeInsets.only(right: 0.0),
                     title: Text(
                       'Taken/Saved',
@@ -300,7 +299,6 @@ class GallerySecondAppBar extends StatelessWidget {
               PopupMenuDivider(),
               PopupMenuItem(
                 child: ListTile(
-                  //TODO:create a onpressed that allows view all chronologically
                   title: Text(
                     'All',
                     textScaleFactor: 1.2,
