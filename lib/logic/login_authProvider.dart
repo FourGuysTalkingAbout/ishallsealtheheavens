@@ -105,7 +105,7 @@ class UserRepository with ChangeNotifier {
       notifyListeners();
 
       final FacebookLoginResult fbLoginResult = await _facebookLogin
-          .logInWithReadPermissions(['email', 'public_profile']);
+          .logIn(['email', 'public_profile']);
       FacebookAccessToken fbToken = fbLoginResult.accessToken;
 
       final AuthCredential fbCredential =

@@ -35,7 +35,8 @@ class CustomCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.black,
                     image: DecorationImage(
-                      image: CachedNetworkImageProvider(instancePhoto,targetWidth: 262, targetHeight: 217)
+                      fit: BoxFit.cover,
+                      image: CachedNetworkImageProvider(instancePhoto)
                     )
                   ),
                   ),

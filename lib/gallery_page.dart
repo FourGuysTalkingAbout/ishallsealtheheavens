@@ -12,7 +12,7 @@ import 'logic/login_authProvider.dart';
 import 'local_device_details_page.dart';
 import 'details_page.dart';
 
-final PermissionHandler _permissionHandler = PermissionHandler();
+//final PermissionHandler _permissionHandler = PermissionHandler();
 
 class Gallery extends StatefulWidget {
   @override
@@ -58,6 +58,7 @@ class _GalleryState extends State<Gallery> {
                   default:
                     return Container(
                         height: 200,
+                        padding: EdgeInsets.all(8.0),
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             key: PageStorageKey<String>(
@@ -65,7 +66,6 @@ class _GalleryState extends State<Gallery> {
                             itemCount: snapshot.data['userImages'] != null
                                 ? snapshot.data['userImages'].length
                                 : 0,
-                            padding: EdgeInsets.all(8.0),
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 child: Container(
@@ -128,7 +128,7 @@ class _GalleryState extends State<Gallery> {
         Container(
             padding: EdgeInsets.all(24.0),
             child:
-                Text('Saved Photos', style: Theme.of(context).textTheme.title)),
+                Text('Saved Photos', style: Theme.of(context).textTheme.headline6)),
         FutureBuilder(
           future: listDeviceImages(),
           builder: (context, snapshot) {
@@ -141,8 +141,9 @@ class _GalleryState extends State<Gallery> {
               default:
                 return Container(
                   height: 200,
+                  padding: EdgeInsets.all(8.0),
                   child: ListView.builder(
-                      key: PageStorageKey<String>('Preseves scroll position'),
+                      key: PageStorageKey<String>('Preserves scroll position'),
                       itemCount: snapshot.data.length ?? 0,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
@@ -178,9 +179,10 @@ class _GalleryState extends State<Gallery> {
 class AllPhotosList extends StatelessWidget {
 
   getUserImages(FirebaseUser user) async  {
-    var result = await _permissionHandler.requestPermissions([PermissionGroup.storage]);
+    var result = await Permission.storage.request();
+//    var result = await _permissionHandler.requestPermissions([Permission.storage]);
 
-  if(result[PermissionGroup.storage] == PermissionStatus.granted) {
+  if (result == PermissionStatus.granted) {
     List allImages = []; // create empty list
 
     Directory externalDirectory = Directory('storage/emulated/0/ISSTH'); //
@@ -197,8 +199,9 @@ class AllPhotosList extends StatelessWidget {
   }
 
   checkPermissions() async {
-    PermissionStatus permission =  await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    print(permission);
+
+    PermissionStatus permission =  await Permission.storage.status;
+//    print(permission);
   return permission;
   }
 
@@ -206,46 +209,49 @@ class AllPhotosList extends StatelessWidget {
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<UserRepository>(context).user;
 
-    return FutureBuilder(
-      future: getUserImages(user),
-      builder: (context, snapshot) {
-        if(snapshot.hasError) return Text('Error: ${snapshot.error}');
-        if(checkPermissions() == PermissionStatus.denied) return Center(child: FlatButton(child: Text('Allow')));
-        switch(snapshot.connectionState) {
-          case ConnectionState.waiting: return Text('Loading...');
-          default:return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, mainAxisSpacing: 2.0),
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: Card(
-                    elevation: 5.0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 14.0),
-                      child: snapshot.data[index] is File ? Image.file(snapshot.data[index], fit: BoxFit.fill) :
-                      CachedNetworkImage(
-                          imageUrl: snapshot.data[index],
-                          placeholder: (context, url) => CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                          fit: BoxFit.fill),
+    return Container(
+      color: Colors.grey[200],
+      child: FutureBuilder(
+        future: getUserImages(user),
+        builder: (context, snapshot) {
+          if(snapshot.hasError) return Text('Error: ${snapshot.error}');
+          if(checkPermissions() == PermissionStatus.denied) return Center(child: FlatButton(child: Text('Allow')));
+          switch(snapshot.connectionState) {
+            case ConnectionState.waiting: return Text('Loading...');
+            default:return GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, mainAxisSpacing: 2.0),
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    child: Card(
+                      elevation: 5.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14.0),
+                        child: snapshot.data[index] is File ? Image.file(snapshot.data[index], fit: BoxFit.fill) :
+                        CachedNetworkImage(
+                            imageUrl: snapshot.data[index],
+                            placeholder: (context, url) => CircularProgressIndicator(),
+                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            fit: BoxFit.fill),
+                      ),
                     ),
-                  ),
-                  onTap: () =>
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => snapshot.data[index] is File ? DeviceImage(file: snapshot.data[index]) :DetailsPage(
-                                id: snapshot.data[index]
-                                [index],
-                                imageUrl: snapshot
-                                    .data[index],
-                              ))),
+                    onTap: () =>
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => snapshot.data[index] is File ? DeviceImage(file: snapshot.data[index]) :DetailsPage(
+                                  id: snapshot.data[index]
+                                  [index],
+                                  imageUrl: snapshot
+                                      .data[index],
+                                ))),
 
-                );
-              });
+                  );
+                });
+          }
         }
-      }
+      ),
     );
   }
 }

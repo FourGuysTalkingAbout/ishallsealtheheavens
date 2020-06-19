@@ -58,7 +58,7 @@ flutter {
 
 dependencies {
     implementation 'com.facebook.android:facebook-login:[5,6)'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-core:17.4.3'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

@@ -15,15 +15,24 @@ import 'package:flushbar/flushbar.dart';
 
 import 'logic/login_authProvider.dart';
 
-class DetailsPage extends StatelessWidget {
+class DetailsPage extends StatefulWidget {
   final String imageUrl;
   final String id;
   final String docID;
 
+
   DetailsPage({this.imageUrl, this.id, this.docID});
 
   @override
+  _DetailsPageState createState() => _DetailsPageState();
+}
+
+class _DetailsPageState extends State<DetailsPage> {
+  bool visible = false;
+
+  @override
   Widget build(BuildContext context) {
+
     FirebaseUser user = Provider.of<UserRepository>(context).user;
     return FutureBuilder(
         future: getMetaData(),
@@ -31,71 +40,86 @@ class DetailsPage extends StatelessWidget {
           if (snapshot.data == null) {
             return Container();
           } else {
-
             StorageMetadata storageMetadata = snapshot.data;
             String when = timeago.format(DateTime.fromMillisecondsSinceEpoch(
                     storageMetadata.creationTimeMillis)
                 .toLocal());
             String imageName = storageMetadata.name;
             String name = storageMetadata.customMetadata['author'];
-            String instanceName = storageMetadata.customMetadata['instanceName'];
+            String instanceName =
+                storageMetadata.customMetadata['instanceName'];
             String host = storageMetadata.customMetadata['host'];
-
 
             return Scaffold(
 //              endDrawer: detailsDrawer(),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
-              floatingActionButton: Builder(
-                builder: (context) => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    FlatButton(
-                        child: Icon(
-                          Icons.info,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Flushbar(
-                            backgroundColor: Colors.deepPurple,
-                            messageText: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text('From $instanceName',
-                                    style: TextStyle(color: Colors.white)),
-                                Text('$when',
-                                    style: TextStyle(color: Colors.white))
-                              ],
-                            ),
-                            duration: Duration(seconds: 2),
-                          )..show(context);
-                        }),
-                    Visibility(
-                      visible: name == user.displayName || host == user.uid, // if user took photo then show delete button
-                      child: FlatButton(
-                          child: Icon(FontAwesomeIcons.trash,color: Colors.white,),
+              floatingActionButton: Visibility(
+                visible: visible,
+                child: Builder(
+                  builder: (context) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      FlatButton(
+                          child: Icon(
+                            Icons.info,
+                            color: Colors.white,
+                          ),
                           onPressed: () {
-                            deleteInsideInstance(docID, user.uid);
-                            deleteImageFromGallery(user.uid);
-                            Navigator.pop(context);
-                          }
+                            Flushbar(
+                              backgroundColor: Colors.deepPurple,
+                              messageText: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text('From $instanceName',
+                                      style: TextStyle(color: Colors.white)),
+                                  Text('$when',
+                                      style: TextStyle(color: Colors.white))
+                                ],
+                              ),
+                              duration: Duration(seconds: 2),
+                            )..show(context);
+                          }),
+                      Visibility(
+                        visible: name == user.displayName ||
+                            host ==
+                                user.uid, // if user took photo then show delete button
+                        child: FlatButton(
+                            child: Icon(
+                              FontAwesomeIcons.trash,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              deleteInsideInstance(widget.docID, user.uid);
+                              deleteImageFromGallery(user.uid);
+                              Navigator.pop(context);
+                            }),
                       ),
-                    ),
-                    Visibility(
-                      visible: !user.isAnonymous, //if user is not anonymous allow download.
-                      child: FlatButton(
-                        child: Icon(FontAwesomeIcons.download, color: Colors.white),
-                        onPressed: () => _downloadImage(imageName),
-                      ),
-                    )
-                  ],
+                      Visibility(
+                        visible: !user
+                            .isAnonymous, //if user is not anonymous allow download.
+                        child: FlatButton(
+                          child: Icon(FontAwesomeIcons.download,
+                              color: Colors.white),
+                          onPressed: () => _downloadImage(imageName),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
               body: GestureDetector(
+                //Pop back to page on vertical dragdown
+                onVerticalDragUpdate: (details) {
+                  if (details.primaryDelta > 3.5) {
+                    Navigator.pop(context);
+                  }
+                },
                 child: Hero(
-                  tag: id,
+                  tag: widget.id,
                   child: CachedNetworkImage(
-                    imageUrl: imageUrl,
+                    imageUrl: widget.imageUrl,
                     fit: BoxFit.fill, //TODO:might have to fix test needed
                     height: MediaQuery.of(context)
                         .size
@@ -106,7 +130,10 @@ class DetailsPage extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                  setState(() {
+                    visible = !visible;
+                  });
+
                 },
               ),
             );
@@ -115,7 +142,8 @@ class DetailsPage extends StatelessWidget {
   }
 
   getMetaData() async {
-    StorageReference storageRef = await FirebaseStorage.instance.getReferenceFromUrl(imageUrl);
+    StorageReference storageRef =
+        await FirebaseStorage.instance.getReferenceFromUrl(widget.imageUrl);
     String imageName = await storageRef.getName();
     StorageMetadata storageMetadata = await FirebaseStorage.instance
         .ref()
@@ -139,33 +167,40 @@ class DetailsPage extends StatelessWidget {
   }
 
   _downloadImage(String imageName) async {
-    var requestStoragePermission = await PermissionHandler().requestPermissions([PermissionGroup.storage]); //request allow write to external storage.
+//    var requestStoragePermission = await PermissionHandler().requestPermissions([PermissionGroup.storage]); //request allow write to external storage.
 
-    var imageFile = await DefaultCacheManager().getSingleFile(imageUrl);
-     Image.Image image = Image.decodeImage(imageFile.readAsBytesSync());
-     Image.Image thumbnail = Image.copyResize(image, width: 200, height: 200); //find use for it instead of downloading the full image download small scale
-    bool checkIfExists = await File('storage/emulated/0/ISSTH/$imageName').exists();
-    File savedImage = File('storage/emulated/0/ISSTH/$imageName')..writeAsBytesSync(Image.encodeJpg(image));
+    var imageFile = await DefaultCacheManager().getSingleFile(widget.imageUrl);
+    Image.Image image = Image.decodeImage(imageFile.readAsBytesSync());
+    Image.Image thumbnail = Image.copyResize(image,
+        width: 200,
+        height:
+            200); //find use for it instead of downloading the full image download small scale
+    bool checkIfExists =
+        await File('storage/emulated/0/ISSTH/$imageName').exists();
+    File savedImage = File('storage/emulated/0/ISSTH/$imageName')
+      ..writeAsBytesSync(Image.encodeJpg(image));
 
-    if(checkIfExists) {
+    if (checkIfExists) {
       print('already saved');
       return null;
-    } else  {
+    } else {
       print('Saving.');
       return savedImage;
     }
   }
 
-  // find way to access
-  deleteInsideInstance(String docID, String user) async { //
-    StorageReference storageRef = await FirebaseStorage.instance.getReferenceFromUrl(imageUrl); // references Image to FirebaseStorage
+  deleteInsideInstance(String docID, String user) async {
+    //
+    StorageReference storageRef = await FirebaseStorage.instance
+        .getReferenceFromUrl(widget.imageUrl); // references Image to FirebaseStorage
 
     final DocumentReference instRef = db.document('instances/$docID');
     final DocumentReference userRef = db.document('users/$user');
 
     db.runTransaction((Transaction tx) async {
-       await tx.update(instRef,  {'photoURL': FieldValue.arrayRemove([imageUrl])}); //removes from instance collection
-
+      await tx.update(instRef, {
+        'photoURL': FieldValue.arrayRemove([widget.imageUrl])
+      }); //removes from instance collection
     });
 //    storageRef.delete(); // will delete the Image from Firebase Storage. No longer exists
   }
@@ -174,7 +209,9 @@ class DetailsPage extends StatelessWidget {
     final DocumentReference userRef = db.document('users/$user');
 
     db.runTransaction((Transaction tx) async {
-      await tx.update(userRef,  {'userImages': FieldValue.arrayRemove([imageUrl])}); //removes from user collection but not instance
+      await tx.update(userRef, {
+        'userImages': FieldValue.arrayRemove([widget.imageUrl])
+      }); //removes from user collection but not instance
     });
   }
 }

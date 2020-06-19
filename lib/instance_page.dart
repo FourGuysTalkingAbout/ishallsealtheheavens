@@ -1,11 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -33,19 +33,20 @@ class InstancePage extends StatefulWidget {
 }
 
 class _InstancePageState extends State<InstancePage> {
-
+  final picker = ImagePicker();
   openCamera(String host) async {
-    FirebaseUser user = Provider.of<UserRepository>(context).user;
-    var requestCameraPermission = await PermissionHandler().requestPermissions([PermissionGroup.camera]); // request to use device camera
+    FirebaseUser user = Provider.of<UserRepository>(context, listen: false).user;
+    var requestCameraPermission = await Permission.camera.request(); // request to use device camera
 
     //TODO: implement a better naming convention for the 'imageName'
     final now = DateTime.now().toLocal();
     final formatter = DateFormat.MMMMEEEEd().add_Hm().add_s();
     final currentDate = formatter.format(now);
 
-    File imageFile = await ImagePicker.pickImage(
+
+    final imageFile = await picker.getImage(
       //TODO Find proper resolution of pictures
-        source: ImageSource.camera,imageQuality: 100); //returns a File after picture is taken
+        source: ImageSource.camera, imageQuality: 100); //returns a File after picture is taken
     StorageMetadata metaData = StorageMetadata(customMetadata: <String, String>{
       'author': user.displayName,
       'instanceName': widget.instanceName,
@@ -56,9 +57,8 @@ class _InstancePageState extends State<InstancePage> {
         .ref()
         .child('images')
         .child('$currentDate.jpg');
-
     final StorageUploadTask uploadTask = storageRef.putFile(
-        imageFile, metaData); // uploads file into Firebase Storage
+        File(imageFile.path), metaData); // uploads file into Firebase Storage
 //    saveFile.writeFile(imageFile.readAsStringSync());
 
     final StorageTaskSnapshot taskSnapshot = await uploadTask
@@ -85,7 +85,7 @@ class _InstancePageState extends State<InstancePage> {
   }
 
   saveAsUserImage(String url) {
-    FirebaseUser user = Provider.of<UserRepository>(context).user;
+    FirebaseUser user = Provider.of<UserRepository>(context, listen: false).user;
 
     final DocumentReference postRef = db.document('users/${user.uid}');
     db.runTransaction((Transaction tx) async {
@@ -199,21 +199,25 @@ class PhotoGridView extends StatelessWidget {
                         tag: snapshot.data[index],
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 14.0),
-                          child: CachedNetworkImage(imageUrl: snapshot.data[index],
-                            placeholder: (context, url) => CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
+                          child: CachedNetworkImage(imageUrl: snapshot
+                              .data[index],
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                               fit: BoxFit.fill),
                         )),
                   ),
                   onTap: () =>
                       Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailsPage(
-                                id: snapshot.data[index],
-                                imageUrl: snapshot.data[index],
-                                docID: docId,
-                              ))),
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailsPage(
+                                    id: snapshot.data[index],
+                                    imageUrl: snapshot.data[index],
+                                    docID: docId,
+                                  ))),
 
                 );
               });
@@ -222,8 +226,12 @@ class PhotoGridView extends StatelessWidget {
     );
   }
 
+
   _deleteImage(String name) {
-    db.collection('instances').document(docId).updateData({'photoURL': FieldValue.arrayRemove([name])});
+    db.collection('instances').document(docId).updateData(
+        {'photoURL': FieldValue.arrayRemove([name])});
     print('I PRESSED IT');
   }
 }
+
+

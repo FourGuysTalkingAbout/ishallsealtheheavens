@@ -15,11 +15,18 @@ class DeviceImage extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-          child: Image.file(file,
-            fit: isPortrait ? BoxFit.cover : BoxFit.fill,
+        child: GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if(details.primaryDelta > 3.5) {
+              Navigator.pop(context);
+            }
+          },
+          child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+            child: Image.file(file,
+              fit: isPortrait ? BoxFit.cover : BoxFit.fill,
+            ),
           ),
         ),
       ),

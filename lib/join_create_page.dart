@@ -84,9 +84,9 @@ class _NavBarState extends State<NavBar> {
   }
 
   requestWritePermission() async {
-    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage, PermissionGroup.camera]);
-    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    print('Permission: $permission');
+    Map<Permission, PermissionStatus> permissions = await [Permission.storage, Permission.camera].request();
+//    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    print('Permission: $permissions');
   }
   createDeviceDirectory()  async {
 
